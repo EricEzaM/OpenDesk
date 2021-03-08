@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenDesk.API.Models;
+using OpenDesk.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,14 +23,12 @@ namespace OpenDesk.API.Controllers
 		private const string MicrosoftAuthName = "Microsoft";
 
 		private readonly HttpClient httpClient;
-		private readonly UserManager<IdentityUser> userManager;
-		private readonly IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory;
+		private readonly IIdentityService identityService;
 
-		public AuthController(HttpClient httpClient, UserManager<IdentityUser> userManager, IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory)
+		public AuthController(HttpClient httpClient, IIdentityService identityService)
 		{
 			this.httpClient = httpClient;
-			this.userManager = userManager;
-			this.userClaimsPrincipalFactory = userClaimsPrincipalFactory;
+			this.identityService = identityService;
 		}
 
 		[HttpPost(MicrosoftAuthName)]
@@ -72,17 +71,36 @@ namespace OpenDesk.API.Controllers
 			// Can use custom tenant filtering logic here
 			// << Tenant Filtering Logic here >>
 
-			var user = await userManager.FindByLoginAsync(MicrosoftAuthName, idToken.Subject);
+			var (result, userId) = await identityService.GetUserIdAsync(MicrosoftAuthName, idToken.Subject);
 
-			if (user == null)
+			if (result.Succeeded == false)
 			{
-				user = new IdentityUser(idToken.Claims.FirstOrDefault(c => c.Type == "email").Value);
-				await userManager.CreateAsync(user);
-				await userManager.AddLoginAsync(user, new UserLoginInfo(MicrosoftAuthName, idToken.Subject, MicrosoftAuthName));
+				// No user yet, so create one
+				var username = idToken.Claims.FirstOrDefault(c => c.Type == "email").Value;
+				(result, userId) = await identityService.CreateUserAsync(username);
+
+				if (result.Succeeded)
+				{
+					// Creation Success, add external login info
+					result = await identityService.AddUserLoginAsync(userId, MicrosoftAuthName, idToken.Subject, MicrosoftAuthName);
+
+					if (result.Succeeded == false)
+					{
+						return BadRequest("Could not add external login information to user.");
+					}
+				}
+				else
+				{
+					return BadRequest($"Could not create user with username '{username}'");
+				}
 			}
 
-			var cp = await userClaimsPrincipalFactory.CreateAsync(user);
-			await HttpContext.SignInAsync(cp);
+			var (cpResult, cp) = await identityService.GetUserClaimsPrincipal(userId);
+
+			if (cpResult.Succeeded)
+			{
+				await HttpContext.SignInAsync(cp);
+			}
 
 			return NoContent();
 		}
