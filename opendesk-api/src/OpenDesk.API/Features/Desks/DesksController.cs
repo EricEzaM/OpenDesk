@@ -20,13 +20,13 @@ namespace OpenDesk.API.Features.Desks
 		[HttpGet("{officeId}/desks")]
 		public async Task<IActionResult> Get(string officeId)
 		{
-			var result = await _mediator.Send(new GetDesks.Command(officeId));
+			var result = await _mediator.Send(new GetDesksCommand(officeId));
 
 			return Ok(result);
 		}
 
 		[HttpPost("{officeId}/desks")]
-		public async Task<IActionResult> Create(string officeId, [FromBody]CreateDesk.Command command)
+		public async Task<IActionResult> Create(string officeId, [FromBody]CreateDeskCommand command)
 		{
 			command.OfficeId = officeId;
 

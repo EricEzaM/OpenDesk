@@ -10,41 +10,38 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Desks
 {
-	public class GetDesks
+	public class GetDesksCommand : IRequest<IEnumerable<DeskDTO>>
 	{
-		public class Command : IRequest<IEnumerable<DeskDTO>> 
+		public GetDesksCommand(string officeId)
 		{
-			public Command(string officeId)
-			{
-				OfficeId = officeId;
-			}
-
-			public string OfficeId { get; set; }
+			OfficeId = officeId;
 		}
 
-		public class Handler : IRequestHandler<Command, IEnumerable<DeskDTO>>
+		public string OfficeId { get; set; }
+	}
+
+	public class GetDesksHandler : IRequestHandler<GetDesksCommand, IEnumerable<DeskDTO>>
+	{
+		private readonly OpenDeskDbContext _db;
+
+		public GetDesksHandler(OpenDeskDbContext db)
 		{
-			private readonly OpenDeskDbContext _db;
+			_db = db;
+		}
 
-			public Handler(OpenDeskDbContext db)
-			{
-				_db = db;
-			}
-
-			public async Task<IEnumerable<DeskDTO>> Handle(Command request, CancellationToken cancellationToken)
-			{
-				return await _db
-					.Desks
-					.Where(d => d.Office.Id == request.OfficeId)
-					.Select(d => new DeskDTO
-					{
-						Id = d.Id,
-						Name = d.Name,
-						DiagramPosition = d.DiagramPosition
-					})
-					.AsNoTracking() // As No Tracking so that EF does not complain about Diagram Position not having an owner.
-					.ToListAsync();
-			}
+		public async Task<IEnumerable<DeskDTO>> Handle(GetDesksCommand request, CancellationToken cancellationToken)
+		{
+			return await _db
+				.Desks
+				.Where(d => d.Office.Id == request.OfficeId)
+				.Select(d => new DeskDTO
+				{
+					Id = d.Id,
+					Name = d.Name,
+					DiagramPosition = d.DiagramPosition
+				})
+				.AsNoTracking() // As No Tracking so that EF does not complain about Diagram Position not having an owner.
+				.ToListAsync();
 		}
 	}
 }

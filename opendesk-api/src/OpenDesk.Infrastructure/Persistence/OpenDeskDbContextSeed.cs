@@ -1,4 +1,5 @@
-﻿using OpenDesk.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using OpenDesk.Domain.Entities;
 using OpenDesk.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,22 @@ namespace OpenDesk.Infrastructure.Persistence
 					new Desk()
 					{
 						Name = "Desk 1",
-						DiagramPosition = new DiagramPosition(10, 10)
+						DiagramPosition = new DiagramPosition(10, 10),
+						Bookings = new List<Booking>()
+						{
+							new Booking()
+							{
+								UserId = "SomeId",
+								StartDateTime = DateTimeOffset.Now.AddDays(1).AddHours(-3),
+								EndDateTime = DateTimeOffset.Now.AddDays(1).AddHours(2)
+							},
+							new Booking()
+							{
+								UserId = "SomeId2",
+								StartDateTime = DateTimeOffset.Now.AddDays(1).AddHours(3),
+								EndDateTime = DateTimeOffset.Now.AddDays(1).AddHours(5)
+							}
+						}
 					},
 					new Desk()
 					{

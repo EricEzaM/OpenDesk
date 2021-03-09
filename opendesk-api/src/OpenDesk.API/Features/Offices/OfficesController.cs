@@ -20,7 +20,7 @@ namespace OpenDesk.API.Features.Office
 		[HttpGet]
 		public async Task<IActionResult> Get()
 		{
-			var result = await _mediator.Send(new GetOffices.Command());
+			var result = await _mediator.Send(new GetOfficesCommand());
 
 			return Ok(result);
 		}

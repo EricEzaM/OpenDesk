@@ -11,30 +11,26 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Office
 {
-	public class GetOffices
+	public class GetOfficesCommand : IRequest<IEnumerable<OfficeDTO>> { }
+
+	public class GetOfficesHandler : IRequestHandler<GetOfficesCommand, IEnumerable<OfficeDTO>>
 	{
-		public class Command : IRequest<IEnumerable<OfficeDTO>> { }
+		private readonly OpenDeskDbContext _db;
 
-		public class Handler : IRequestHandler<Command, IEnumerable<OfficeDTO>>
+		public GetOfficesHandler(OpenDeskDbContext db)
 		{
-			private readonly OpenDeskDbContext _db;
+			_db = db;
+		}
 
-			public Handler(OpenDeskDbContext db)
-			{
-				_db = db;
-			}
-
-			public async Task<IEnumerable<OfficeDTO>> Handle(Command request, CancellationToken cancellationToken)
-			{
-				return await _db.Offices
-					.Select(ol => new OfficeDTO
-					{
-						Id = ol.Id,
-						Name = ol.Name
-					})
-					.ToListAsync();
-			}
+		public async Task<IEnumerable<OfficeDTO>> Handle(GetOfficesCommand request, CancellationToken cancellationToken)
+		{
+			return await _db.Offices
+				.Select(ol => new OfficeDTO
+				{
+					Id = ol.Id,
+					Name = ol.Name
+				})
+				.ToListAsync();
 		}
 	}
-
 }

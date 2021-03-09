@@ -12,56 +12,53 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Desks
 {
-	public class CreateDesk
+	public class CreateDeskCommand : IRequest<DeskDTO>
 	{
-		public class Command : IRequest<DeskDTO>
+		public string Name { get; set; }
+		public DiagramPosition DiagramPosition { get; set; }
+		public string OfficeId { get; set; }
+	}
+
+	public class CreateDeskHandler : IRequestHandler<CreateDeskCommand, DeskDTO>
+	{
+		private readonly OpenDeskDbContext _db;
+
+		public CreateDeskHandler(OpenDeskDbContext db)
 		{
-			public string Name { get; set; }
-			public DiagramPosition DiagramPosition { get; set; }
-			public string OfficeId { get; set; }
+			_db = db;
 		}
 
-		public class Handler : IRequestHandler<Command, DeskDTO>
+		public async Task<DeskDTO> Handle(CreateDeskCommand request, CancellationToken cancellationToken)
 		{
-			private readonly OpenDeskDbContext _db;
+			var office = await _db
+				.Offices
+				.Include(o => o.Desks)
+				.FirstOrDefaultAsync(o => o.Id == request.OfficeId);
 
-			public Handler(OpenDeskDbContext db)
+			if (office == null)
 			{
-				_db = db;
+				// TODO Better error handling?
+				throw new Exception("office not found");
 			}
 
-			public async Task<DeskDTO> Handle(Command request, CancellationToken cancellationToken)
+			var desk = new Desk()
 			{
-				var office = await _db
-					.Offices
-					.Include(o => o.Desks)
-					.FirstOrDefaultAsync(o => o.Id == request.OfficeId);
+				Name = request.Name,
+				DiagramPosition = request.DiagramPosition,
+			};
 
-				if (office == null)
-				{
-					// TODO Better error handling?
-					throw new Exception("office not found");
-				}
+			await _db.Desks.AddAsync(desk);
 
-				var desk = new Desk()
-				{
-					Name = request.Name,
-					DiagramPosition = request.DiagramPosition,
-				};
+			office.Desks.Add(desk);
 
-				await _db.Desks.AddAsync(desk);
+			await _db.SaveChangesAsync();
 
-				office.Desks.Add(desk);
-
-				await _db.SaveChangesAsync();
-
-				return new DeskDTO
-				{
-					Id = desk.Id,
-					Name = desk.Name,
-					DiagramPosition = desk.DiagramPosition,
-				};
-			}
+			return new DeskDTO
+			{
+				Id = desk.Id,
+				Name = desk.Name,
+				DiagramPosition = desk.DiagramPosition,
+			};
 		}
 	}
 }

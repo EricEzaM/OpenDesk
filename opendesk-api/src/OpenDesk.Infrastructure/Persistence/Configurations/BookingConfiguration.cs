@@ -14,6 +14,11 @@ namespace OpenDesk.Infrastructure.Persistence.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Booking> builder)
 		{
+			builder.Property(p => p.Id)
+				.ValueGeneratedOnAdd();
+
+			builder.HasKey(p => p.Id);
+
 			builder.Property(p => p.StartDateTime)
 				.IsRequired();
 
