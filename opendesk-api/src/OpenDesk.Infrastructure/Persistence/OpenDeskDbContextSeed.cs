@@ -12,7 +12,7 @@ namespace OpenDesk.Infrastructure.Persistence
 	{
 		public static async Task SeedDefaults(OpenDeskDbContext context)
 		{
-			context.OfficeLocations.Add(new OfficeLocation
+			context.Offices.Add(new Office
 			{
 				Name = "Office 1",
 				Desks = new List<Desk>()
@@ -35,7 +35,7 @@ namespace OpenDesk.Infrastructure.Persistence
 				}
 			});
 
-			context.OfficeLocations.Add(new OfficeLocation
+			context.Offices.Add(new Office
 			{
 				Name = "Office 2",
 				Desks = new List<Desk>()

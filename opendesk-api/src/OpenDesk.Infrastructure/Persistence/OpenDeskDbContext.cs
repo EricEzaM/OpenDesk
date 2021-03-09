@@ -23,7 +23,7 @@ namespace OpenDesk.Infrastructure.Persistence
 
 		public DbSet<Desk> Desks { get; set; }
 		public DbSet<Booking> Bookings { get; set; }
-		public DbSet<OfficeLocation> OfficeLocations { get; set; }
+		public DbSet<Office> Offices { get; set; }
 
 		public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
 		{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Common.DataTransferObjects
 {
-	public class OfficeLocationDTO
+	public class OfficeDTO
 	{
 		public string Id { get; set; }
 		public string Name { get; set; }

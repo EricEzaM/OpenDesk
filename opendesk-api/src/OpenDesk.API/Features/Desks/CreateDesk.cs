@@ -14,7 +14,7 @@ namespace OpenDesk.API.Features.Desks
 		{
 			public string Name { get; set; }
 			public DiagramPosition DiagramPosition { get; set; }
-			public string OfficeLocationId { get; set; }
+			public string OfficeId { get; set; }
 		}
 	}
 }

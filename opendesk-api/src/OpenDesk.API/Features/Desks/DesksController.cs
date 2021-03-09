@@ -18,7 +18,7 @@ namespace OpenDesk.API.Features.Desks
 		[HttpPost("{officeId}/desks")]
 		public async Task<IActionResult> Create(string officeId, [FromBody]CreateDesk.Command command)
 		{
-			command.OfficeLocationId = officeId;
+			command.OfficeId = officeId;
 
 			return Ok();
 		}

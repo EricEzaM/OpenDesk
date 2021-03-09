@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Infrastructure.Persistence.Configurations
 {
-	public class OfficeLocationConfiguration : IEntityTypeConfiguration<OfficeLocation>
+	public class OfficeConfiguration : IEntityTypeConfiguration<Office>
 	{
-		public void Configure(EntityTypeBuilder<OfficeLocation> builder)
+		public void Configure(EntityTypeBuilder<Office> builder)
 		{
 			builder.Property(o => o.Id)
 				.ValueGeneratedOnAdd();

@@ -9,7 +9,7 @@ namespace OpenDesk.Domain.Entities
 	{
 		public string Name { get; set; }
 		public DiagramPosition DiagramPosition { get; set; }
-		public OfficeLocation OfficeLocation { get; set; }
+		public Office Office { get; set; }
 		public List<Booking> Bookings { get; set; }
 	}
 }

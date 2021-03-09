@@ -25,7 +25,7 @@ namespace OpenDesk.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Desk>>> GetDesks()
         {
-            return await _context.Desks.Include(d => d.OfficeLocation).ToListAsync();
+            return await _context.Desks.Include(d => d.Office).ToListAsync();
         }
 
         // GET: api/Desks/5
