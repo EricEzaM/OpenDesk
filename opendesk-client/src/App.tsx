@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 
 import OfficePlanImage from "./OfficePlanImage.png";
-import Desk from "./map/models/Desk";
-import OfficeImage from "./map/models/OfficeImage";
+import Desk from "./models/Desk";
+import OfficeImage from "./models/OfficeImage";
 import OfficeMap from "./map/OfficeMap";
+import DeskDetails from "./desks/DeskDetails";
 
 function App()
 {
@@ -45,9 +46,7 @@ function App()
 
   return (
     <div>
-      <div>
-        {selectedDesk && selectedDesk.name + " at " + selectedDesk.location}
-      </div>
+      <DeskDetails desk={selectedDesk} />
       <OfficeMap image={officeImage} desks={desks} selectedDesk={selectedDesk} onDeskSelected={onDeskSelected}/>
     </div>
 	);

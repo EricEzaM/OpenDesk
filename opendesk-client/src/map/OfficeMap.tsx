@@ -1,6 +1,6 @@
 import React from "react"
 
-import { MapContainer, Marker, Popup, ImageOverlay } from "react-leaflet";
+import { MapContainer, Marker, ImageOverlay } from "react-leaflet";
 import { CRS, icon, point } from "leaflet";
 import "leaflet/dist/leaflet.css"
 
@@ -8,8 +8,8 @@ import DeskLocationIcon from "./icons/desk-location.svg";
 import DeskHighlightIcon from "./icons/desk-highlight.svg";
 
 import MapClickedAtLocationPopup from "../map/helpers/MapClickedAtLocationPopup";
-import OfficeImage from "./models/OfficeImage"
-import Desk from "./models/Desk";
+import OfficeImage from "../models/OfficeImage"
+import Desk from "../models/Desk";
 
 interface Props
 {
@@ -48,7 +48,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props)
         (
           <Marker position={desk.location}
             icon={icon({
-              iconUrl: desk.id == selectedDesk?.id ? DeskHighlightIcon : DeskLocationIcon,
+              iconUrl: desk.id === selectedDesk?.id ? DeskHighlightIcon : DeskLocationIcon,
               iconSize: point(30, 30)
             })}
             eventHandlers={{

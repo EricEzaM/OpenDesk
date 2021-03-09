@@ -1,5 +1,3 @@
-import { InteractiveLayerOptions } from "leaflet";
-
 export default interface Desk
 {
   id: string
