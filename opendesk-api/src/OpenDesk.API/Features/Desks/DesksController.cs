@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,13 @@ namespace OpenDesk.API.Features.Desks
 	[Route("api/office")]
 	public class DesksController : ControllerBase
 	{
+		private readonly IMediator _mediator;
+
+		public DesksController(IMediator mediator)
+		{
+			_mediator = mediator;
+		}
+
 		[HttpGet("{officeId}/desks")]
 		public async Task<IActionResult> Get(string officeId)
 		{
@@ -20,7 +28,9 @@ namespace OpenDesk.API.Features.Desks
 		{
 			command.OfficeId = officeId;
 
-			return Ok();
+			var result = await _mediator.Send(command);
+
+			return Ok(result);
 		}
 
 		[HttpDelete("{officeId}/desks/{deskId}")]
