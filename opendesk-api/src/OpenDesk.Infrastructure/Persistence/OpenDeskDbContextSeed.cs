@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenDesk.Domain.Entities;
 using OpenDesk.Domain.ValueObjects;
+using OpenDesk.Infrastructure.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace OpenDesk.Infrastructure.Persistence
 	{
 		public static async Task SeedDefaults(OpenDeskDbContext context)
 		{
+			var userEntity = context.Users.Add(new OpenDeskUser("test.user@testuser.com"));
+
 			context.Offices.Add(new Office
 			{
 				Name = "Office 1",
@@ -26,13 +29,13 @@ namespace OpenDesk.Infrastructure.Persistence
 						{
 							new Booking()
 							{
-								UserId = "SomeId",
+								UserId = userEntity.Entity.Id,
 								StartDateTime = DateTimeOffset.Now.AddDays(1).AddHours(-3),
 								EndDateTime = DateTimeOffset.Now.AddDays(1).AddHours(2)
 							},
 							new Booking()
 							{
-								UserId = "SomeId2",
+								UserId = userEntity.Entity.Id,
 								StartDateTime = DateTimeOffset.Now.AddDays(1).AddHours(3),
 								EndDateTime = DateTimeOffset.Now.AddDays(1).AddHours(5)
 							}

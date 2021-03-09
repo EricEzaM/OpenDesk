@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Common.DataTransferObjects
 {
-	public class BookingDTO
+	public class UserDTO
 	{
 		public string Id { get; set; }
-		public string DeskId { get; set; }
-		public DateTimeOffset StartDateTime { get; set; }
-		public DateTimeOffset EndDateTime { get; set; }
-		public UserDTO User { get; set; }
+		public string UserName { get; set; }
+		public string Name { get; set; }
 	}
 }

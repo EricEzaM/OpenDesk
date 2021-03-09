@@ -25,13 +25,23 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			return await _db.Bookings
 				.Include(b => b.Desk)
-				.Select(b => new BookingDTO
+				.Join(_db.Users, b => b.UserId, u => u.Id, (b, u) => new
 				{
-					Id = b.Id,
-					DeskId = b.Desk.Id,
-					UserId = b.UserId,
-					StartDateTime = b.StartDateTime,
-					EndDateTime = b.EndDateTime
+					Booking = b,
+					User = new UserDTO
+					{
+						Id = u.Id,
+						UserName = u.UserName,
+						Name = "Name Placeholder"
+					}
+				})
+				.Select(bu => new BookingDTO
+				{
+					Id = bu.Booking.Id,
+					DeskId = bu.Booking.Desk.Id,
+					StartDateTime = bu.Booking.StartDateTime,
+					EndDateTime = bu.Booking.EndDateTime,
+					User = bu.User
 				})
 				.ToListAsync();
 		}
