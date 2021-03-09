@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Office
 {
-	[Route("/api/offices")]
+	[Route("api/offices")]
 	public class OfficesController : ControllerBase
 	{
 		private readonly IMediator _mediator;
@@ -17,18 +17,10 @@ namespace OpenDesk.API.Features.Office
 			_mediator = mediator;
 		}
 
-		[HttpGet("/")]
+		[HttpGet]
 		public async Task<IActionResult> Get()
 		{
-			var result = await _mediator.Send(new GetOfficesQuery());
-
-			return Ok(result);
-		}
-
-		[HttpGet("/{officeId}/desks")]
-		public async Task<IActionResult> GetDesks(string officeId)
-		{
-			var result = await _mediator.Send(new GetOfficeDesksQuery(officeId));
+			var result = await _mediator.Send(new GetOffices.Command());
 
 			return Ok(result);
 		}
