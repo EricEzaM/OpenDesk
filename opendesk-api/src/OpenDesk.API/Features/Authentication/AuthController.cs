@@ -14,7 +14,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace OpenDesk.API.Controllers
+namespace OpenDesk.API.Features.Authentication
 {
 	[Route("api/[controller]")]
 	[ApiController]
@@ -22,13 +22,13 @@ namespace OpenDesk.API.Controllers
 	{
 		private const string MicrosoftAuthName = "Microsoft";
 
-		private readonly HttpClient httpClient;
-		private readonly IIdentityService identityService;
+		private readonly HttpClient _httpClient;
+		private readonly IIdentityService _identityService;
 
 		public AuthController(HttpClient httpClient, IIdentityService identityService)
 		{
-			this.httpClient = httpClient;
-			this.identityService = identityService;
+			this._httpClient = httpClient;
+			this._identityService = identityService;
 		}
 
 		[HttpPost(MicrosoftAuthName)]
@@ -53,7 +53,7 @@ namespace OpenDesk.API.Controllers
 			ub.Query = query.ReadAsStringAsync().Result;
 
 			// Send request
-			var res = await httpClient.SendAsync(new HttpRequestMessage
+			var res = await _httpClient.SendAsync(new HttpRequestMessage
 			{
 				RequestUri = ub.Uri,
 				Method = HttpMethod.Post,
@@ -71,18 +71,18 @@ namespace OpenDesk.API.Controllers
 			// Can use custom tenant filtering logic here
 			// << Tenant Filtering Logic here >>
 
-			var (result, userId) = await identityService.GetUserIdAsync(MicrosoftAuthName, idToken.Subject);
+			var (result, userId) = await _identityService.GetUserIdAsync(MicrosoftAuthName, idToken.Subject);
 
 			if (result.Succeeded == false)
 			{
 				// No user yet, so create one
 				var username = idToken.Claims.FirstOrDefault(c => c.Type == "email").Value;
-				(result, userId) = await identityService.CreateUserAsync(username);
+				(result, userId) = await _identityService.CreateUserAsync(username);
 
 				if (result.Succeeded)
 				{
 					// Creation Success, add external login info
-					result = await identityService.AddUserLoginAsync(userId, MicrosoftAuthName, idToken.Subject, MicrosoftAuthName);
+					result = await _identityService.AddUserLoginAsync(userId, MicrosoftAuthName, idToken.Subject, MicrosoftAuthName);
 
 					if (result.Succeeded == false)
 					{
@@ -95,7 +95,7 @@ namespace OpenDesk.API.Controllers
 				}
 			}
 
-			var (cpResult, cp) = await identityService.GetUserClaimsPrincipal(userId);
+			var (cpResult, cp) = await _identityService.GetUserClaimsPrincipal(userId);
 
 			if (cpResult.Succeeded)
 			{
