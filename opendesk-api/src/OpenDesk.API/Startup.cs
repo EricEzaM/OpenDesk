@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +36,9 @@ namespace OpenDesk.API
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddInfrastructure(Configuration);
-			
+
+			services.AddMediatR(typeof(Startup));
+
 			services.AddHttpClient();
 
 			services.AddControllers();
@@ -59,10 +62,12 @@ namespace OpenDesk.API
 
 			app.UseRouting();
 
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>
 			{
+				//endpoints.MapControllers();
 				endpoints.MapControllers();
 			});
 		}
