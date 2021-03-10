@@ -13,7 +13,7 @@ export function GetMonthDayFormatted(date: Date) {
 }
 
 export function GetFullDateWith24hTime(date: Date) {
-  date.toLocaleDateString([], {
+  return date.toLocaleDateString([], {
     year: "numeric",
     month: "numeric",
     day: "numeric",
