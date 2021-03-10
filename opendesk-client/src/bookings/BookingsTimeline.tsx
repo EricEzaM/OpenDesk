@@ -30,6 +30,26 @@ function BookingsTimeline({
 	prospectiveBookingStart,
 	prospectiveBookingEnd,
 }: Props) {
+	let prospOverlapsExisting = false;
+	if (prospectiveBookingStart && prospectiveBookingEnd) {
+		debugger
+		for (let i = 0; i < bookings.length; i++) {
+			const booking = bookings[i];
+
+			prospOverlapsExisting =
+				// Start is between existing start and end
+				(prospectiveBookingStart >= booking.startDateTime &&
+					prospectiveBookingStart <= booking.endDateTime) ||
+				// End is between existing start and end
+				(prospectiveBookingEnd >= booking.startDateTime &&
+					prospectiveBookingEnd <= booking.endDateTime);
+			
+			if (prospOverlapsExisting) {
+				break;
+			}
+		}
+	}
+
 	let currentDate = new Date();
 
 	let dateBarsStartDate = new Date(
@@ -68,7 +88,7 @@ function BookingsTimeline({
 					offset: po,
 					startsInside: psi,
 					endsInside: pei,
-				} = GetInnerDateBarSizing(
+				} = getInnerDateBarSizing(
 					prospectiveBookingStart ?? new Date(),
 					prospectiveBookingEnd ?? new Date(),
 					bar
@@ -90,7 +110,7 @@ function BookingsTimeline({
 									offset,
 									startsInside,
 									endsInside,
-								} = GetInnerDateBarSizing(b.startDateTime, b.endDateTime, bar);
+								} = getInnerDateBarSizing(b.startDateTime, b.endDateTime, bar);
 
 								return (
 									<div
@@ -98,7 +118,7 @@ function BookingsTimeline({
 										style={{
 											width: width + "%",
 											marginLeft: offset + "%",
-											borderRadius: GetBookingBarBorderRadius(
+											borderRadius: getBookingBarBorderRadius(
 												startsInside,
 												endsInside
 											),
@@ -116,11 +136,11 @@ function BookingsTimeline({
 
 							{prospectiveBookingStart && prospectiveBookingEnd && (
 								<div
-									className="booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective"
+									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${prospOverlapsExisting ? "booking-timeline-bar__time-booked--clashes" : ""}`}
 									style={{
 										width: pw + "%",
 										marginLeft: po + "%",
-										borderRadius: GetBookingBarBorderRadius(psi, pei),
+										borderRadius: getBookingBarBorderRadius(psi, pei),
 									}}
 									title={
 										"\r\nFrom " +
@@ -133,12 +153,8 @@ function BookingsTimeline({
 
 							{/* Time Display at each end of bar */}
 							<div className="booking-timeline-bar__time-display">
-								<span>
-									{Get24hTime(bar.start)}
-								</span>
-								<span>
-									{Get24hTime(bar.end)}
-								</span>
+								<span>{Get24hTime(bar.start)}</span>
+								<span>{Get24hTime(bar.end)}</span>
 							</div>
 						</div>
 					</div>
@@ -150,7 +166,7 @@ function BookingsTimeline({
 
 export default BookingsTimeline;
 
-function GetInnerDateBarSizing(
+function getInnerDateBarSizing(
 	bStart: Date,
 	bEnd: Date,
 	bar: DateBar
@@ -213,7 +229,7 @@ function GetInnerDateBarSizing(
 	};
 }
 
-function GetBookingBarBorderRadius(startsInside: boolean, endsInside: boolean) {
+function getBookingBarBorderRadius(startsInside: boolean, endsInside: boolean) {
 	if (startsInside && !endsInside) {
 		return "999px 0 0 999px";
 	} else if (endsInside && !startsInside) {

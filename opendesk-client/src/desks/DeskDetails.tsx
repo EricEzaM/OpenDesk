@@ -7,6 +7,12 @@ import Booking from "../models/Booking";
 import Desk from "../models/Desk";
 
 import "react-datepicker/dist/react-datepicker.css";
+import {
+	setHours,
+	setMilliseconds,
+	setMinutes,
+	setSeconds,
+} from "date-fns";
 
 interface Props {
 	desk: Desk | null;
@@ -30,18 +36,11 @@ function DeskDetails({ desk }: Props) {
 	const [bkStart, setBkStart] = useState<Date>();
 	const [bkEnd, setBkEnd] = useState<Date>();
 
-	const startDateRef = useRef<HTMLInputElement>(null);
-	const startTimeRef = useRef<HTMLInputElement>(null);
-	const endDateRef = useRef<HTMLInputElement>(null);
-	const endTimeRef = useRef<HTMLInputElement>(null);
+	function disallowPast(date: Date) {
+		let currentDate = setHours(setMinutes(setSeconds(setMilliseconds(new Date(), 0), 0), 0),0);
+		let dateOnly = setHours(setMinutes(setSeconds(setMilliseconds(date, 0), 0), 0),0);
 
-	function onBookingChanged() {
-		setBkStart(
-			new Date(startDateRef.current?.value + " " + startTimeRef.current?.value)
-		);
-		setBkEnd(
-			new Date(endDateRef.current?.value + " " + endTimeRef.current?.value)
-		);
+		return dateOnly >= currentDate;
 	}
 
 	return (
@@ -53,12 +52,42 @@ function DeskDetails({ desk }: Props) {
 					<p>Location = {desk.location}</p>
 				</>
 			)}
-			<BookingsTimeline bookings={bookings} prospectiveBookingStart={bkStart} prospectiveBookingEnd={bkEnd}/>
+			<BookingsTimeline
+				bookings={bookings}
+				prospectiveBookingStart={bkStart}
+				prospectiveBookingEnd={bkEnd}
+			/>
 
-			<p>Start</p>
-			<DatePicker placeholderText="Click to select a Date & Time" onChange={date => date && date instanceof Date && setBkStart(date)} />
-			<p>End</p>
-			<DatePicker placeholderText="Click to select a Date & Time" onChange={ date => date && date instanceof Date && setBkEnd(date)}/>
+			<div style={{ display: "flex", margin: "0.5em 0" }}>
+				<div style={{ marginRight: "1em" }}>
+					<p>Start</p>
+					<DatePicker
+						placeholderText="Click to select a Date & Time"
+						selected={bkStart}
+						onChange={(date) =>date && date instanceof Date && setBkStart(date)}
+						showTimeSelect
+						timeIntervals={15}
+						minTime={setHours(setMinutes(new Date(), 0), 6)}
+						maxTime={setHours(setMinutes(new Date(), 0), 21)}
+						dateFormat="MMMM d, yyyy h:mm aa"
+						filterDate={disallowPast}
+					/>
+				</div>
+				<div>
+					<p>End</p>
+					<DatePicker
+						placeholderText="Click to select a Date & Time"
+						selected={bkEnd}
+						onChange={(date) => date && date instanceof Date && setBkEnd(date)}
+						showTimeSelect
+						timeIntervals={15}
+						minTime={setHours(setMinutes(new Date(), 0), 6)}
+						maxTime={setHours(setMinutes(new Date(), 0), 21)}
+						dateFormat="MMMM d, yyyy h:mm aa"
+						filterDate={disallowPast}
+					/>
+				</div>
+			</div>
 		</div>
 	);
 }
