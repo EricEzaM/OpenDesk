@@ -82,16 +82,7 @@ function BookingsTimeline({
 						</div>
 
 						{/* Timeline Bar itself */}
-						<div
-							style={{
-								width: "500px",
-								height: "30px",
-								backgroundColor: "whitesmoke",
-								position: "relative",
-								display: "flex",
-								alignItems: "center",
-							}}
-						>
+						<div className="booking-timeline-bar">
 							{/* Calculating what should be displayed as the "time taken" on each bar */}
 							{bookings.map((b) => {
 								const {
@@ -103,20 +94,14 @@ function BookingsTimeline({
 
 								return (
 									<div
+										className="booking-timeline-bar__time-booked"
 										style={{
-											position: "absolute",
-											height: "100%",
 											width: width + "%",
 											marginLeft: offset + "%",
-											backgroundColor: "#bf391f",
-											borderRadius:
-												startsInside && !endsInside
-													? "999px 0 0 999px"
-													: endsInside && !startsInside
-													? "0 999px 999px 0"
-													: endsInside && startsInside
-													? "999px"
-													: "0",
+											borderRadius: GetBookingBarBorderRadius(
+												startsInside,
+												endsInside
+											),
 										}}
 										title={
 											b.user.name +
@@ -131,21 +116,11 @@ function BookingsTimeline({
 
 							{prospectiveBookingStart && prospectiveBookingEnd && (
 								<div
+									className="booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective"
 									style={{
-										position: "absolute",
-										height: "100%",
 										width: pw + "%",
 										marginLeft: po + "%",
-										backgroundColor: "#5fa339",
-										// background: "repeating-linear-gradient(45deg, #bf391f, #bf391f 5px, orange 5px, orange 10px)",
-										borderRadius:
-											psi && !pei
-												? "999px 0 0 999px"
-												: pei && !psi
-												? "0 999px 999px 0"
-												: pei && psi
-												? "999px"
-												: "0",
+										borderRadius: GetBookingBarBorderRadius(psi, pei),
 									}}
 									title={
 										"\r\nFrom " +
@@ -157,23 +132,14 @@ function BookingsTimeline({
 							)}
 
 							{/* Time Display at each end of bar */}
-							<div
-								style={{
-									display: "flex",
-									justifyContent: "space-between",
-									position: "absolute",
-									width: "100%",
-									pointerEvents: "none",
-								}}
-							>
-								<div style={{ margin: "0 5px 0 5px", fontSize: "0.7em" }}>
+							<div className="booking-timeline-bar__time-display">
+								<span>
 									{Get24hTime(bar.start)}
-								</div>
-								<div style={{ margin: "0 5px 0 5px", fontSize: "0.7em" }}>
+								</span>
+								<span>
 									{Get24hTime(bar.end)}
-								</div>
+								</span>
 							</div>
-
 						</div>
 					</div>
 				);
@@ -245,4 +211,15 @@ function GetInnerDateBarSizing(
 		endsInside: endsInside,
 		startsInside: startsInside,
 	};
+}
+
+function GetBookingBarBorderRadius(startsInside: boolean, endsInside: boolean) {
+	if (startsInside && !endsInside) {
+		return "999px 0 0 999px";
+	} else if (endsInside && !startsInside) {
+		return "0 999px 999px 0";
+	} else if (endsInside && startsInside) {
+		return "999px";
+	}
+	return "0";
 }

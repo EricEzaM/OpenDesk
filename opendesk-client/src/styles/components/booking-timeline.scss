@@ -1,0 +1,42 @@
+.booking-timeline-bar {
+	width: 500px;
+	height: 30px;
+	background-color: whitesmoke;
+	position: relative;
+	display: flex;
+	align-items: center;
+
+	&__time-booked {
+		position: absolute;
+		height: 100%;
+		background-color: #bf391f;
+
+		&--prospective {
+			background-color: #5fa339;
+		}
+
+		&--clashes {
+			background-color: none;
+			background: repeating-linear-gradient(
+				45deg,
+				#bf391f,
+				#bf391f 5px,
+				orange 5px,
+				orange 10px
+			);
+		}
+	}
+
+  &__time-display {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    width: 100%;
+    pointer-events: none;
+
+    & span {
+      margin: 0 5px 0 5px;
+      font-size: 0.7em;
+    }
+  }
+}
