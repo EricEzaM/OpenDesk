@@ -1,7 +1,12 @@
 import React, { useRef, useState } from "react";
+
+import DatePicker from "react-datepicker";
+
 import BookingsTimeline from "../bookings/BookingsTimeline";
 import Booking from "../models/Booking";
 import Desk from "../models/Desk";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 interface Props {
 	desk: Desk | null;
@@ -50,26 +55,10 @@ function DeskDetails({ desk }: Props) {
 			)}
 			<BookingsTimeline bookings={bookings} prospectiveBookingStart={bkStart} prospectiveBookingEnd={bkEnd}/>
 
-			<input
-				ref={startDateRef}
-				type="date"
-				onChange={(e) => onBookingChanged()}
-			/>
-			<input
-				ref={startTimeRef}
-				type="time"
-				onChange={(e) => onBookingChanged()}
-			/>
-			<input
-				ref={endDateRef}
-				type="date"
-				onChange={(e) => onBookingChanged()}
-			/>
-			<input
-				ref={endTimeRef}
-				type="time"
-				onChange={(e) => onBookingChanged()}
-			/>
+			<p>Start</p>
+			<DatePicker placeholderText="Click to select a Date & Time" onChange={date => date && date instanceof Date && setBkStart(date)} />
+			<p>End</p>
+			<DatePicker placeholderText="Click to select a Date & Time" onChange={ date => date && date instanceof Date && setBkEnd(date)}/>
 		</div>
 	);
 }
