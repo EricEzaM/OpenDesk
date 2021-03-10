@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import BookingsTimeline from "../bookings/BookingsTimeline";
 import Booking from "../models/Booking";
 import Desk from "../models/Desk";
@@ -22,6 +22,23 @@ function DeskDetails({ desk }: Props) {
 		},
 	];
 
+	const [bkStart, setBkStart] = useState<Date>();
+	const [bkEnd, setBkEnd] = useState<Date>();
+
+	const startDateRef = useRef<HTMLInputElement>(null);
+	const startTimeRef = useRef<HTMLInputElement>(null);
+	const endDateRef = useRef<HTMLInputElement>(null);
+	const endTimeRef = useRef<HTMLInputElement>(null);
+
+	function onBookingChanged() {
+		setBkStart(
+			new Date(startDateRef.current?.value + " " + startTimeRef.current?.value)
+		);
+		setBkEnd(
+			new Date(endDateRef.current?.value + " " + endTimeRef.current?.value)
+		);
+	}
+
 	return (
 		<div>
 			{desk && (
@@ -31,7 +48,28 @@ function DeskDetails({ desk }: Props) {
 					<p>Location = {desk.location}</p>
 				</>
 			)}
-			<BookingsTimeline bookings={bookings}/>
+			<BookingsTimeline bookings={bookings} prospectiveBookingStart={bkStart} prospectiveBookingEnd={bkEnd}/>
+
+			<input
+				ref={startDateRef}
+				type="date"
+				onChange={(e) => onBookingChanged()}
+			/>
+			<input
+				ref={startTimeRef}
+				type="time"
+				onChange={(e) => onBookingChanged()}
+			/>
+			<input
+				ref={endDateRef}
+				type="date"
+				onChange={(e) => onBookingChanged()}
+			/>
+			<input
+				ref={endTimeRef}
+				type="time"
+				onChange={(e) => onBookingChanged()}
+			/>
 		</div>
 	);
 }

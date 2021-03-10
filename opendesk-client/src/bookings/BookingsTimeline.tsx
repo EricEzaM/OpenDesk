@@ -8,6 +8,8 @@ import {
 
 interface Props {
 	bookings: Booking[];
+	prospectiveBookingStart?: Date;
+	prospectiveBookingEnd?: Date;
 }
 
 interface DateBar {
@@ -23,7 +25,11 @@ interface InnerDateBar {
 	endsInside: boolean;
 }
 
-function BookingsTimeline({ bookings }: Props) {
+function BookingsTimeline({
+	bookings,
+	prospectiveBookingStart,
+	prospectiveBookingEnd,
+}: Props) {
 	let currentDate = new Date();
 
 	let dateBarsStartDate = new Date(
@@ -57,6 +63,17 @@ function BookingsTimeline({ bookings }: Props) {
 	return (
 		<div>
 			{datebars.map((bar) => {
+				const {
+					width: pw,
+					offset: po,
+					startsInside: psi,
+					endsInside: pei,
+				} = GetInnerDateBarSizing(
+					prospectiveBookingStart ?? new Date(),
+					prospectiveBookingEnd ?? new Date(),
+					bar
+				);
+
 				return (
 					<div style={{ display: "flex", alignItems: "center" }}>
 						{/* Date displayed at start of bar */}
@@ -75,6 +92,70 @@ function BookingsTimeline({ bookings }: Props) {
 								alignItems: "center",
 							}}
 						>
+							{/* Calculating what should be displayed as the "time taken" on each bar */}
+							{bookings.map((b) => {
+								const {
+									width,
+									offset,
+									startsInside,
+									endsInside,
+								} = GetInnerDateBarSizing(b.startDateTime, b.endDateTime, bar);
+
+								return (
+									<div
+										style={{
+											position: "absolute",
+											height: "100%",
+											width: width + "%",
+											marginLeft: offset + "%",
+											backgroundColor: "#bf391f",
+											borderRadius:
+												startsInside && !endsInside
+													? "999px 0 0 999px"
+													: endsInside && !startsInside
+													? "0 999px 999px 0"
+													: endsInside && startsInside
+													? "999px"
+													: "0",
+										}}
+										title={
+											b.user.name +
+											"\r\nFrom " +
+											GetFullDateWith24hTime(b.startDateTime) +
+											"\r\nTo " +
+											GetFullDateWith24hTime(b.endDateTime)
+										}
+									></div>
+								);
+							})}
+
+							{prospectiveBookingStart && prospectiveBookingEnd && (
+								<div
+									style={{
+										position: "absolute",
+										height: "100%",
+										width: pw + "%",
+										marginLeft: po + "%",
+										backgroundColor: "#5fa339",
+										// background: "repeating-linear-gradient(45deg, #bf391f, #bf391f 5px, orange 5px, orange 10px)",
+										borderRadius:
+											psi && !pei
+												? "999px 0 0 999px"
+												: pei && !psi
+												? "0 999px 999px 0"
+												: pei && psi
+												? "999px"
+												: "0",
+									}}
+									title={
+										"\r\nFrom " +
+										GetFullDateWith24hTime(prospectiveBookingStart) +
+										"\r\nTo " +
+										GetFullDateWith24hTime(prospectiveBookingEnd)
+									}
+								></div>
+							)}
+
 							{/* Time Display at each end of bar */}
 							<div
 								style={{
@@ -93,38 +174,6 @@ function BookingsTimeline({ bookings }: Props) {
 								</div>
 							</div>
 
-							{/* Calculating what should be displayed as the "time taken" on each bar */}
-							{bookings.map((b) => {
-								const {
-									width,
-									offset,
-									startsInside,
-									endsInside,
-								} = GetInnerDateBarSizing(b, bar);
-
-								return (
-									<div
-										style={{
-											height: "100%",
-											width: width + "%",
-											marginLeft: offset + "%",
-											backgroundColor: "#bf391f",
-											borderRadius: startsInside
-												? "999px 0 0 999px"
-												: endsInside
-												? "0 999px 999px 0"
-												: "0",
-										}}
-										title={
-											b.user.name +
-											"\r\nFrom " +
-											GetFullDateWith24hTime(b.startDateTime) +
-											"\r\nTo " +
-											GetFullDateWith24hTime(b.endDateTime)
-										}
-									></div>
-								);
-							})}
 						</div>
 					</div>
 				);
@@ -135,16 +184,18 @@ function BookingsTimeline({ bookings }: Props) {
 
 export default BookingsTimeline;
 
-function GetInnerDateBarSizing(booking: Booking, bar: DateBar): InnerDateBar {
+function GetInnerDateBarSizing(
+	bStart: Date,
+	bEnd: Date,
+	bar: DateBar
+): InnerDateBar {
 	let barLength = bar.end.getTime() - bar.start.getTime();
 
 	let offset = 0;
 	let width = 0;
 
-	let isInBar =
-		booking.endDateTime >= bar.start && booking.startDateTime <= bar.end;
-	let usesBar =
-		booking.startDateTime <= bar.start && booking.endDateTime >= bar.end;
+	let isInBar = bEnd >= bar.start && bStart <= bar.end;
+	let usesBar = bStart <= bar.start && bEnd >= bar.end;
 	if (!isInBar && !usesBar) {
 		return {
 			width: 0,
@@ -154,12 +205,12 @@ function GetInnerDateBarSizing(booking: Booking, bar: DateBar): InnerDateBar {
 		};
 	}
 
-	let startsInside = booking.startDateTime >= bar.start;
-	let endsInside = booking.endDateTime <= bar.end;
+	let startsInside = bStart >= bar.start;
+	let endsInside = bEnd <= bar.end;
 
-	let bookingEndInBar = booking.endDateTime.getTime() - bar.start.getTime();
+	let bookingEndInBar = bEnd.getTime() - bar.start.getTime();
 
-	let bookingStartInBar = booking.startDateTime.getTime() - bar.start.getTime();
+	let bookingStartInBar = bStart.getTime() - bar.start.getTime();
 
 	// Booking starts and ends outside of bar.
 	if (!startsInside && !endsInside) {
