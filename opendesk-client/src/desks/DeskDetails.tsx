@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 
 import DatePicker from "react-datepicker";
 
@@ -33,14 +33,58 @@ function DeskDetails({ desk }: Props) {
 		},
 	];
 
-	const [bkStart, setBkStart] = useState<Date>();
-	const [bkEnd, setBkEnd] = useState<Date>();
+	const [bkStart, setBkStart] = useState<Date>(setHours(setMinutes(new Date(), 0), 6));
+	const [bkEnd, setBkEnd] = useState<Date>(setHours(setMinutes(new Date(), 0), 20));
+
+	function handleStartChange(date: Date) {
+		// Don't allow starting bookings after 6pm
+		if (date.getHours() >= 18) {
+			return;
+		}
+		// If start was moved to after end, adjust end to still be after start
+		if (date > bkEnd) {
+			setBkEnd(setHours(setMinutes(date, 0), bkEnd.getHours()));
+		}
+
+		setBkStart(date);
+	}
+
+	function handleEndChange(date: Date) {
+		// Don't allow end bookings before 8am
+		if (date.getHours() <= 8) {
+			return;
+		}
+		// If end date was moved to before start, adjust start.
+		if (date < bkStart) {
+			setBkStart(setHours(setMinutes(date, 0), bkStart.getHours()));
+		}
+
+		setBkEnd(date)
+	}
 
 	function disallowPast(date: Date) {
 		let currentDate = setHours(setMinutes(setSeconds(setMilliseconds(new Date(), 0), 0), 0),0);
 		let dateOnly = setHours(setMinutes(setSeconds(setMilliseconds(date, 0), 0), 0),0);
 
 		return dateOnly >= currentDate;
+	}
+
+	function customTimeInput({ value, onChange }: { value: string, onChange: (event: string) => void }) {
+		return (
+		<select
+			value={value}
+			onChange={e => onChange(e.target.value)}
+		>
+			<option value="06:00">6:00 AM</option>
+			<option value="08:00">8:00 AM</option>
+			<option value="10:00">10:00 AM</option>
+			<option value="12:00">12:00 PM</option>
+			<option value="14:00">2:00 PM</option>
+			<option value="16:00">4:00 PM</option>
+			<option value="18:00">6:00 PM</option>
+			<option value="20:00">8:00 PM</option>
+		</select>
+		)
 	}
 
 	return (
@@ -59,34 +103,26 @@ function DeskDetails({ desk }: Props) {
 			/>
 
 			<div style={{ display: "flex", margin: "0.5em 0" }}>
-				<div style={{ marginRight: "1em" }}>
-					<p>Start</p>
-					<DatePicker
-						placeholderText="Click to select a Date & Time"
-						selected={bkStart}
-						onChange={(date) =>date && date instanceof Date && setBkStart(date)}
-						showTimeSelect
-						timeIntervals={15}
-						minTime={setHours(setMinutes(new Date(), 0), 6)}
-						maxTime={setHours(setMinutes(new Date(), 0), 21)}
-						dateFormat="MMMM d, yyyy h:mm aa"
-						filterDate={disallowPast}
-					/>
-				</div>
-				<div>
-					<p>End</p>
-					<DatePicker
-						placeholderText="Click to select a Date & Time"
-						selected={bkEnd}
-						onChange={(date) => date && date instanceof Date && setBkEnd(date)}
-						showTimeSelect
-						timeIntervals={15}
-						minTime={setHours(setMinutes(new Date(), 0), 6)}
-						maxTime={setHours(setMinutes(new Date(), 0), 21)}
-						dateFormat="MMMM d, yyyy h:mm aa"
-						filterDate={disallowPast}
-					/>
-				</div>
+				<DatePicker
+					placeholderText="Start Date & Time"
+					selected={bkStart}
+					onChange={(date) =>date && date instanceof Date && handleStartChange(date)}
+					dateFormat="MMMM d, yyyy h:mm aa"
+					filterDate={disallowPast}
+					showTimeInput
+					customTimeInput={React.createElement(customTimeInput)}
+				/>
+				<p style={{margin: "0 5px"}}>to</p>
+				<DatePicker
+					placeholderText="End Date & Time"
+					selected={bkEnd}
+					onChange={(date) => date && date instanceof Date && handleEndChange(date)}
+					dateFormat="MMMM d, yyyy h:mm aa"
+					filterDate={disallowPast}
+					showTimeInput
+					customTimeInput={React.createElement(customTimeInput)}
+				/>
+				<button>Book Desk</button>
 			</div>
 		</div>
 	);
