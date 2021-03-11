@@ -39,10 +39,13 @@ function BookingsTimeline({
 			prospOverlapsExisting =
 				// Start is between existing start and end
 				(prospectiveBookingStart >= booking.startDateTime &&
-					prospectiveBookingStart <= booking.endDateTime) ||
+					prospectiveBookingStart < booking.endDateTime) ||
 				// End is between existing start and end
-				(prospectiveBookingEnd >= booking.startDateTime &&
-					prospectiveBookingEnd <= booking.endDateTime);
+				(prospectiveBookingEnd > booking.startDateTime &&
+					prospectiveBookingEnd <= booking.endDateTime) ||
+				// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
+				(prospectiveBookingStart <= booking.startDateTime &&
+					prospectiveBookingEnd >= booking.endDateTime);
 			
 			if (prospOverlapsExisting) {
 				break;
@@ -62,7 +65,7 @@ function BookingsTimeline({
 		currentDate.getFullYear(),
 		currentDate.getMonth(),
 		currentDate.getDate(),
-		21
+		20
 	);
 
 	let datebars: DateBar[] = [];
