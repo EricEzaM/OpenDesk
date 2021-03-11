@@ -8,8 +8,8 @@ import {
 
 interface Props {
 	bookings: Booking[];
-	prospectiveBookingStart?: Date;
-	prospectiveBookingEnd?: Date;
+	bookingStart?: Date;
+	bookingEnd?: Date;
 }
 
 interface DateBar {
@@ -25,27 +25,27 @@ interface InnerDateBar {
 
 function BookingsTimeline({
 	bookings,
-	prospectiveBookingStart,
-	prospectiveBookingEnd,
+	bookingStart,
+	bookingEnd,
 }: Props) {
-	let prospOverlapsExisting = false;
-	if (prospectiveBookingStart && prospectiveBookingEnd) {
-		debugger;
+
+	let bookingInvalid = false;
+	if (bookingStart && bookingEnd) {
 		for (let i = 0; i < bookings.length; i++) {
 			const booking = bookings[i];
 
-			prospOverlapsExisting =
+			bookingInvalid =
 				// Start is between existing start and end
-				(prospectiveBookingStart >= booking.startDateTime &&
-					prospectiveBookingStart < booking.endDateTime) ||
+				(bookingStart >= booking.startDateTime &&
+					bookingStart < booking.endDateTime) ||
 				// End is between existing start and end
-				(prospectiveBookingEnd > booking.startDateTime &&
-					prospectiveBookingEnd <= booking.endDateTime) ||
+				(bookingEnd > booking.startDateTime &&
+					bookingEnd <= booking.endDateTime) ||
 				// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
-				(prospectiveBookingStart <= booking.startDateTime &&
-					prospectiveBookingEnd >= booking.endDateTime);
+				(bookingStart <= booking.startDateTime &&
+					bookingEnd >= booking.endDateTime);
 
-			if (prospOverlapsExisting) {
+			if (bookingInvalid) {
 				break;
 			}
 		}
@@ -85,8 +85,8 @@ function BookingsTimeline({
 		<div>
 			{datebars.map((bar) => {
 				const { width: pw, offset: po } = getInnerDateBarSizing(
-					prospectiveBookingStart ?? new Date(),
-					prospectiveBookingEnd ?? new Date(),
+					bookingStart ?? new Date(),
+					bookingEnd ?? new Date(),
 					bar
 				);
 
@@ -125,10 +125,10 @@ function BookingsTimeline({
 								);
 							})}
 
-							{prospectiveBookingStart && prospectiveBookingEnd && (
+							{bookingStart && bookingEnd && (
 								<div
 									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${
-										prospOverlapsExisting
+										bookingInvalid
 											? "booking-timeline-bar__time-booked--clashes"
 											: ""
 									}`}
@@ -138,9 +138,9 @@ function BookingsTimeline({
 									}}
 									title={
 										"\r\nFrom " +
-										GetFullDateWith24hTime(prospectiveBookingStart) +
+										GetFullDateWith24hTime(bookingStart) +
 										"\r\nTo " +
-										GetFullDateWith24hTime(prospectiveBookingEnd)
+										GetFullDateWith24hTime(bookingEnd)
 									}
 								></div>
 							)}

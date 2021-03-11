@@ -98,8 +98,8 @@ function DeskDetails({ desk }: Props) {
 			)}
 			<BookingsTimeline
 				bookings={bookings}
-				prospectiveBookingStart={bkStart}
-				prospectiveBookingEnd={bkEnd}
+				bookingStart={bkStart}
+				bookingEnd={bkEnd}
 			/>
 
 			<div style={{ display: "flex", margin: "0.5em", justifyContent: "center" }}>
