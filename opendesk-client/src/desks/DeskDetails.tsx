@@ -37,8 +37,8 @@ function DeskDetails({ desk }: Props) {
 	const [bkEnd, setBkEnd] = useState<Date>(setHours(setMinutes(new Date(), 0), 20));
 
 	function handleStartChange(date: Date) {
-		// Don't allow starting bookings after 6pm
-		if (date.getHours() >= 18) {
+		// Don't allow starting bookings after
+		if (date.getHours() >= 20) {
 			return;
 		}
 		// If start was moved to after end, adjust end to still be after start
@@ -50,8 +50,8 @@ function DeskDetails({ desk }: Props) {
 	}
 
 	function handleEndChange(date: Date) {
-		// Don't allow end bookings before 8am
-		if (date.getHours() <= 8) {
+		// Don't allow end bookings before
+		if (date.getHours() <= 6) {
 			return;
 		}
 		// If end date was moved to before start, adjust start.
