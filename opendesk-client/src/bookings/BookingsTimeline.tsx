@@ -121,10 +121,6 @@ function BookingsTimeline({
 										style={{
 											width: width + "%",
 											marginLeft: offset + "%",
-											borderRadius: getBookingBarBorderRadius(
-												startsInside,
-												endsInside
-											),
 										}}
 										title={
 											b.user.name +
@@ -143,7 +139,6 @@ function BookingsTimeline({
 									style={{
 										width: pw + "%",
 										marginLeft: po + "%",
-										borderRadius: getBookingBarBorderRadius(psi, pei),
 									}}
 									title={
 										"\r\nFrom " +
@@ -230,15 +225,4 @@ function getInnerDateBarSizing(
 		endsInside: endsInside,
 		startsInside: startsInside,
 	};
-}
-
-function getBookingBarBorderRadius(startsInside: boolean, endsInside: boolean) {
-	if (startsInside && !endsInside) {
-		return "999px 0 0 999px";
-	} else if (endsInside && !startsInside) {
-		return "0 999px 999px 0";
-	} else if (endsInside && startsInside) {
-		return "999px";
-	}
-	return "0";
 }
