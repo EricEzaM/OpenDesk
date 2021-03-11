@@ -69,7 +69,7 @@ function DeskDetails({ desk }: Props) {
 		return dateOnly >= currentDate;
 	}
 
-	function customTimeInput({ value, onChange }: { value: string, onChange: (event: string) => void }) {
+	function CustomTimeInput({ value, onChange }: { value: string, onChange: (event: string) => void }) {
 		return (
 		<select
 			value={value}
@@ -102,7 +102,8 @@ function DeskDetails({ desk }: Props) {
 				prospectiveBookingEnd={bkEnd}
 			/>
 
-			<div style={{ display: "flex", margin: "0.5em 0" }}>
+			<div style={{ display: "flex", margin: "0.5em", justifyContent: "center" }}>
+				<p style={{margin: "0 0.5em"}}>From</p>
 				<DatePicker
 					placeholderText="Start Date & Time"
 					selected={bkStart}
@@ -110,9 +111,9 @@ function DeskDetails({ desk }: Props) {
 					dateFormat="MMMM d, yyyy h:mm aa"
 					filterDate={disallowPast}
 					showTimeInput
-					customTimeInput={React.createElement(customTimeInput)}
+					customTimeInput={React.createElement(CustomTimeInput)}
 				/>
-				<p style={{margin: "0 5px"}}>to</p>
+				<p style={{margin: "0 0.5em"}}>to</p>
 				<DatePicker
 					placeholderText="End Date & Time"
 					selected={bkEnd}
@@ -120,9 +121,9 @@ function DeskDetails({ desk }: Props) {
 					dateFormat="MMMM d, yyyy h:mm aa"
 					filterDate={disallowPast}
 					showTimeInput
-					customTimeInput={React.createElement(customTimeInput)}
+					customTimeInput={React.createElement(CustomTimeInput)}
 				/>
-				<button>Book Desk</button>
+				<button style={{margin: "0 0.5em", padding: "0 0.5em", whiteSpace: "nowrap"}}>Book Desk</button>
 			</div>
 		</div>
 	);
