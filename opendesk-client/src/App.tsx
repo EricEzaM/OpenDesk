@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import OfficePlanImage from "./OfficePlanImage.png";
+import OfficePlanImage from "./OfficePlanImage2.png";
 import Desk from "./models/Desk";
 import OfficeImage from "./models/OfficeImage";
 import OfficeMap from "./map/OfficeMap";
@@ -12,7 +12,8 @@ function App()
 
   let officeImage : OfficeImage = {
     url: OfficePlanImage,
-    size: [659, 503]
+    // size: [659, 503]
+    size: [864 * 1.3, 435 * 1.3]
   }
 
   let desks: Desk[] = [

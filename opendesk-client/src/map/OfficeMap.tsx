@@ -19,7 +19,9 @@ interface Props {
 }
 
 function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
-	let imageCoords = [image.size[1], image.size[0]];
+	let imageBoundsMax = [image.size[1], image.size[0]];
+
+	let height = Math.min(image.size[0], 450); // maximum map display = 600 px
 
 	return (
     <div style={{
@@ -28,8 +30,10 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
     >
 			<div
 				style={{
-					height: imageCoords[0] + "px",
-					width: imageCoords[1] + "px",
+					// height: imageCoords[0] + "px",
+					// width: imageCoords[1] + "px",
+					height: height + "px",
+					width: "100%",
 					margin: "0 auto",
 				}}
 			>
@@ -39,24 +43,26 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 						width: "100%",
 						border: "solid 5px black",
 					}}
-					center={[imageCoords[0] / 2, imageCoords[1] / 2]}
+					center={[imageBoundsMax[0] / 2, imageBoundsMax[1] / 2]}
 					crs={CRS.Simple}
 					attributionControl={false}
 					// Disable dragging and zooming
-					zoom={0}
-					dragging={false}
+					zoom={-5}
+					dragging={true}
 					zoomControl={false}
 					scrollWheelZoom={false}
 					touchZoom={false}
 					doubleClickZoom={false}
 					keyboard={false}
 					boxZoom={false}
+					maxBounds={[[-25, -25], [imageBoundsMax[0] + 25, imageBoundsMax[1] + 25]]}
+					maxBoundsViscosity={1}
 				>
 					<ImageOverlay
 						url={image.url}
 						bounds={[
 							[0, 0],
-							[imageCoords[0], imageCoords[1]],
+							[imageBoundsMax[0], imageBoundsMax[1]],
 						]}
 					/>
 
