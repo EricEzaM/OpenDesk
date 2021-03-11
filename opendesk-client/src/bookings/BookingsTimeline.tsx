@@ -21,8 +21,6 @@ interface DateBar {
 interface InnerDateBar {
 	width: number;
 	offset: number;
-	startsInside: boolean;
-	endsInside: boolean;
 }
 
 function BookingsTimeline({
@@ -32,7 +30,7 @@ function BookingsTimeline({
 }: Props) {
 	let prospOverlapsExisting = false;
 	if (prospectiveBookingStart && prospectiveBookingEnd) {
-		debugger
+		debugger;
 		for (let i = 0; i < bookings.length; i++) {
 			const booking = bookings[i];
 
@@ -46,7 +44,7 @@ function BookingsTimeline({
 				// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
 				(prospectiveBookingStart <= booking.startDateTime &&
 					prospectiveBookingEnd >= booking.endDateTime);
-			
+
 			if (prospOverlapsExisting) {
 				break;
 			}
@@ -86,12 +84,7 @@ function BookingsTimeline({
 	return (
 		<div>
 			{datebars.map((bar) => {
-				const {
-					width: pw,
-					offset: po,
-					startsInside: psi,
-					endsInside: pei,
-				} = getInnerDateBarSizing(
+				const { width: pw, offset: po } = getInnerDateBarSizing(
 					prospectiveBookingStart ?? new Date(),
 					prospectiveBookingEnd ?? new Date(),
 					bar
@@ -108,12 +101,11 @@ function BookingsTimeline({
 						<div className="booking-timeline-bar">
 							{/* Calculating what should be displayed as the "time taken" on each bar */}
 							{bookings.map((b) => {
-								const {
-									width,
-									offset,
-									startsInside,
-									endsInside,
-								} = getInnerDateBarSizing(b.startDateTime, b.endDateTime, bar);
+								const { width, offset } = getInnerDateBarSizing(
+									b.startDateTime,
+									b.endDateTime,
+									bar
+								);
 
 								return (
 									<div
@@ -135,7 +127,11 @@ function BookingsTimeline({
 
 							{prospectiveBookingStart && prospectiveBookingEnd && (
 								<div
-									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${prospOverlapsExisting ? "booking-timeline-bar__time-booked--clashes" : ""}`}
+									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${
+										prospOverlapsExisting
+											? "booking-timeline-bar__time-booked--clashes"
+											: ""
+									}`}
 									style={{
 										width: pw + "%",
 										marginLeft: po + "%",
@@ -180,8 +176,6 @@ function getInnerDateBarSizing(
 		return {
 			width: 0,
 			offset: 0,
-			startsInside: true,
-			endsInside: true,
 		};
 	}
 
@@ -222,7 +216,5 @@ function getInnerDateBarSizing(
 	return {
 		width: width,
 		offset: offset,
-		endsInside: endsInside,
-		startsInside: startsInside,
 	};
 }
