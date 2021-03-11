@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { addDays } from "date-fns/esm";
 import React from "react";
 import Booking from "../models/Booking";
 
@@ -65,11 +66,9 @@ function BookingsTimeline({
 	let datebars: DateBar[] = [];
 
 	for (let i = 0; i < 7; i++) {
-		let start = new Date(dateBarsStartDate.getTime());
-		start.setDate(dateBarsStartDate.getDate() + i);
+		let start = addDays(new Date(dateBarsStartDate.getTime()), i);
 
-		let end = new Date(dateBarsEndDate.getTime());
-		end.setDate(dateBarsEndDate.getDate() + i);
+		let end = addDays(new Date(dateBarsEndDate.getTime()), i);
 
 		datebars.push({
 			start: start,
