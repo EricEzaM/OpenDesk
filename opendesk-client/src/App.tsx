@@ -45,9 +45,9 @@ function App()
   }
 
   return (
-    <div>
-      <DeskDetails desk={selectedDesk} />
+    <div style={{maxWidth: "1024px", margin: "0 auto"}}>
       <OfficeMap image={officeImage} desks={desks} selectedDesk={selectedDesk} onDeskSelected={onDeskSelected}/>
+      <DeskDetails desk={selectedDesk} />
     </div>
 	);
 }

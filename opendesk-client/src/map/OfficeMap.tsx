@@ -25,7 +25,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props)
 
   return (
     <MapContainer
-        style={{ height: imageCoords[0] + "px", width: imageCoords[1] + "px" }}
+        style={{ height: imageCoords[0] + "px", width: imageCoords[1] + "px", margin: "0 auto", border: "solid 5px black" }}
         center={[imageCoords[0] / 2, imageCoords[1] / 2]}
         crs={CRS.Simple}
         attributionControl={false}
