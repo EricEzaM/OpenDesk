@@ -46,7 +46,13 @@ function App()
   }
 
   return (
-    <div style={{maxWidth: "1024px", margin: "0 auto"}}>
+    <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center" }}>OpenDesk</h1>
+      <select style={{ margin: "0 auto" }}>
+        <option>Office 1</option>
+        <option>Office 2</option>
+        <option>Office 3</option>
+      </select>
       <OfficeMap image={officeImage} desks={desks} selectedDesk={selectedDesk} onDeskSelected={onDeskSelected}/>
       <DeskDetails desk={selectedDesk} />
     </div>
