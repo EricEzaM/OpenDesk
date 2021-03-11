@@ -1,10 +1,6 @@
+import { format } from "date-fns";
 import React from "react";
 import Booking from "../models/Booking";
-import {
-	Get24hTime,
-	GetFullDateWith24hTime,
-	GetMonthDayFormatted,
-} from "../util/DateUtils";
 
 interface Props {
 	bookings: Booking[];
@@ -93,8 +89,8 @@ function BookingsTimeline({
 				return (
 					<div style={{ display: "flex", alignItems: "center" }}>
 						{/* Date displayed at start of bar */}
-						<div style={{ margin: "0 10px" }}>
-							{GetMonthDayFormatted(bar.start)}
+						<div style={{ margin: "0 10px", width: "100px" }}>
+							{format(bar.start, "EEEEEE dd/MM")}
 						</div>
 
 						{/* Timeline Bar itself */}
@@ -116,10 +112,8 @@ function BookingsTimeline({
 										}}
 										title={
 											b.user.name +
-											"\r\nFrom " +
-											GetFullDateWith24hTime(b.startDateTime) +
-											"\r\nTo " +
-											GetFullDateWith24hTime(b.endDateTime)
+											"\r\nFrom " + format(b.startDateTime, "dd/MM/yyyy h:mm bb") +
+											"\r\nTo " + format(b.startDateTime, "dd/MM/yyyy h:mm bb")
 										}
 									></div>
 								);
@@ -137,18 +131,16 @@ function BookingsTimeline({
 										marginLeft: po + "%",
 									}}
 									title={
-										"\r\nFrom " +
-										GetFullDateWith24hTime(bookingStart) +
-										"\r\nTo " +
-										GetFullDateWith24hTime(bookingEnd)
+										"\r\nFrom " + format(bookingStart, "dd/MM/yyyy h:mm bb") +
+										"\r\nTo " + format(bookingEnd, "dd/MM/yyyy h:mm bb")
 									}
 								></div>
 							)}
 
 							{/* Time Display at each end of bar */}
 							<div className="booking-timeline-bar__time-display">
-								<span>{Get24hTime(bar.start)}</span>
-								<span>{Get24hTime(bar.end)}</span>
+								<span>{format(bar.start, "HH:mm")}</span>
+								<span>{format(bar.end, "HH:mm")}</span>
 							</div>
 						</div>
 					</div>
