@@ -85,11 +85,9 @@ function DeskDetails({ desk }: Props) {
 	return (
 		<div>
 			{desk && (
-				<>
-					<p>Id = {desk.id}</p>
-					<p>Name = {desk.name}</p>
-					<p>Location = {desk.location}</p>
-				</>
+				<div style={{marginBottom: "0.5em", borderBottom: "solid 3px #00a0af"}}>
+					<h3 style={{textAlign: "center"}}>{desk.name}</h3>
+				</div>
 			)}
 			<BookingsTimeline
 				bookings={bookings}
@@ -118,7 +116,7 @@ function DeskDetails({ desk }: Props) {
 					showTimeInput
 					customTimeInput={React.createElement(CustomTimeInput)}
 				/>
-				<button style={{margin: "0 0.5em", padding: "0 0.5em", whiteSpace: "nowrap"}}>Book Desk</button>
+				<button style={{margin: "0 0.5em", padding: "0 0.5em", whiteSpace: "nowrap", color: "white", backgroundColor: "#00a0af", border: "none", borderRadius: "4px"}}>Book Desk</button>
 			</div>
 		</div>
 	);
