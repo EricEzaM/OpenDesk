@@ -48,11 +48,13 @@ function App()
   return (
     <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
       <h1 style={{ textAlign: "center" }}>OpenDesk</h1>
-      <select style={{ margin: "0 auto" }}>
-        <option>Office 1</option>
-        <option>Office 2</option>
-        <option>Office 3</option>
-      </select>
+      <div style={{textAlign:"center", marginTop: "0.5em"}}>
+        <select style={{ margin: "0 auto" }}>
+          <option>Office 1</option>
+          <option>Office 2</option>
+          <option>Office 3 With a Really Long name</option>
+        </select>
+      </div>
       <OfficeMap image={officeImage} desks={desks} selectedDesk={selectedDesk} onDeskSelected={onDeskSelected}/>
       <DeskDetails desk={selectedDesk} />
     </div>

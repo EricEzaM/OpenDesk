@@ -25,7 +25,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 
 	return (
     <div style={{
-      margin: "1em",
+      margin: "0.5em",
     }}
     >
 			<div
