@@ -32,13 +32,14 @@ namespace OpenDesk.API.Features.Offices
 
 		public async Task<OfficeDTO> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
 		{
-			// TODO Re-write this. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
+			// TODO Re-write this to make it more secure. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
+			// Store in blob storage somewhere and replace ImageId with ImageUrl in the Office database model?
 
 			string fName = Guid.NewGuid().ToString();
 			string path = Path.Combine(_env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
 			using (var stream = new FileStream(path, FileMode.Create))
 			{
-				await request.Image.CopyToAsync(stream);
+				await request.Image.CopyToAsync(stream, cancellationToken);
 			}
 
 			var office = new Office
@@ -48,7 +49,7 @@ namespace OpenDesk.API.Features.Offices
 			};
 
 			_db.Offices.Add(office);
-			await _db.SaveChangesAsync();
+			await _db.SaveChangesAsync(cancellationToken);
 
 			return new OfficeDTO
 			{
