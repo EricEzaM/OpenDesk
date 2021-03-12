@@ -46,10 +46,10 @@ function App()
   }
 
   return (
-    <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
-      <h1 style={{ textAlign: "center" }}>OpenDesk</h1>
-      <div style={{textAlign:"center", marginTop: "0.5em"}}>
-        <select style={{ margin: "0 auto" }}>
+    <div className="container">
+      <h1 className="main-title">OpenDesk</h1>
+      <div className="office-selection">
+        <select className="office-selection__dropdown">
           <option>Office 1</option>
           <option>Office 2</option>
           <option>Office 3 With a Really Long name</option>

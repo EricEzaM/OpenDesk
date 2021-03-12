@@ -83,20 +83,20 @@ function DeskDetails({ desk }: Props) {
 	}
 
 	return (
-		<div>
+		<div className="desk-details">
 			{desk && (
-				<div style={{marginBottom: "0.5em", borderBottom: "solid 3px #00a0af"}}>
-					<h3 style={{textAlign: "center"}}>{desk.name}</h3>
+				<div className="desk-details__title">
+					<h3>{desk.name}</h3>
 				</div>
 			)}
 			<BookingsTimeline
-				bookings={bookings}
-				bookingStart={bkStart}
-				bookingEnd={bkEnd}
+				existingBookings={bookings}
+				newBookingStart={bkStart}
+				newBookingEnd={bkEnd}
 			/>
 
-			<div style={{ display: "flex", margin: "0.5em", justifyContent: "center" }}>
-				<p style={{margin: "0 0.5em"}}>From</p>
+			<div className="desk-details__datepickers">
+				<p className="desk-details__datepickers-text">From</p>
 				<DatePicker
 					placeholderText="Start Date & Time"
 					selected={bkStart}
@@ -106,7 +106,7 @@ function DeskDetails({ desk }: Props) {
 					showTimeInput
 					customTimeInput={React.createElement(CustomTimeInput)}
 				/>
-				<p style={{margin: "0 0.5em"}}>to</p>
+				<p className="desk-details__datepickers-text">to</p>
 				<DatePicker
 					placeholderText="End Date & Time"
 					selected={bkEnd}
@@ -116,7 +116,7 @@ function DeskDetails({ desk }: Props) {
 					showTimeInput
 					customTimeInput={React.createElement(CustomTimeInput)}
 				/>
-				<button style={{margin: "0 0.5em", padding: "0 0.5em", whiteSpace: "nowrap", color: "white", backgroundColor: "#00a0af", border: "none", borderRadius: "4px"}}>Book Desk</button>
+				<button className="desk-details__submit">Book Desk</button>
 			</div>
 		</div>
 	);

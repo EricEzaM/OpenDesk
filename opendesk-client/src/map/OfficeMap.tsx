@@ -24,25 +24,14 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 	let height = Math.min(image.size[0], 450); // maximum map display = 600 px
 
 	return (
-    <div style={{
-      margin: "0.5em",
-    }}
-    >
+    <div className="map-container">
 			<div
+				className="map-container__inner"
 				style={{
-					// height: imageCoords[0] + "px",
-					// width: imageCoords[1] + "px",
 					height: height + "px",
-					width: "100%",
-					margin: "0 auto",
 				}}
 			>
 				<MapContainer
-					style={{
-						height: "100%",
-						width: "100%",
-						border: "solid 5px black",
-					}}
 					center={[imageBoundsMax[0] / 2, imageBoundsMax[1] / 2]}
 					crs={CRS.Simple}
 					attributionControl={false}

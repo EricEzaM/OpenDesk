@@ -4,9 +4,9 @@ import { addDays } from "date-fns/esm";
 import Booking from "../models/Booking";
 
 interface Props {
-	bookings: Booking[];
-	bookingStart?: Date;
-	bookingEnd?: Date;
+	existingBookings: Booking[];
+	newBookingStart?: Date;
+	newBookingEnd?: Date;
 }
 
 interface DateBar {
@@ -21,26 +21,26 @@ interface InnerDateBar {
 }
 
 function BookingsTimeline({
-	bookings,
-	bookingStart,
-	bookingEnd,
+	existingBookings,
+	newBookingStart,
+	newBookingEnd,
 }: Props) {
 
 	let bookingInvalid = false;
-	if (bookingStart && bookingEnd) {
-		for (let i = 0; i < bookings.length; i++) {
-			const booking = bookings[i];
+	if (newBookingStart && newBookingEnd) {
+		for (let i = 0; i < existingBookings.length; i++) {
+			const booking = existingBookings[i];
 
 			bookingInvalid =
 				// Start is between existing start and end
-				(bookingStart >= booking.startDateTime &&
-					bookingStart < booking.endDateTime) ||
+				(newBookingStart >= booking.startDateTime &&
+					newBookingStart < booking.endDateTime) ||
 				// End is between existing start and end
-				(bookingEnd > booking.startDateTime &&
-					bookingEnd <= booking.endDateTime) ||
+				(newBookingEnd > booking.startDateTime &&
+					newBookingEnd <= booking.endDateTime) ||
 				// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
-				(bookingStart <= booking.startDateTime &&
-					bookingEnd >= booking.endDateTime);
+				(newBookingStart <= booking.startDateTime &&
+					newBookingEnd >= booking.endDateTime);
 
 			if (bookingInvalid) {
 				break;
@@ -79,26 +79,26 @@ function BookingsTimeline({
 	return (
 		<div>
 			{datebars.map((bar) => {
-				const { width: pw, offset: po } = getInnerDateBarSizing(
-					bookingStart ?? new Date(),
-					bookingEnd ?? new Date(),
+				const { width: newBookingWidth, offset: newBookingOffset } = getInnerDateBarSizing(
+					newBookingStart ?? new Date(),
+					newBookingEnd ?? new Date(),
 					bar
 				);
 
 				return (
-					<div style={{ display: "flex", alignItems: "center" }}>
+					<div className="booking-container">
 						{/* Date displayed at start of bar */}
-						<div style={{ margin: "0 10px", width: "100px" }}>
+						<div className="booking-container__date">
 							{format(bar.start, "EEEEEE dd/MM")}
 						</div>
 
 						{/* Timeline Bar itself */}
 						<div className="booking-timeline-bar">
 							{/* Calculating what should be displayed as the "time taken" on each bar */}
-							{bookings.map((b) => {
-								const { width, offset } = getInnerDateBarSizing(
-									b.startDateTime,
-									b.endDateTime,
+							{existingBookings.map((existingBooking) => {
+								const { width: existingBookingWidth, offset: existingBookingOffset } = getInnerDateBarSizing(
+									existingBooking.startDateTime,
+									existingBooking.endDateTime,
 									bar
 								);
 
@@ -106,19 +106,19 @@ function BookingsTimeline({
 									<div
 										className="booking-timeline-bar__time-booked"
 										style={{
-											width: width + "%",
-											marginLeft: offset + "%",
+											width: existingBookingWidth + "%",
+											marginLeft: existingBookingOffset + "%",
 										}}
 										title={
-											b.user.name +
-											"\r\nFrom " + format(b.startDateTime, "dd/MM/yyyy h:mm bb") +
-											"\r\nTo " + format(b.endDateTime, "dd/MM/yyyy h:mm bb")
+											existingBooking.user.name +
+											"\r\nFrom " + format(existingBooking.startDateTime, "dd/MM/yyyy h:mm bb") +
+											"\r\nTo " + format(existingBooking.endDateTime, "dd/MM/yyyy h:mm bb")
 										}
 									></div>
 								);
 							})}
 
-							{bookingStart && bookingEnd && (
+							{newBookingStart && newBookingEnd && (
 								<div
 									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${
 										bookingInvalid
@@ -126,12 +126,12 @@ function BookingsTimeline({
 											: ""
 									}`}
 									style={{
-										width: pw + "%",
-										marginLeft: po + "%",
+										width: newBookingWidth + "%",
+										marginLeft: newBookingOffset + "%",
 									}}
 									title={
-										"\r\nFrom " + format(bookingStart, "dd/MM/yyyy h:mm bb") +
-										"\r\nTo " + format(bookingEnd, "dd/MM/yyyy h:mm bb")
+										"\r\nFrom " + format(newBookingStart, "dd/MM/yyyy h:mm bb") +
+										"\r\nTo " + format(newBookingEnd, "dd/MM/yyyy h:mm bb")
 									}
 								></div>
 							)}

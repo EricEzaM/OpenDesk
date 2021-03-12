@@ -1,0 +1,13 @@
+.main-title {
+  text-align: center;
+  font-size: 3em;
+}
+
+.office-selection {
+  text-align: center;
+  margin-top: $margin;
+
+  &__dropdown {
+    margin: 0 auto;
+  }
+}

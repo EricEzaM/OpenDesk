@@ -1,0 +1,27 @@
+.desk-details {
+  &__title {
+    margin-bottom: $margin;
+    border-bottom: solid 3px #00a0af;
+    text-align: center;
+  }
+
+  &__datepickers {
+    display: flex;
+    justify-content: center;
+    margin: $margin;
+  }
+
+  &__datepickers-text {
+    margin: 0 $margin;
+  }
+
+  &__submit {
+    margin: 0 $margin;
+    padding: 0 0.5em;
+    white-space: nowrap;
+    color: white;
+    background-color: #00a0af;
+    border: none;
+    border-radius: 4px;
+  }
+}

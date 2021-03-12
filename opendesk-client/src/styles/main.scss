@@ -4,8 +4,13 @@
 @import "./base/base";
 @import "./base/reset";
 
+@import "./pages/common";
+@import "./pages/index";
+
 @import "./components/booking-timeline";
-@import "./components/react-datepicker-additions";
+@import "./components/desk-details.scss";
+@import "./components/office-map.scss";
+@import "./components/package-extensions.scss";
 
 input, select {
   font-size: 13px;
