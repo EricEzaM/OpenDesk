@@ -5,24 +5,10 @@ import Desk from "./models/Desk";
 import OfficeImage from "./models/OfficeImage";
 import OfficeMap from "./map/OfficeMap";
 import DeskDetails from "./desks/DeskDetails";
-import Office from "./models/Office";
+import OfficeSelector from "./OfficeSelector";
 
 function App() {
-	const [offices, setOffices] = useState<Office[]>([]);
 	const [selectedDesk, setSelectedDesk] = useState<Desk | null>(null);
-
-	useEffect(() => {
-		fetch(process.env.REACT_APP_API_URL + "/api/offices")
-			.then((res) => res.json())
-			.then(
-				(data) => {
-					setOffices(data);
-				},
-				(error) => {
-					console.log(error);
-				}
-			);
-	}, []);
 
 	let officeImage: OfficeImage = {
 		url: OfficePlanImage,
@@ -58,18 +44,14 @@ function App() {
 		console.log("Selected desk " + desk.name);
 	}
 
+	function onOfficeSelected(officeId: string) {
+		alert(officeId);
+	}
+
 	return (
 		<div className="container">
 			<h1 className="main-title">OpenDesk</h1>
-			<div className="office-selection">
-				<select className="office-selection__dropdown">
-					<option>-- Select an Office --</option>
-					{offices &&
-						offices.map((o) => {
-							return <option value={o.id}>{o.name}</option>;
-						})}
-				</select>
-			</div>
+			<OfficeSelector onChange={onOfficeSelected} />
 			<OfficeMap
 				image={officeImage}
 				desks={desks}
