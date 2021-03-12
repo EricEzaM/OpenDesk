@@ -1,6 +1,6 @@
+import React from "react";
 import { format } from "date-fns";
 import { addDays } from "date-fns/esm";
-import React from "react";
 import Booking from "../models/Booking";
 
 interface Props {
@@ -112,7 +112,7 @@ function BookingsTimeline({
 										title={
 											b.user.name +
 											"\r\nFrom " + format(b.startDateTime, "dd/MM/yyyy h:mm bb") +
-											"\r\nTo " + format(b.startDateTime, "dd/MM/yyyy h:mm bb")
+											"\r\nTo " + format(b.endDateTime, "dd/MM/yyyy h:mm bb")
 										}
 									></div>
 								);
@@ -156,6 +156,7 @@ function getInnerDateBarSizing(
 	bEnd: Date,
 	bar: DateBar
 ): InnerDateBar {
+	debugger
 	let barLength = bar.end.getTime() - bar.start.getTime();
 
 	let offset = 0;

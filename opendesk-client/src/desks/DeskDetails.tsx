@@ -7,12 +7,7 @@ import Booking from "../models/Booking";
 import Desk from "../models/Desk";
 
 import "react-datepicker/dist/react-datepicker.css";
-import {
-	setHours,
-	setMilliseconds,
-	setMinutes,
-	setSeconds,
-} from "date-fns";
+import { set } from "date-fns";
 
 interface Props {
 	desk: Desk | null;
@@ -33,8 +28,8 @@ function DeskDetails({ desk }: Props) {
 		},
 	];
 
-	const [bkStart, setBkStart] = useState<Date>(setHours(setMinutes(new Date(), 0), 6));
-	const [bkEnd, setBkEnd] = useState<Date>(setHours(setMinutes(new Date(), 0), 20));
+	const [bkStart, setBkStart] = useState<Date>(set(new Date(), {hours: 6, minutes: 0, seconds: 0, milliseconds: 0}));
+	const [bkEnd, setBkEnd] = useState<Date>(set(new Date(), {hours: 20, minutes: 0, seconds: 0, milliseconds: 0}));
 
 	function handleStartChange(date: Date) {
 		// Don't allow starting bookings after
@@ -43,7 +38,7 @@ function DeskDetails({ desk }: Props) {
 		}
 		// If start was moved to after end, adjust end to still be after start
 		if (date > bkEnd) {
-			setBkEnd(setHours(setMinutes(date, 0), bkEnd.getHours()));
+			setBkEnd(set(date, {hours: bkEnd.getHours(), minutes: 0}));
 		}
 
 		setBkStart(date);
@@ -56,15 +51,15 @@ function DeskDetails({ desk }: Props) {
 		}
 		// If end date was moved to before start, adjust start.
 		if (date < bkStart) {
-			setBkStart(setHours(setMinutes(date, 0), bkStart.getHours()));
+			setBkStart(set(date, {hours: bkStart.getHours(), minutes: 0}));
 		}
 
 		setBkEnd(date)
 	}
 
 	function disallowPast(date: Date) {
-		let currentDate = setHours(setMinutes(setSeconds(setMilliseconds(new Date(), 0), 0), 0),0);
-		let dateOnly = setHours(setMinutes(setSeconds(setMilliseconds(date, 0), 0), 0),0);
+		let currentDate = set(new Date(), {hours: 0, minutes: 0, seconds: 0, milliseconds: 0});
+		let dateOnly = set(date, {hours: 0, minutes: 0, seconds: 0, milliseconds: 0});
 
 		return dateOnly >= currentDate;
 	}
