@@ -156,7 +156,6 @@ function getInnerDateBarSizing(
 	bEnd: Date,
 	bar: DateBar
 ): InnerDateBar {
-	debugger
 	let barLength = bar.end.getTime() - bar.start.getTime();
 
 	let offset = 0;
