@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenDesk.API.Features.Office
+namespace OpenDesk.API.Features.Offices
 {
 	public class GetOfficesCommand : IRequest<IEnumerable<OfficeDTO>> { }
 
