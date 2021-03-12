@@ -1,5 +1,5 @@
 import React from "react";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { addDays } from "date-fns/esm";
 import Booking from "../models/Booking";
 
@@ -139,6 +139,7 @@ function BookingsTimeline({
 							{/* Time Display at each end of bar */}
 							<div className="booking-timeline-bar__time-display">
 								<span>{format(bar.start, "HH:mm")}</span>
+								<span>{format(set(new Date(), {hours: 13, minutes: 0}), "HH:mm")}</span>
 								<span>{format(bar.end, "HH:mm")}</span>
 							</div>
 						</div>
