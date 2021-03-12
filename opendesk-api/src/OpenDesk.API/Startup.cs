@@ -25,9 +25,12 @@ namespace OpenDesk.API
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
+		private readonly IWebHostEnvironment _env;
+
+		public Startup(IConfiguration configuration, IWebHostEnvironment env)
 		{
 			Configuration = configuration;
+			_env = env;
 		}
 
 		public IConfiguration Configuration { get; }
@@ -40,6 +43,19 @@ namespace OpenDesk.API
 			services.AddMediatR(typeof(Startup));
 
 			services.AddHttpClient();
+
+			if (_env.IsDevelopment())
+			{
+				services.AddCors(o =>
+				{
+					o.AddDefaultPolicy(cb =>
+					{
+						cb.AllowAnyOrigin();
+						cb.AllowAnyMethod();
+						cb.AllowAnyHeader();
+					});
+				});
+			}
 
 			services.AddControllers();
 			services.AddSwaggerGen(c =>
@@ -61,6 +77,11 @@ namespace OpenDesk.API
 			app.UseHttpsRedirection();
 
 			app.UseRouting();
+
+			if (env.IsDevelopment())
+			{
+				app.UseCors();
+			}
 
 			app.UseAuthentication();
 			app.UseAuthorization();
