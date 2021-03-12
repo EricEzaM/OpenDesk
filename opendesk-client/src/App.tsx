@@ -1,63 +1,83 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import OfficePlanImage from "./OfficePlanImage2.png";
 import Desk from "./models/Desk";
 import OfficeImage from "./models/OfficeImage";
 import OfficeMap from "./map/OfficeMap";
 import DeskDetails from "./desks/DeskDetails";
+import Office from "./models/Office";
 
-function App()
-{
-  const [selectedDesk, setSelectedDesk] = useState<Desk | null>(null)
+function App() {
+	const [offices, setOffices] = useState<Office[]>([]);
+	const [selectedDesk, setSelectedDesk] = useState<Desk | null>(null);
 
-  let officeImage : OfficeImage = {
-    url: OfficePlanImage,
-    // size: [659, 503]
-    size: [864 * 1.3, 435 * 1.3]
-  }
+	useEffect(() => {
+		fetch(process.env.REACT_APP_API_URL + "/api/offices")
+			.then((res) => res.json())
+			.then(
+				(data) => {
+					setOffices(data);
+				},
+				(error) => {
+					console.log(error);
+				}
+			);
+	}, []);
 
-  let desks: Desk[] = [
-    {
-      id: "1",
-      location: [366, 215],
-      name: "Desk 1"
-    },
-    {
-      id: "2",
-      location: [366, 365],
-      name: "Desk 2"
-    },
-    {
-      id: "3",
-      location: [363, 497],
-      name: "Desk 3"
-    },
-    {
-      id: "4",
-      location: [422, 220],
-      name: "Desk 4"
-    },
-  ]
+	let officeImage: OfficeImage = {
+		url: OfficePlanImage,
+		// size: [659, 503]
+		size: [864 * 1.3, 435 * 1.3],
+	};
 
-  function onDeskSelected(desk: Desk)
-  {
-    setSelectedDesk(desk)
-    console.log("Selected desk " + desk.name)
-  }
+	let desks: Desk[] = [
+		{
+			id: "1",
+			location: [366, 215],
+			name: "Desk 1",
+		},
+		{
+			id: "2",
+			location: [366, 365],
+			name: "Desk 2",
+		},
+		{
+			id: "3",
+			location: [363, 497],
+			name: "Desk 3",
+		},
+		{
+			id: "4",
+			location: [422, 220],
+			name: "Desk 4",
+		},
+	];
 
-  return (
-    <div className="container">
-      <h1 className="main-title">OpenDesk</h1>
-      <div className="office-selection">
-        <select className="office-selection__dropdown">
-          <option>Office 1</option>
-          <option>Office 2</option>
-          <option>Office 3 With a Really Long name</option>
-        </select>
-      </div>
-      <OfficeMap image={officeImage} desks={desks} selectedDesk={selectedDesk} onDeskSelected={onDeskSelected}/>
-      <DeskDetails desk={selectedDesk} />
-    </div>
+	function onDeskSelected(desk: Desk) {
+		setSelectedDesk(desk);
+		console.log("Selected desk " + desk.name);
+	}
+
+	return (
+		<div className="container">
+			<h1 className="main-title">OpenDesk</h1>
+			<div className="office-selection">
+				<select className="office-selection__dropdown">
+					<option>-- Select an Office --</option>
+					{offices &&
+						offices.map((o) => {
+							return <option value={o.id}>{o.name}</option>;
+						})}
+				</select>
+			</div>
+			<OfficeMap
+				image={officeImage}
+				desks={desks}
+				selectedDesk={selectedDesk}
+				onDeskSelected={onDeskSelected}
+			/>
+			<DeskDetails desk={selectedDesk} />
+		</div>
 	);
 }
 
