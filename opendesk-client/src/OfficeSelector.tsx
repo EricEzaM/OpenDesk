@@ -3,7 +3,7 @@ import Office from "./models/Office";
 import apiRequest from "./utils/requestUtils";
 
 interface Props {
-	onChange?: (officeId: string) => void;
+	onChange?: (office: Office) => void;
 }
 
 function OfficeSelector({ onChange }: Props) {
@@ -25,7 +25,10 @@ function OfficeSelector({ onChange }: Props) {
 		<div className="office-selector">
 			<select
 				className="office-selector__dropdown"
-				onChange={(e) => onChange && onChange(e.target.value)}
+				onChange={(e) => {
+					let changedOffice = offices.find((o) => o.id === e.target.value);
+					changedOffice && onChange && onChange(changedOffice);
+				}}
 			>
 				<option value="" disabled selected>
 					-- Select an Office --

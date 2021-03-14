@@ -14,7 +14,7 @@ import Desk from "../models/Desk";
 interface Props {
 	image: OfficeImage;
 	desks: Desk[];
-	selectedDesk: Desk | null;
+	selectedDesk?: Desk;
 	onDeskSelected: (desk: Desk) => void;
 }
 
@@ -24,7 +24,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 	let height = Math.min(image.size[0], 450); // maximum map display = 600 px
 
 	return (
-    <div className="map-container">
+		<div className="map-container">
 			<div
 				className="map-container__inner"
 				style={{
@@ -44,7 +44,10 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 					doubleClickZoom={false}
 					keyboard={false}
 					boxZoom={false}
-					maxBounds={[[-25, -25], [imageBoundsMax[0] + 25, imageBoundsMax[1] + 25]]}
+					maxBounds={[
+						[-25, -25],
+						[imageBoundsMax[0] + 25, imageBoundsMax[1] + 25],
+					]}
 					maxBoundsViscosity={1}
 				>
 					<ImageOverlay

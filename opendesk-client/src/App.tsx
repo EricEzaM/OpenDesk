@@ -6,9 +6,11 @@ import OfficeImage from "./models/OfficeImage";
 import OfficeMap from "./map/OfficeMap";
 import DeskDetails from "./desks/DeskDetails";
 import OfficeSelector from "./OfficeSelector";
+import Office from "./models/Office";
 
 function App() {
-	const [selectedDesk, setSelectedDesk] = useState<Desk | null>(null);
+	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
+	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
 
 	let officeImage: OfficeImage = {
 		url: OfficePlanImage,
@@ -44,21 +46,24 @@ function App() {
 		console.log("Selected desk " + desk.name);
 	}
 
-	function onOfficeSelected(officeId: string) {
-		alert(officeId);
+	function onOfficeSelected(office: Office) {
+		setSelectedOffice(office);
+		console.log("Selected office " + office.name);
 	}
 
 	return (
 		<div className="container">
 			<h1 className="main-title">OpenDesk</h1>
 			<OfficeSelector onChange={onOfficeSelected} />
-			<OfficeMap
-				image={officeImage}
-				desks={desks}
-				selectedDesk={selectedDesk}
-				onDeskSelected={onDeskSelected}
-			/>
-			<DeskDetails desk={selectedDesk} />
+			{selectedOffice && (
+				<OfficeMap
+					image={officeImage}
+					desks={desks}
+					selectedDesk={selectedDesk}
+					onDeskSelected={onDeskSelected}
+				/>
+			)}
+			{selectedDesk && <DeskDetails desk={selectedDesk} />}
 		</div>
 	);
 }
