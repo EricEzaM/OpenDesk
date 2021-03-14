@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 import { MapContainer, Marker, ImageOverlay } from "react-leaflet";
-import { CRS, icon, point } from "leaflet";
+import {
+	CRS,
+	icon,
+	point,
+	ImageOverlay as LImageOverlay,
+	LatLngBounds,
+	Map,
+} from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import DeskLocationIcon from "./icons/desk-location.svg";
@@ -23,6 +30,30 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 
 	let displayHeight = Math.min(image.width, 450); // maximum map display = 600 px
 
+	const ref = useRef<LImageOverlay>();
+	const mapRef = useRef<Map>();
+
+	// Image Change
+	useEffect(() => {
+		// Update image bounds so image scales properly
+		ref &&
+			ref.current &&
+			ref.current.setBounds(
+				new LatLngBounds([
+					[0, 0],
+					[imageBoundsMax[0], imageBoundsMax[1]],
+				])
+			);
+
+		// Update maps bounds so that panning works properly for new image
+		mapRef &&
+			mapRef.current &&
+			mapRef.current.setMaxBounds([
+				[-25, -25],
+				[imageBoundsMax[0] + 25, imageBoundsMax[1] + 25],
+			]);
+	}, [image]);
+
 	return (
 		<div className="map-container">
 			<div
@@ -32,6 +63,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 				}}
 			>
 				<MapContainer
+					whenCreated={(map) => (mapRef.current = map)}
 					center={[imageBoundsMax[0] / 2, imageBoundsMax[1] / 2]}
 					crs={CRS.Simple}
 					attributionControl={false}
@@ -51,6 +83,8 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 					maxBoundsViscosity={1}
 				>
 					<ImageOverlay
+						//@ts-ignore
+						ref={ref}
 						url={image.url}
 						bounds={[
 							[0, 0],
