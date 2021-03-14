@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import OfficePlanImage from "./OfficePlanImage2.png";
 import Desk from "./models/Desk";
-import OfficeImage from "./models/OfficeImage";
 import OfficeMap from "./map/OfficeMap";
 import DeskDetails from "./desks/DeskDetails";
 import OfficeSelector from "./OfficeSelector";
@@ -11,12 +9,6 @@ import Office from "./models/Office";
 function App() {
 	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
 	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
-
-	let officeImage: OfficeImage = {
-		url: OfficePlanImage,
-		// size: [659, 503]
-		size: [864 * 1.3, 435 * 1.3],
-	};
 
 	let desks: Desk[] = [
 		{
@@ -57,7 +49,7 @@ function App() {
 			<OfficeSelector onChange={onOfficeSelected} />
 			{selectedOffice && (
 				<OfficeMap
-					image={officeImage}
+					image={selectedOffice.image}
 					desks={desks}
 					selectedDesk={selectedDesk}
 					onDeskSelected={onDeskSelected}

@@ -8,8 +8,8 @@ import DeskLocationIcon from "./icons/desk-location.svg";
 import DeskHighlightIcon from "./icons/desk-highlight.svg";
 
 import MapClickedAtLocationPopup from "../map/helpers/MapClickedAtLocationPopup";
-import OfficeImage from "../models/OfficeImage";
 import Desk from "../models/Desk";
+import { OfficeImage } from "../models/Office";
 
 interface Props {
 	image: OfficeImage;
@@ -19,16 +19,16 @@ interface Props {
 }
 
 function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
-	let imageBoundsMax = [image.size[1], image.size[0]];
+	let imageBoundsMax = [image.height, image.width];
 
-	let height = Math.min(image.size[0], 450); // maximum map display = 600 px
+	let displayHeight = Math.min(image.width, 450); // maximum map display = 600 px
 
 	return (
 		<div className="map-container">
 			<div
 				className="map-container__inner"
 				style={{
-					height: height + "px",
+					height: displayHeight + "px",
 				}}
 			>
 				<MapContainer
