@@ -19,12 +19,12 @@ namespace OpenDesk.API.Features.Offices
 		public IFormFile Image { get; set; }
 	}
 
-	public class CreateOfficeHandlet : IRequestHandler<CreateOfficeCommand, OfficeDTO>
+	public class CreateOfficeHandler : IRequestHandler<CreateOfficeCommand, OfficeDTO>
 	{
 		private readonly OpenDeskDbContext _db;
 		private readonly IWebHostEnvironment _env;
 
-		public CreateOfficeHandlet(OpenDeskDbContext db, IWebHostEnvironment env)
+		public CreateOfficeHandler(OpenDeskDbContext db, IWebHostEnvironment env)
 		{
 			_db = db;
 			_env = env;
@@ -33,7 +33,7 @@ namespace OpenDesk.API.Features.Offices
 		public async Task<OfficeDTO> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
 		{
 			// TODO Re-write this to make it more secure. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
-			// Store in blob storage somewhere and replace ImageId with ImageUrl in the Office database model?
+			// Store in blob storage somewhere and replace ImageUrl with one from a storage provider in the Office database model?
 
 			string fName = Guid.NewGuid().ToString();
 			string path = Path.Combine(_env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
@@ -45,7 +45,7 @@ namespace OpenDesk.API.Features.Offices
 			var office = new Office
 			{
 				Name = request.Name,
-				ImageId = fName
+				ImageUrl = $"https://localhost:5001/office-images/{fName}.png" // TODO fix hardcoded png
 			};
 
 			_db.Offices.Add(office);
@@ -55,6 +55,7 @@ namespace OpenDesk.API.Features.Offices
 			{
 				Id = office.Id,
 				Name = office.Name,
+				ImageUrl = office.ImageUrl
 			};
 		}
 	}

@@ -25,10 +25,11 @@ namespace OpenDesk.API.Features.Offices
 		public async Task<IEnumerable<OfficeDTO>> Handle(GetOfficesCommand request, CancellationToken cancellationToken)
 		{
 			return await _db.Offices
-				.Select(ol => new OfficeDTO
+				.Select(o => new OfficeDTO
 				{
-					Id = ol.Id,
-					Name = ol.Name
+					Id = o.Id,
+					Name = o.Name,
+					ImageUrl = o.ImageUrl
 				})
 				.ToListAsync();
 		}

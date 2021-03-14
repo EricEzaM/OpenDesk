@@ -35,19 +35,5 @@ namespace OpenDesk.API.Features.Offices
 			var result = await _mediator.Send(command);
 			return Ok(result);
 		}
-
-		[HttpGet("{officeId}/image")]
-		public async Task<IActionResult> GetImage(string officeId)
-		{
-			var imageId = await _mediator.Send(new GetOfficeImageCommand(officeId));
-
-			FileStream stream = System.IO.File.Open(
-				Path.Combine(_env.ContentRootPath, "office-images", imageId + ".png"),
-				FileMode.Open,
-				FileAccess.Read);
-
-			// The below closes the stream for us once it's finished sending!
-			return File(stream, "image/png");	
-		}
 	}
 }

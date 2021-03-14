@@ -9,11 +9,21 @@
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenDesk.Application\OpenDesk.Application.csproj" />
     <ProjectReference Include="..\OpenDesk.Domain\OpenDesk.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Persistence\Seed\OfficePlanImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Persistence\Seed\OfficePlanImage2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
