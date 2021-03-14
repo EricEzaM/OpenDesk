@@ -5,6 +5,7 @@ using OpenDesk.Domain.ValueObjects;
 using OpenDesk.Infrastructure.Identity;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -27,12 +28,17 @@ namespace OpenDesk.Infrastructure.Persistence
 					"Seed",
 					"OfficePlanImage2.png");
 
-			var url = await GetImageUrl(existingFile, env);
+			var img = await GetOfficeImage(existingFile, env);
 
 			context.Offices.Add(new Office
 			{
 				Name = "Office 1",
-				ImageUrl = url,
+				Image = new OfficeImage()
+				{
+					Url = img.Url,
+					Width = img.Width,
+					Height = img.Height
+				},
 				Desks = new List<Desk>()
 				{
 					new Desk()
@@ -71,7 +77,7 @@ namespace OpenDesk.Infrastructure.Persistence
 			await context.SaveChangesAsync();
 		}
 
-		public static async Task<string> GetImageUrl(string existingFile, IHostEnvironment env)
+		public static async Task<OfficeImage> GetOfficeImage(string existingFile, IHostEnvironment env)
 		{
 			// Get existing
 			using var imageFS = new FileStream(existingFile, FileMode.Open);
@@ -82,9 +88,16 @@ namespace OpenDesk.Infrastructure.Persistence
 			using var stream = new FileStream(path, FileMode.Create);
 			await imageFS.CopyToAsync(stream);
 
+			var size = Image.FromStream(stream);
+
 			// TODO: Fix this so that its not hardcoded
 			// return URL
-			return $"https://localhost:5001/office-images/{fName}.png";
+			return new OfficeImage()
+			{
+				Url = $"https://localhost:5001/office-images/{fName}.png",
+				Width = size.Width,
+				Height = size.Height
+			};
 		}
 	}
 }

@@ -10,6 +10,8 @@ using OpenDesk.Domain.Entities;
 using OpenDesk.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using System.Drawing;
+using OpenDesk.Domain.ValueObjects;
 
 namespace OpenDesk.API.Features.Offices
 {
@@ -37,15 +39,20 @@ namespace OpenDesk.API.Features.Offices
 
 			string fName = Guid.NewGuid().ToString();
 			string path = Path.Combine(_env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
-			using (var stream = new FileStream(path, FileMode.Create))
-			{
-				await request.Image.CopyToAsync(stream, cancellationToken);
-			}
+			using var stream = new FileStream(path, FileMode.Create);
+			await request.Image.CopyToAsync(stream, cancellationToken);
+
+			var size = Image.FromStream(stream).Size;
 
 			var office = new Office
 			{
 				Name = request.Name,
-				ImageUrl = $"https://localhost:5001/office-images/{fName}.png" // TODO fix hardcoded png
+				Image = new OfficeImage()
+				{
+					Url = $"https://localhost:5001/office-images/{fName}.png", // TODO fix hardcoded png
+					Width = size.Width,
+					Height = size.Height
+				}
 			};
 
 			_db.Offices.Add(office);
@@ -55,7 +62,7 @@ namespace OpenDesk.API.Features.Offices
 			{
 				Id = office.Id,
 				Name = office.Name,
-				ImageUrl = office.ImageUrl
+				Image = office.Image
 			};
 		}
 	}

@@ -29,8 +29,9 @@ namespace OpenDesk.API.Features.Offices
 				{
 					Id = o.Id,
 					Name = o.Name,
-					ImageUrl = o.ImageUrl
+					Image = o.Image
 				})
+				.AsNoTracking()
 				.ToListAsync();
 		}
 	}

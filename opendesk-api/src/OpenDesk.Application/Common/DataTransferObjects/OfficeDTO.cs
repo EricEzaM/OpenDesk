@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenDesk.Domain.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace OpenDesk.Application.Common.DataTransferObjects
 	{
 		public string Id { get; set; }
 		public string Name { get; set; }
-		public string ImageUrl { get; set; }
+		public OfficeImage Image { get; set;}
 	}
 }
