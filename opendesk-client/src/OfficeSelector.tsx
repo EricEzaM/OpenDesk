@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Office from "./models/Office";
+import apiRequest from "./utils/requestUtils";
 
 interface Props {
 	onChange?: (officeId: string) => void;
@@ -7,18 +8,17 @@ interface Props {
 
 function OfficeSelector({ onChange }: Props) {
 	const [offices, setOffices] = useState<Office[]>([]);
+	const [error, setError] = useState<string | undefined>();
 
 	useEffect(() => {
-		fetch(process.env.REACT_APP_API_URL + "/api/offices")
-			.then((res) => res.json())
-			.then(
-				(data) => {
-					setOffices(data);
-				},
-				(error) => {
-					console.log(error);
-				}
-			);
+		apiRequest("/offices").then(
+			(json) => {
+				setOffices(json);
+			},
+			(error) => {
+				setError(error);
+			}
+		);
 	}, []);
 
 	return (
@@ -32,6 +32,7 @@ function OfficeSelector({ onChange }: Props) {
 				</option>
 				{offices && offices.map((o) => <option value={o.id}>{o.name}</option>)}
 			</select>
+			{error && <div style={{ fontSize: "small", color: "red" }}>{error}</div>}
 		</div>
 	);
 }
