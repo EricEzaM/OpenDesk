@@ -11,22 +11,10 @@ import { set } from "date-fns";
 
 interface Props {
 	desk: Desk | null;
+	bookings: Booking[];
 }
 
-function DeskDetails({ desk }: Props) {
-	let bookings: Booking[] = [
-		{
-			id: "id1",
-			deskId: "desk1",
-			startDateTime: new Date(2021, 2, 11, 12),
-			endDateTime: new Date(2021, 2, 13, 18),
-			user: {
-				id: "1234",
-				name: "John Smith",
-				username: "john.smith@email.com",
-			},
-		},
-	];
+function DeskDetails({ desk, bookings }: Props) {
 
 	const [bkStart, setBkStart] = useState<Date>(set(new Date(), {hours: 6, minutes: 0, seconds: 0, milliseconds: 0}));
 	const [bkEnd, setBkEnd] = useState<Date>(set(new Date(), {hours: 20, minutes: 0, seconds: 0, milliseconds: 0}));
