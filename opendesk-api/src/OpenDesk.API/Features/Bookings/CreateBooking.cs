@@ -30,9 +30,10 @@ namespace OpenDesk.API.Features.Bookings
 
 		public async Task<BookingDTO> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
 		{
-			var desk = _db.Desks
+			var desk = await _db
+				.Desks
 				.Include(d => d.Bookings)
-				.FirstOrDefault(d => d.Id == request.DeskId);
+				.FirstOrDefaultAsync(d => d.Id == request.DeskId);
 
 			if (desk == null)
 			{
@@ -45,12 +46,11 @@ namespace OpenDesk.API.Features.Bookings
 				UserId = request.UserId,
 				StartDateTime = request.StartDateTime,
 				EndDateTime = request.EndDateTime,
-				Desk = desk
 			};
 
+			await _db.Bookings.AddAsync(booking);
+			
 			desk.Bookings.Add(booking);
-
-			_db.Bookings.Add(booking);
 
 			await _db.SaveChangesAsync();
 
