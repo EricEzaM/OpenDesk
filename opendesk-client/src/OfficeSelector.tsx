@@ -11,7 +11,7 @@ function OfficeSelector({ onChange }: Props) {
 	const [error, setError] = useState<string | undefined>();
 
 	useEffect(() => {
-		apiRequest("/offices").then(
+		apiRequest("offices").then(
 			(json) => {
 				setOffices(json);
 			},

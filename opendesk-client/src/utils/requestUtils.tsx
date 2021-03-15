@@ -19,7 +19,7 @@ export default function apiRequest(
 	options?: RequestInit
 ): Promise<any> {
 	return new Promise((resolve, reject) => {
-		fetch(process.env.REACT_APP_API_URL + "/api" + url, options)
+		fetch(process.env.REACT_APP_API_URL + "/api/" + url, options)
 			.then(parseJson)
 			.then((response) => {
 				if (response.ok) {
