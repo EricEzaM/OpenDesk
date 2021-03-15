@@ -46,6 +46,7 @@ namespace OpenDesk.API.Features.Bookings
 				})
 				.Select(bu => new BookingDTO
 				{
+					Id = bu.Booking.Id,
 					DeskId = bu.Booking.Desk.Id,
 					StartDateTime = bu.Booking.StartDateTime,
 					EndDateTime = bu.Booking.EndDateTime,
