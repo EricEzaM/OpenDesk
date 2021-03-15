@@ -44,7 +44,8 @@ namespace OpenDesk.API.Features.Bookings
 				// TODO: Get this from currently logged in user, NOT from query params
 				UserId = request.UserId,
 				StartDateTime = request.StartDateTime,
-				EndDateTime = request.EndDateTime
+				EndDateTime = request.EndDateTime,
+				Desk = desk
 			};
 
 			desk.Bookings.Add(booking);
