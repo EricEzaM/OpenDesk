@@ -92,9 +92,9 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 						]}
 					/>
 
-					{desks.map((desk) => (
+					{desks.length > 0 && desks.map((desk) => (
 						<Marker
-							position={desk.location}
+							position={[desk.diagramPosition.x, desk.diagramPosition.y]}
 							icon={icon({
 								iconUrl:
 									desk.id === selectedDesk?.id

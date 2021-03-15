@@ -1,37 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Desk from "./models/Desk";
 import OfficeMap from "./map/OfficeMap";
 import DeskDetails from "./desks/DeskDetails";
 import OfficeSelector from "./OfficeSelector";
 import Office from "./models/Office";
+import apiRequest from "./utils/requestUtils";
 
 function App() {
 	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
 	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
-
-	let desks: Desk[] = [
-		{
-			id: "1",
-			location: [366, 215],
-			name: "Desk 1",
-		},
-		{
-			id: "2",
-			location: [366, 365],
-			name: "Desk 2",
-		},
-		{
-			id: "3",
-			location: [363, 497],
-			name: "Desk 3",
-		},
-		{
-			id: "4",
-			location: [422, 220],
-			name: "Desk 4",
-		},
-	];
+	const [desks, setDesks] = useState<Desk[]>([]);
 
 	function onDeskSelected(desk: Desk) {
 		setSelectedDesk(desk);
@@ -41,6 +20,11 @@ function App() {
 	function onOfficeSelected(office: Office) {
 		setSelectedOffice(office);
 		console.log("Selected office " + office.name);
+
+		apiRequest(`offices/${office.id}/desks`).then((d) => {
+			setDesks(d);
+			console.log(d);
+		});
 	}
 
 	return (
