@@ -8,6 +8,7 @@ import Desk from "../models/Desk";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { set } from "date-fns";
+import apiRequest from "../utils/requestUtils";
 
 interface Props {
 	desk: Desk | null;
@@ -15,9 +16,12 @@ interface Props {
 }
 
 function DeskDetails({ desk, bookings }: Props) {
-
-	const [bkStart, setBkStart] = useState<Date>(set(new Date(), {hours: 6, minutes: 0, seconds: 0, milliseconds: 0}));
-	const [bkEnd, setBkEnd] = useState<Date>(set(new Date(), {hours: 20, minutes: 0, seconds: 0, milliseconds: 0}));
+	const [bkStart, setBkStart] = useState<Date>(
+		set(new Date(), { hours: 6, minutes: 0, seconds: 0, milliseconds: 0 })
+	);
+	const [bkEnd, setBkEnd] = useState<Date>(
+		set(new Date(), { hours: 20, minutes: 0, seconds: 0, milliseconds: 0 })
+	);
 
 	function handleStartChange(date: Date) {
 		// Don't allow starting bookings after
@@ -26,7 +30,7 @@ function DeskDetails({ desk, bookings }: Props) {
 		}
 		// If start was moved to after end, adjust end to still be after start
 		if (date > bkEnd) {
-			setBkEnd(set(date, {hours: bkEnd.getHours(), minutes: 0}));
+			setBkEnd(set(date, { hours: bkEnd.getHours(), minutes: 0 }));
 		}
 
 		setBkStart(date);
@@ -39,35 +43,48 @@ function DeskDetails({ desk, bookings }: Props) {
 		}
 		// If end date was moved to before start, adjust start.
 		if (date < bkStart) {
-			setBkStart(set(date, {hours: bkStart.getHours(), minutes: 0}));
+			setBkStart(set(date, { hours: bkStart.getHours(), minutes: 0 }));
 		}
 
-		setBkEnd(date)
+		setBkEnd(date);
 	}
 
 	function disallowPast(date: Date) {
-		let currentDate = set(new Date(), {hours: 0, minutes: 0, seconds: 0, milliseconds: 0});
-		let dateOnly = set(date, {hours: 0, minutes: 0, seconds: 0, milliseconds: 0});
+		let currentDate = set(new Date(), {
+			hours: 0,
+			minutes: 0,
+			seconds: 0,
+			milliseconds: 0,
+		});
+		let dateOnly = set(date, {
+			hours: 0,
+			minutes: 0,
+			seconds: 0,
+			milliseconds: 0,
+		});
 
 		return dateOnly >= currentDate;
 	}
 
-	function CustomTimeInput({ value, onChange }: { value: string, onChange: (event: string) => void }) {
+	function CustomTimeInput({
+		value,
+		onChange,
+	}: {
+		value: string;
+		onChange: (event: string) => void;
+	}) {
 		return (
-		<select
-			value={value}
-			onChange={e => onChange(e.target.value)}
-		>
-			<option value="06:00">6:00 AM</option>
-			<option value="08:00">8:00 AM</option>
-			<option value="10:00">10:00 AM</option>
-			<option value="12:00">12:00 PM</option>
-			<option value="14:00">2:00 PM</option>
-			<option value="16:00">4:00 PM</option>
-			<option value="18:00">6:00 PM</option>
-			<option value="20:00">8:00 PM</option>
-		</select>
-		)
+			<select value={value} onChange={(e) => onChange(e.target.value)}>
+				<option value="06:00">6:00 AM</option>
+				<option value="08:00">8:00 AM</option>
+				<option value="10:00">10:00 AM</option>
+				<option value="12:00">12:00 PM</option>
+				<option value="14:00">2:00 PM</option>
+				<option value="16:00">4:00 PM</option>
+				<option value="18:00">6:00 PM</option>
+				<option value="20:00">8:00 PM</option>
+			</select>
+		);
 	}
 
 	return (
@@ -88,7 +105,9 @@ function DeskDetails({ desk, bookings }: Props) {
 				<DatePicker
 					placeholderText="Start Date & Time"
 					selected={bkStart}
-					onChange={(date) =>date && date instanceof Date && handleStartChange(date)}
+					onChange={(date) =>
+						date && date instanceof Date && handleStartChange(date)
+					}
 					dateFormat="MMMM d, yyyy h:mm aa"
 					filterDate={disallowPast}
 					showTimeInput
@@ -98,7 +117,9 @@ function DeskDetails({ desk, bookings }: Props) {
 				<DatePicker
 					placeholderText="End Date & Time"
 					selected={bkEnd}
-					onChange={(date) => date && date instanceof Date && handleEndChange(date)}
+					onChange={(date) =>
+						date && date instanceof Date && handleEndChange(date)
+					}
 					dateFormat="MMMM d, yyyy h:mm aa"
 					filterDate={disallowPast}
 					showTimeInput
