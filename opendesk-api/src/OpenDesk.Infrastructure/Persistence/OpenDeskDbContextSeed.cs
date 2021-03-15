@@ -30,6 +30,8 @@ namespace OpenDesk.Infrastructure.Persistence
 
 			var img = await GetOfficeImage(existingFile, env);
 
+			var n = DateTimeOffset.Now;
+
 			context.Offices.Add(new Office
 			{
 				Name = "Office 1",
@@ -50,14 +52,14 @@ namespace OpenDesk.Infrastructure.Persistence
 							new Booking()
 							{
 								UserId = userEntity.Entity.Id,
-								StartDateTime = DateTimeOffset.Now.AddDays(1).AddHours(-3),
-								EndDateTime = DateTimeOffset.Now.AddDays(1).AddHours(2)
+								StartDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 8, 0, 0, TimeSpan.Zero),
+								EndDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 18, 0, 0, TimeSpan.Zero)
 							},
 							new Booking()
 							{
 								UserId = userEntity.Entity.Id,
-								StartDateTime = DateTimeOffset.Now.AddDays(1).AddHours(3),
-								EndDateTime = DateTimeOffset.Now.AddDays(1).AddHours(5)
+								StartDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 8, 0, 0, TimeSpan.Zero).AddDays(2),
+								EndDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 18, 0, 0, TimeSpan.Zero).AddDays(3)
 							}
 						}
 					},
