@@ -1,7 +1,7 @@
 import React from "react";
 import { format, set } from "date-fns";
 import { addDays } from "date-fns/esm";
-import Booking from "../models/Booking";
+import { Booking } from "types";
 
 interface Props {
 	existingBookings: Booking[];
@@ -25,7 +25,6 @@ function BookingsTimeline({
 	newBookingStart,
 	newBookingEnd,
 }: Props) {
-
 	let bookingInvalid = false;
 	if (newBookingStart && newBookingEnd) {
 		for (let i = 0; i < existingBookings.length; i++) {
@@ -79,7 +78,10 @@ function BookingsTimeline({
 	return (
 		<div>
 			{datebars.map((bar) => {
-				const { width: newBookingWidth, offset: newBookingOffset } = getInnerDateBarSizing(
+				const {
+					width: newBookingWidth,
+					offset: newBookingOffset,
+				} = getInnerDateBarSizing(
 					newBookingStart ?? new Date(),
 					newBookingEnd ?? new Date(),
 					bar
@@ -96,7 +98,10 @@ function BookingsTimeline({
 						<div className="booking-timeline-bar">
 							{/* Calculating what should be displayed as the "time taken" on each bar */}
 							{existingBookings.map((existingBooking) => {
-								const { width: existingBookingWidth, offset: existingBookingOffset } = getInnerDateBarSizing(
+								const {
+									width: existingBookingWidth,
+									offset: existingBookingOffset,
+								} = getInnerDateBarSizing(
 									existingBooking.startDateTime,
 									existingBooking.endDateTime,
 									bar
@@ -111,8 +116,13 @@ function BookingsTimeline({
 										}}
 										title={
 											existingBooking.user.name +
-											"\r\nFrom " + format(existingBooking.startDateTime, "dd/MM/yyyy h:mm bb") +
-											"\r\nTo " + format(existingBooking.endDateTime, "dd/MM/yyyy h:mm bb")
+											"\r\nFrom " +
+											format(
+												existingBooking.startDateTime,
+												"dd/MM/yyyy h:mm bb"
+											) +
+											"\r\nTo " +
+											format(existingBooking.endDateTime, "dd/MM/yyyy h:mm bb")
 										}
 									></div>
 								);
@@ -130,8 +140,10 @@ function BookingsTimeline({
 										marginLeft: newBookingOffset + "%",
 									}}
 									title={
-										"\r\nFrom " + format(newBookingStart, "dd/MM/yyyy h:mm bb") +
-										"\r\nTo " + format(newBookingEnd, "dd/MM/yyyy h:mm bb")
+										"\r\nFrom " +
+										format(newBookingStart, "dd/MM/yyyy h:mm bb") +
+										"\r\nTo " +
+										format(newBookingEnd, "dd/MM/yyyy h:mm bb")
 									}
 								></div>
 							)}
@@ -139,7 +151,9 @@ function BookingsTimeline({
 							{/* Time Display at each end of bar */}
 							<div className="booking-timeline-bar__time-display">
 								<span>{format(bar.start, "HH:mm")}</span>
-								<span>{format(set(new Date(), {hours: 13, minutes: 0}), "HH:mm")}</span>
+								<span>
+									{format(set(new Date(), { hours: 13, minutes: 0 }), "HH:mm")}
+								</span>
 								<span>{format(bar.end, "HH:mm")}</span>
 							</div>
 						</div>

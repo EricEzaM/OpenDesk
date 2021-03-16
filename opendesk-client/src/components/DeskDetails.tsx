@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-
 import DatePicker from "react-datepicker";
+import { set } from "date-fns";
 
-import BookingsTimeline from "../bookings/BookingsTimeline";
-import Booking from "../models/Booking";
-import Desk from "../models/Desk";
+import BookingsTimeline from "components/BookingsTimeline";
+import { Desk, Booking } from "types";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { set } from "date-fns";
-import apiRequest from "../utils/requestUtils";
 
 interface Props {
 	desk: Desk | null;

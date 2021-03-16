@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Office from "./models/Office";
-import apiRequest from "./utils/requestUtils";
+import { Office } from "types";
+import apiRequest from "utils/requestUtils";
 
 interface Props {
 	onChange?: (office: Office) => void;

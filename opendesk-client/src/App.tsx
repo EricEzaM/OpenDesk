@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 
-import Desk from "./models/Desk";
-import OfficeMap from "./map/OfficeMap";
-import DeskDetails from "./desks/DeskDetails";
-import OfficeSelector from "./OfficeSelector";
-import Office from "./models/Office";
-import apiRequest from "./utils/requestUtils";
-import Booking from "./models/Booking";
+import { Office, Desk, Booking } from "types";
+// import DeskDetails from "@comps/DeskDetails";
+import OfficeMap from "components/Map/OfficeMap";
+import OfficeSelector from "components/OfficeSelector";
+import apiRequest from "utils/requestUtils";
+import DeskDetails from "components/DeskDetails";
 
 function App() {
 	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
@@ -24,10 +23,10 @@ function App() {
 		apiRequest(`desks/${desk.id}/bookings`).then((b) => {
 			var bookings = JSON.parse(JSON.stringify(b), (k, value) => {
 				const isDate = k === "startDateTime" || k === "endDateTime";
-				return isDate ? new Date(value) : value
+				return isDate ? new Date(value) : value;
 			});
 			setSelectedDeskBookings(bookings);
-			console.log(bookings)
+			console.log(bookings);
 		});
 	}
 
@@ -53,7 +52,9 @@ function App() {
 					onDeskSelected={onDeskSelected}
 				/>
 			)}
-			{selectedDesk && <DeskDetails desk={selectedDesk} bookings={selectedDeskBookings}/>}
+			{selectedDesk && (
+				<DeskDetails desk={selectedDesk} bookings={selectedDeskBookings} />
+			)}
 		</div>
 	);
 }

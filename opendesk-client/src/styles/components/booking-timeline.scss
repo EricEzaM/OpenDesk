@@ -38,16 +38,16 @@
 		}
 	}
 
-  &__time-display {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    width: 100%;
-    pointer-events: none;
+	&__time-display {
+		display: flex;
+		justify-content: space-between;
+		position: absolute;
+		width: 100%;
+		pointer-events: none;
 
-    & span {
-      margin: 0 5px 0 5px;
-      font-size: 0.7em;
-    }
-  }
+		& span {
+			margin: 0 5px 0 5px;
+			font-size: 0.7em;
+		}
+	}
 }

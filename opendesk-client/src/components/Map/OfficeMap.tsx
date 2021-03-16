@@ -11,12 +11,11 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import DeskLocationIcon from "./icons/desk-location.svg";
-import DeskHighlightIcon from "./icons/desk-highlight.svg";
+import DeskLocationIcon from "resources/desk-location.svg";
+import DeskHighlightIcon from "resources/desk-highlight.svg";
 
-import MapClickedAtLocationPopup from "../map/helpers/MapClickedAtLocationPopup";
-import Desk from "../models/Desk";
-import { OfficeImage } from "../models/Office";
+import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
+import { Desk, OfficeImage } from "types";
 
 interface Props {
 	image: OfficeImage;
@@ -92,23 +91,24 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 						]}
 					/>
 
-					{desks.length > 0 && desks.map((desk) => (
-						<Marker
-							position={[desk.diagramPosition.x, desk.diagramPosition.y]}
-							icon={icon({
-								iconUrl:
-									desk.id === selectedDesk?.id
-										? DeskHighlightIcon
-										: DeskLocationIcon,
-								iconSize: point(30, 30),
-							})}
-							eventHandlers={{
-								click: () => {
-									onDeskSelected(desk);
-								},
-							}}
-						/>
-					))}
+					{desks.length > 0 &&
+						desks.map((desk) => (
+							<Marker
+								position={[desk.diagramPosition.x, desk.diagramPosition.y]}
+								icon={icon({
+									iconUrl:
+										desk.id === selectedDesk?.id
+											? DeskHighlightIcon
+											: DeskLocationIcon,
+									iconSize: point(30, 30),
+								})}
+								eventHandlers={{
+									click: () => {
+										onDeskSelected(desk);
+									},
+								}}
+							/>
+						))}
 
 					<MapClickedAtLocationPopup />
 				</MapContainer>
