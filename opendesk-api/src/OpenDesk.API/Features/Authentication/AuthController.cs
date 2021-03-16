@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenDesk.API.Models;
+using OpenDesk.Application.Common.DataTransferObjects;
 using OpenDesk.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -105,11 +106,16 @@ namespace OpenDesk.API.Features.Authentication
 			return Redirect(authModel.State);
 		}
 
-		[HttpGet("test")]
+		[HttpGet("user")]
 		[Authorize]
-		public IActionResult Test()
+		public IActionResult GetUser()
 		{
-			return new JsonResult("Yes");
+			return Ok(new UserDTO()
+			{
+				Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
+				Name = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
+				UserName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value
+			});
 		}
 	}
 }
