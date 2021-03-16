@@ -8,6 +8,6 @@ namespace OpenDesk.API.Models
 	public class MicrosoftAuthRequestModel
 	{
 		public string Code { get; set; }
-		public string RedirectUri { get; set; }
+		public string State { get; set; }
 	}
 }

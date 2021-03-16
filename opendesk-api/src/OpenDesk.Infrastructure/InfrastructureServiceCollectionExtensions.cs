@@ -40,6 +40,7 @@ namespace OpenDesk.Infrastructure
 			})
 				.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
 				{
+					o.Cookie.Name = "OpenDeskUser";
 					o.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
 
 					o.Events.OnRedirectToAccessDenied = ctx =>

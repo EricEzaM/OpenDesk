@@ -32,13 +32,13 @@ namespace OpenDesk.API.Features.Authentication
 		}
 
 		[HttpPost(MicrosoftAuthName)]
-		public async Task<IActionResult> Authenticate(MicrosoftAuthRequestModel authModel)
+		public async Task<IActionResult> Authenticate([FromForm]MicrosoftAuthRequestModel authModel)
 		{
 			// Construct form content
 			var content = new FormUrlEncodedContent(new Dictionary<string, string>()
 				{
 					{ "code", authModel.Code },
-					{ "redirect_uri", authModel.RedirectUri},
+					{ "redirect_uri", Url.ActionLink().ToLower()},
 					{ "grant_type", "authorization_code" },
 					{ "client_id", "961880c5-5302-41fa-9da3-98adada694d9" },
 					{ "client_secret", "8Ta.WbRj_2o81mH~Q_Bd6_~4v~4qvz7I8-" }, // TODO: Remove hard coded secret, generate a new one.
@@ -102,7 +102,7 @@ namespace OpenDesk.API.Features.Authentication
 				await HttpContext.SignInAsync(cp);
 			}
 
-			return NoContent();
+			return Redirect(authModel.State);
 		}
 
 		[HttpGet("test")]
