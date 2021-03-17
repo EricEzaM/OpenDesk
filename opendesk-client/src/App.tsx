@@ -6,13 +6,20 @@ import PrivateRoute from "router/PrivateRoute";
 import Unauthenticated from "components/auth/Unauthenticated";
 import Authenticated from "components/auth/Authenticated";
 
+import { ReactComponent as MsSigningDarkButton } from "resources/ms-signin-dark.svg";
+
 function LogInOut() {
 	const { signIn, signOut } = useAuth();
 
 	return (
 		<>
 			<Unauthenticated>
-				<button onClick={() => signIn(window.location.href)}>Login</button>
+				<button
+					style={{ border: "none", lineHeight: 0, cursor: "pointer" }}
+					onClick={() => signIn(window.location.href)}
+				>
+					<MsSigningDarkButton />
+				</button>
 			</Unauthenticated>
 			<Authenticated>
 				<button onClick={() => signOut(window.location.origin)}>Logout</button>
