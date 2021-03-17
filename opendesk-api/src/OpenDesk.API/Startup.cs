@@ -52,9 +52,10 @@ namespace OpenDesk.API
 				{
 					o.AddDefaultPolicy(cb =>
 					{
-						cb.AllowAnyOrigin();
+						cb.WithOrigins("http://localhost:3000");
 						cb.AllowAnyMethod();
 						cb.AllowAnyHeader();
+						cb.AllowCredentials();
 					});
 				});
 			}

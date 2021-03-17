@@ -28,12 +28,31 @@ namespace OpenDesk.API.Features.Authentication
 
 		public AuthController(HttpClient httpClient, IIdentityService identityService)
 		{
-			this._httpClient = httpClient;
-			this._identityService = identityService;
+			_httpClient = httpClient;
+			_identityService = identityService;
 		}
 
-		[HttpPost(MicrosoftAuthName)]
-		public async Task<IActionResult> Authenticate([FromForm]MicrosoftAuthRequestModel authModel)
+		[HttpGet(MicrosoftAuthName)]
+		public async Task<IActionResult> Authenticate(string returnUrl)
+		{
+			var queryContent = new FormUrlEncodedContent(new Dictionary<string, string>()
+				{
+					{ "client_id", "961880c5-5302-41fa-9da3-98adada694d9" },
+					{ "redirect_uri", Url.ActionLink(nameof(Callback)).ToLower()},
+					{ "response_mode", "form_post" },
+					{ "response_type", "code" },
+					{ "state", returnUrl },
+					{ "scope", "openid profile email" },
+				});
+
+			var ub = new UriBuilder("https://login.microsoftonline.com/common/oauth2/v2.0/authorize");
+			ub.Query = await queryContent.ReadAsStringAsync();
+
+			return Redirect(ub.Uri.AbsoluteUri);
+		}
+
+		[HttpPost(MicrosoftAuthName + "/callback")]
+		public async Task<IActionResult> Callback([FromForm] MicrosoftAuthRequestModel authModel)
 		{
 			// Construct form content
 			var content = new FormUrlEncodedContent(new Dictionary<string, string>()
@@ -43,20 +62,13 @@ namespace OpenDesk.API.Features.Authentication
 					{ "grant_type", "authorization_code" },
 					{ "client_id", "961880c5-5302-41fa-9da3-98adada694d9" },
 					{ "client_secret", "8Ta.WbRj_2o81mH~Q_Bd6_~4v~4qvz7I8-" }, // TODO: Remove hard coded secret, generate a new one.
-				});
-
-			// Build URI
-			var query = new FormUrlEncodedContent(new Dictionary<string, string>()
-				{
 					{ "scope", "openid profile email" },
 				});
-			var ub = new UriBuilder("https://login.microsoftonline.com/common/oauth2/v2.0/token");
-			ub.Query = query.ReadAsStringAsync().Result;
 
 			// Send request
 			var res = await _httpClient.SendAsync(new HttpRequestMessage
 			{
-				RequestUri = ub.Uri,
+				RequestUri = new Uri("https://login.microsoftonline.com/common/oauth2/v2.0/token"),
 				Method = HttpMethod.Post,
 				Content = content
 			});
