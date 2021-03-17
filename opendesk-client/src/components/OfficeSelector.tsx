@@ -12,8 +12,10 @@ function OfficeSelector({ onChange }: Props) {
 
 	useEffect(() => {
 		apiRequest("offices").then(
-			(json) => {
-				setOffices(json);
+			(res) => {
+				if (res.ok) {
+					setOffices(res.data);
+				}
 			},
 			(error) => {
 				setError(error);

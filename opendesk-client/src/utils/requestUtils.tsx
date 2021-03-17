@@ -1,33 +1,45 @@
-interface JsonParseResult {
+interface ApiCallResult {
 	ok: boolean;
-	json: any;
+	code: number;
+	data: any;
 }
 
-function parseJson(response: Response): Promise<JsonParseResult> {
+function parseJson(response: Response): Promise<ApiCallResult> {
 	return new Promise((resolve) =>
-		response.json().then((json) =>
-			resolve({
-				ok: response.ok,
-				json: json,
-			})
-		)
+		response.text().then((text) => {
+			try {
+				const data = JSON.parse(text);
+				// Valid JSON
+				return resolve({
+					ok: response.ok,
+					code: response.status,
+					data: data,
+				});
+			} catch {
+				// Not Valid JSON
+				resolve({
+					ok: response.ok,
+					code: response.status,
+					data: {},
+				});
+			}
+		})
 	);
 }
 
 export default function apiRequest(
 	url: string,
 	options?: RequestInit
-): Promise<any> {
+): Promise<ApiCallResult> {
 	return new Promise((resolve, reject) => {
+		options = {...options, credentials: "include" }
 		fetch(process.env.REACT_APP_API_URL + "/api/" + url, options)
 			.then(parseJson)
-			.then((response) => {
-				if (response.ok) {
-					return resolve(response.json);
-				}
-
-				return reject(response.json.error);
-			})
-			.catch((error) => reject(error.message));
+			.then((response) => resolve(response))
+			.catch((error) => {
+				console.error("An error occurred in the API fetch request.");
+				console.error(error);
+				reject(error.message);
+			});
 	});
 }
