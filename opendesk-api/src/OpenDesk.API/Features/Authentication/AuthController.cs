@@ -17,11 +17,11 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Authentication
 {
-	[Route("api/[controller]")]
+	[Route("api/auth")]
 	[ApiController]
 	public class AuthController : ControllerBase
 	{
-		private const string MicrosoftAuthName = "Microsoft";
+		private const string MicrosoftAuthName = "microsoft";
 
 		private readonly HttpClient _httpClient;
 		private readonly IIdentityService _identityService;
@@ -58,7 +58,7 @@ namespace OpenDesk.API.Features.Authentication
 			var content = new FormUrlEncodedContent(new Dictionary<string, string>()
 				{
 					{ "code", authModel.Code },
-					{ "redirect_uri", Url.ActionLink().ToLower()},
+					{ "redirect_uri", Url.ActionLink()},
 					{ "grant_type", "authorization_code" },
 					{ "client_id", "961880c5-5302-41fa-9da3-98adada694d9" },
 					{ "client_secret", "8Ta.WbRj_2o81mH~Q_Bd6_~4v~4qvz7I8-" }, // TODO: Remove hard coded secret, generate a new one.
@@ -116,6 +116,12 @@ namespace OpenDesk.API.Features.Authentication
 			}
 
 			return Redirect(authModel.State);
+		}
+
+		[HttpPost("signout")]
+		public IActionResult SignOutUser()
+		{
+			return SignOut();
 		}
 
 		[HttpGet("user")]
