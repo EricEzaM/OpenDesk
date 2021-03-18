@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -6,17 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenDesk.Application.Common.Interfaces;
 using OpenDesk.Infrastructure.Identity;
 using OpenDesk.Infrastructure.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace OpenDesk.Infrastructure
 {
 	public static class InfrastructureServiceCollectionExtensions
 	{
-		public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IHostEnvironment env)
 		{
 			// PERSISTENCE
 			
@@ -40,8 +39,8 @@ namespace OpenDesk.Infrastructure
 			})
 				.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
 				{
-					o.Cookie.Name = "OpenDeskUser";
-					o.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+					o.Cookie.Name = "OpenDeskAuth";
+					o.Cookie.SameSite = env.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict;
 
 					o.Events.OnRedirectToAccessDenied = ctx =>
 					{
