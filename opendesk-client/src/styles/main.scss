@@ -7,11 +7,12 @@
 @import "./pages/common";
 @import "./pages/index";
 
-@import "./components/office-selector.scss";
+@import "./components/sign-in-out";
+@import "./components/office-selector";
 @import "./components/booking-timeline";
-@import "./components/desk-details.scss";
-@import "./components/office-map.scss";
-@import "./components/package-extensions.scss";
+@import "./components/desk-details";
+@import "./components/office-map";
+@import "./components/package-extensions";
 
 input,
 select {

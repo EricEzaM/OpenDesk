@@ -44,15 +44,8 @@ function Main() {
 		});
 	}
 
-	// const { value, setValue } = useContext(UserContext)
-	const { user } = useAuth();
-
 	return (
 		<>
-			<div>
-				<p>Hello! {JSON.stringify(user)} Welcome to the main page!</p>
-			</div>
-
 			<OfficeSelector onChange={onOfficeSelected} />
 			{selectedOffice && (
 				<OfficeMap

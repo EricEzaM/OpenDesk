@@ -1,0 +1,20 @@
+.sign-in-out {
+	text-align: center;
+	margin: $margin;
+
+	&__in-btn {
+		border: none;
+		line-height: 0;
+		cursor: pointer;
+		margin: $margin;
+	}
+
+	&__out-btn {
+		border: none;
+		line-height: 0;
+		cursor: pointer;
+		margin: $margin;
+		padding: 1em;
+		background-color: lightblue;
+	}
+}
