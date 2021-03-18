@@ -6,9 +6,10 @@ import BookingsTimeline from "components/BookingsTimeline";
 import { Desk, Booking } from "types";
 
 import "react-datepicker/dist/react-datepicker.css";
+import apiRequest from "utils/requestUtils";
 
 interface Props {
-	desk: Desk | null;
+	desk: Desk;
 	bookings: Booking[];
 }
 
@@ -84,6 +85,23 @@ function DeskDetails({ desk, bookings }: Props) {
 		);
 	}
 
+	function SubmitBooking() {
+		apiRequest(`desks/${desk.id}/bookings`, {
+			method: "POST",
+			headers: {
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({
+				startDateTime: bkStart,
+				endDateTime: bkEnd,
+			}),
+		}).then((res) => {
+			if (res.ok) {
+				console.log("submitted");
+			}
+		});
+	}
+
 	return (
 		<div className="desk-details">
 			{desk && (
@@ -122,7 +140,12 @@ function DeskDetails({ desk, bookings }: Props) {
 					showTimeInput
 					customTimeInput={React.createElement(CustomTimeInput)}
 				/>
-				<button className="desk-details__submit">Book Desk</button>
+				<button
+					className="desk-details__submit"
+					onClick={() => SubmitBooking()}
+				>
+					Book Desk
+				</button>
 			</div>
 		</div>
 	);
