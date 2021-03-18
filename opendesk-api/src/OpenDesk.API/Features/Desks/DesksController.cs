@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Desks
 {
+	[Authorize]
 	[Route("api/offices")]
 	public class DesksController : ControllerBase
 	{
@@ -25,6 +27,7 @@ namespace OpenDesk.API.Features.Desks
 			return Ok(result);
 		}
 
+		// TODO: Add permissions / roles authentication.
 		[HttpPost("{officeId}/desks")]
 		public async Task<IActionResult> Create(string officeId, [FromBody]CreateDeskCommand command)
 		{
@@ -38,7 +41,7 @@ namespace OpenDesk.API.Features.Desks
 		[HttpDelete("{officeId}/desks/{deskId}")]
 		public async Task<IActionResult> Delete(string officeId, string deskId)
 		{
-			return Ok();
+			throw new NotImplementedException();
 		}
 	}
 }

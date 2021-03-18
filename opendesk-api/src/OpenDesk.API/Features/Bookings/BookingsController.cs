@@ -1,12 +1,15 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Bookings
 {
+	[Authorize]
 	[Route("api")]
 	public class BookingsController : ControllerBase
 	{
@@ -37,7 +40,17 @@ namespace OpenDesk.API.Features.Bookings
 		public async Task<IActionResult> CreateForDesk(string deskId, [FromBody] CreateBookingCommand command)
 		{
 			command.DeskId = deskId;
+			var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
+			if (userId == null)
+			{
+				return BadRequest(new
+				{
+					Error = "User not found."
+				});
+			}
+
+			command.UserId = userId;
 			var result = await _mediator.Send(command);
 
 			return Ok(result);

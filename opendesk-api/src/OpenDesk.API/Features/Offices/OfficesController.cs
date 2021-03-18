@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Offices
 {
+	[Authorize]
 	[Route("api/offices")]
 	public class OfficesController : ControllerBase
 	{
@@ -29,6 +31,7 @@ namespace OpenDesk.API.Features.Offices
 			return Ok(result);
 		}
 
+		// TODO: Add permissions / roles authentication.
 		[HttpPost]
 		public async Task<IActionResult> Create(CreateOfficeCommand command)
 		{
