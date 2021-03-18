@@ -6,6 +6,7 @@ using OpenDesk.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +14,9 @@ namespace OpenDesk.API.Features.Bookings
 {
 	public class CreateBookingCommand : IRequest<BookingDTO>
 	{
+		[JsonIgnore]
 		public string UserId { get; set; }
+		[JsonIgnore]
 		public string DeskId { get; set; }
 		public DateTimeOffset StartDateTime { get; set; }
 		public DateTimeOffset EndDateTime { get; set; }

@@ -7,6 +7,7 @@ using OpenDesk.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,9 +15,10 @@ namespace OpenDesk.API.Features.Desks
 {
 	public class CreateDeskCommand : IRequest<DeskDTO>
 	{
+		[JsonIgnore]
+		public string OfficeId { get; set; }
 		public string Name { get; set; }
 		public DiagramPosition DiagramPosition { get; set; }
-		public string OfficeId { get; set; }
 	}
 
 	public class CreateDeskHandler : IRequestHandler<CreateDeskCommand, DeskDTO>
