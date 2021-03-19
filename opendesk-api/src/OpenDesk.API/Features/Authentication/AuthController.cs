@@ -124,7 +124,7 @@ namespace OpenDesk.API.Features.Authentication
 			return SignOut();
 		}
 
-		[HttpGet("user")]
+		[HttpGet("/api/me")] // Don't use the controller prefix for this route.
 		[Authorize]
 		public IActionResult GetUser()
 		{

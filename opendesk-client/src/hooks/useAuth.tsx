@@ -54,7 +54,7 @@ function useAuthProvider(): AuthContextProps {
 	// 3. After MS login success, the API will handle that and will create a user in the database. Then will redirect to the provided redirectUrl.
 	// 4. The redirect url is this application, so the app will reload, trigger this effect, hit the user endpoint successfully and give us the user object!
 	useEffect(() => {
-		apiRequest("auth/user").then((res) => {
+		apiRequest("me").then((res) => {
 			if (res.ok) {
 				setUser(res.data);
 			} else {
