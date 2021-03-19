@@ -2,6 +2,7 @@ import React from "react";
 import { format, set } from "date-fns";
 import { addDays } from "date-fns/esm";
 import { Booking } from "types";
+import { useAuth } from "hooks/useAuth";
 
 interface Props {
 	existingBookings: Booking[];
@@ -75,6 +76,8 @@ function BookingsTimeline({
 		});
 	}
 
+	const { user } = useAuth();
+
 	return (
 		<div>
 			{datebars.map((bar) => {
@@ -109,7 +112,11 @@ function BookingsTimeline({
 
 								return (
 									<div
-										className="booking-timeline-bar__time-booked"
+										className={`booking-timeline-bar__time-booked ${
+											existingBooking.user.id === user?.id
+												? "booking-timeline-bar__time-booked--owned"
+												: ""
+										}`}
 										style={{
 											width: existingBookingWidth + "%",
 											marginLeft: existingBookingOffset + "%",
@@ -128,6 +135,7 @@ function BookingsTimeline({
 								);
 							})}
 
+							{/* Display of the prospective booking user has selected */}
 							{newBookingStart && newBookingEnd && (
 								<div
 									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${

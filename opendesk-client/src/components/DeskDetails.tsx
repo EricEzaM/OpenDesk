@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import { set } from "date-fns";
+import { set, setHours } from "date-fns";
 
 import BookingsTimeline from "components/BookingsTimeline";
 import { Desk, Booking } from "types";
@@ -10,16 +10,34 @@ import apiRequest from "utils/requestUtils";
 
 interface Props {
 	desk: Desk;
-	bookings: Booking[];
 }
 
-function DeskDetails({ desk, bookings }: Props) {
-	const [bkStart, setBkStart] = useState<Date>(
-		set(new Date(), { hours: 6, minutes: 0, seconds: 0, milliseconds: 0 })
-	);
-	const [bkEnd, setBkEnd] = useState<Date>(
-		set(new Date(), { hours: 20, minutes: 0, seconds: 0, milliseconds: 0 })
-	);
+function DeskDetails({ desk }: Props) {
+	const defaultDate = set(new Date(), {
+		hours: 0,
+		minutes: 0,
+		seconds: 0,
+		milliseconds: 0,
+	});
+
+	const [bkStart, setBkStart] = useState<Date>(setHours(defaultDate, 6));
+	const [bkEnd, setBkEnd] = useState<Date>(setHours(defaultDate, 20));
+
+	const [bookings, setBookings] = useState<Booking[]>([]);
+
+	// Update bookings when desk is changed.
+	useEffect(() => {
+		apiRequest(`desks/${desk.id}/bookings`).then((res) => {
+			if (res.ok) {
+				// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
+				var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
+					const isDate = k === "startDateTime" || k === "endDateTime";
+					return isDate ? new Date(value) : value;
+				});
+				setBookings(bookings);
+			}
+		});
+	}, [desk]);
 
 	function handleStartChange(date: Date) {
 		// Don't allow starting bookings after
@@ -97,6 +115,17 @@ function DeskDetails({ desk, bookings }: Props) {
 			}),
 		}).then((res) => {
 			if (res.ok) {
+				// TODO: Don't Repeat Yourself... this is a duplicate of above code. Make a way to have it be shared/common.
+				apiRequest(`desks/${desk.id}/bookings`).then((res) => {
+					if (res.ok) {
+						// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
+						var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
+							const isDate = k === "startDateTime" || k === "endDateTime";
+							return isDate ? new Date(value) : value;
+						});
+						setBookings(bookings);
+					}
+				});
 				console.log("submitted");
 			}
 		});

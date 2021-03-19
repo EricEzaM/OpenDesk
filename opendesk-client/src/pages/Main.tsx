@@ -13,24 +13,10 @@ function Main() {
 
 	const [desks, setDesks] = useState<Desk[]>([]);
 	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
-	const [selectedDeskBookings, setSelectedDeskBookings] = useState<Booking[]>(
-		[]
-	);
 
 	function onDeskSelected(desk: Desk) {
 		setSelectedDesk(desk);
 		console.log("Selected desk " + desk.name);
-
-		apiRequest(`desks/${desk.id}/bookings`).then((res) => {
-			if (res.ok) {
-				// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
-				var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
-					const isDate = k === "startDateTime" || k === "endDateTime";
-					return isDate ? new Date(value) : value;
-				});
-				setSelectedDeskBookings(bookings);
-			}
-		});
 	}
 
 	function onOfficeSelected(office: Office) {
@@ -55,9 +41,7 @@ function Main() {
 					onDeskSelected={onDeskSelected}
 				/>
 			)}
-			{selectedDesk && (
-				<DeskDetails desk={selectedDesk} bookings={selectedDeskBookings} />
-			)}
+			{selectedDesk && <DeskDetails desk={selectedDesk} />}
 		</>
 	);
 }

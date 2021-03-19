@@ -21,6 +21,11 @@
 		height: 100%;
 		background-color: #bf391f;
 
+		&--owned {
+			opacity: 75%;
+			background-color: #3997a3;
+		}
+
 		&--prospective {
 			opacity: 75%;
 			background-color: #5fa339;
