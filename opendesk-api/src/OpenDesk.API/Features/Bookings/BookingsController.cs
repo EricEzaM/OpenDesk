@@ -55,5 +55,23 @@ namespace OpenDesk.API.Features.Bookings
 
 			return Ok(result);
 		}
+
+		[HttpGet("/api/me/bookings")]
+		public async Task<IActionResult> GetForSignInUser()
+		{
+			var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+			if (userId == null)
+			{
+				return BadRequest(new
+				{
+					Error = "Could not find user"
+				});
+			}
+
+			var result = await _mediator.Send(new GetBookingsForUserCommand(userId));
+
+			return Ok(result);
+		}
 	}
 }
