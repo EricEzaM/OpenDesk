@@ -45,7 +45,6 @@ namespace OpenDesk.API.Features.Bookings
 
 			var booking = new Booking
 			{
-				// TODO: Get this from currently logged in user, NOT from query params
 				UserId = request.UserId,
 				StartDateTime = request.StartDateTime,
 				EndDateTime = request.EndDateTime,
@@ -57,6 +56,8 @@ namespace OpenDesk.API.Features.Bookings
 
 			await _db.SaveChangesAsync();
 
+			var user = _db.Users.FirstOrDefault(u => u.Id == request.UserId);
+
 			return new BookingDTO
 			{
 				Id = booking.Id,
@@ -65,9 +66,9 @@ namespace OpenDesk.API.Features.Bookings
 				EndDateTime = booking.EndDateTime,
 				User = new UserDTO
 				{
-					Id = "SomeId",
-					Name = "SomeName",
-					UserName = "SomeUserName"
+					Id = user.Id,
+					UserName = user.UserName,
+					Name = "Name Placeholder"
 				}
 			};
 		}
