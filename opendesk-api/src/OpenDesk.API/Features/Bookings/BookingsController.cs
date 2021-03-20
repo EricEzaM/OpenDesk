@@ -56,17 +56,24 @@ namespace OpenDesk.API.Features.Bookings
 			return Ok(result);
 		}
 
-		[HttpGet("/api/me/bookings")]
-		public async Task<IActionResult> GetForSignInUser()
+		[HttpGet("/api/users/{userId}/bookings")]
+		public async Task<IActionResult> GetForSignInUser(string userId)
 		{
-			var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+			var signedInUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-			if (userId == null)
+			if (signedInUserId == null)
 			{
 				return BadRequest(new
 				{
-					Error = "Could not find user"
+					Error = "User not found."
 				});
+			}
+
+			if (signedInUserId != userId)
+			{
+				// Only signed in users can find their own records.
+				// TODO: Admin users (or users with some permission) can access these.
+				return NotFound();
 			}
 
 			var result = await _mediator.Send(new GetBookingsForUserCommand(userId));
