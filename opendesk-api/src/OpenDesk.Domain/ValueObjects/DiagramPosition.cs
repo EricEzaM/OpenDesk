@@ -18,6 +18,12 @@ namespace OpenDesk.Domain.ValueObjects
 			Y = y;
 		}
 
+		public DiagramPosition(DiagramPosition other)
+		{
+			X = other.X;
+			Y = other.Y;
+		}
+
 		public int X { get; set; }
 		public int Y { get; set; }
 
