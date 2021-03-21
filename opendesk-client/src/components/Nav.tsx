@@ -5,13 +5,13 @@ import Authenticated from "./auth/Authenticated";
 function Nav() {
 	return (
 		<nav className="nav">
-			<Link to="/">
+			<Link to="/map">
 				<h1 className="nav__title">OpenDesk</h1>
 			</Link>
 			{/* <h1 className="main-title">OpenDesk</h1> */}
 			<ul className="nav__links-list">
 				<li>
-					<Link to="/">Home</Link>
+					<Link to="/map">Home</Link>
 				</li>
 				<Authenticated>
 					<li>
