@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { MapContainer, Marker, ImageOverlay } from "react-leaflet";
 import {
@@ -20,6 +20,8 @@ import { useHistory, useParams } from "react-router";
 import { compile } from "path-to-regexp";
 import { useRouteMatch } from "react-router-dom";
 
+const MAP_IMAGE_BORDER = 25;
+
 interface Props {
 	image: OfficeImage;
 	desks: Desk[];
@@ -28,43 +30,39 @@ interface Props {
 }
 
 function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
-	const { officeId: pOfficeId, deskId: pDeskId } = useParams<any>();
-	let imageBoundsMax = [image.height, image.width];
+	// =============================================================
+	// Hooks & Variables
+	// =============================================================
 
-	let displayHeight = Math.min(image.width, 450); // maximum map display = 600 px
+	const { officeId: pOfficeId, deskId: pDeskId } = useParams<any>();
 
 	const imageRef = useRef<LImageOverlay>();
 	const mapRef = useRef<Map>();
 
-	// Image Change
-	useEffect(() => {
-		// Update image bounds so image scales properly
-		imageRef &&
-			imageRef.current &&
-			imageRef.current.setBounds(
-				new LatLngBounds([
-					[0, 0],
-					[imageBoundsMax[0], imageBoundsMax[1]],
-				])
-			);
-
-		// Update maps bounds so that panning works properly for new image
-		mapRef &&
-			mapRef.current &&
-			mapRef.current.setMaxBounds([
-				[-25, -25],
-				[imageBoundsMax[0] + 25, imageBoundsMax[1] + 25],
-			]);
-	}, [image]);
-
 	const history = useHistory();
 	const match = useRouteMatch();
 
+	let imageBounds: [number, number] = [image.height, image.width];
+	let imageCenter: [number, number] = [image.height / 2, image.width / 2];
+
+	// =============================================================
+	// Effects
+	// =============================================================
+
 	useEffect(() => {
-		if (pDeskId) {
-			handleSelection(pDeskId);
-		}
+		// Update image bounds so image scales properly
+		updateImageBounds();
+		// Update maps bounds so that panning works properly for new image
+		updateMapMaxBounds();
+	}, [image]);
+
+	useEffect(() => {
+		pDeskId && handleSelection(pDeskId);
 	}, [desks]);
+
+	// =============================================================
+	// Functions
+	// =============================================================
 
 	function handleSelection(deskId: string) {
 		let changedDesk = desks.find((d) => d.id === deskId);
@@ -77,17 +75,37 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 		});
 	}
 
+	function updateMapMaxBounds() {
+		let min: [number, number] = [-MAP_IMAGE_BORDER, -MAP_IMAGE_BORDER];
+		let max: [number, number] = [
+			imageBounds[0] + MAP_IMAGE_BORDER,
+			imageBounds[1] + MAP_IMAGE_BORDER,
+		];
+
+		mapRef?.current?.setMaxBounds([min, max]);
+		// Update map center
+		mapRef?.current?.setView(imageCenter);
+	}
+
+	function updateImageBounds() {
+		imageRef?.current?.setBounds(new LatLngBounds([[0, 0], imageBounds]));
+	}
+
+	function onMapCreated(map: Map) {
+		mapRef.current = map;
+		updateMapMaxBounds();
+	}
+
+	// =============================================================
+	// Render
+	// =============================================================
+
 	return (
 		<div className="map-container">
-			<div
-				className="map-container__inner"
-				style={{
-					height: displayHeight + "px",
-				}}
-			>
+			<div className="map-container__inner">
 				<MapContainer
-					whenCreated={(map) => (mapRef.current = map)}
-					center={[imageBoundsMax[0] / 2, imageBoundsMax[1] / 2]}
+					whenCreated={onMapCreated}
+					center={imageCenter}
 					crs={CRS.Simple}
 					attributionControl={false}
 					// Disable dragging and zooming
@@ -99,20 +117,13 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 					doubleClickZoom={false}
 					keyboard={false}
 					boxZoom={false}
-					maxBounds={[
-						[-25, -25],
-						[imageBoundsMax[0] + 25, imageBoundsMax[1] + 25],
-					]}
 					maxBoundsViscosity={1}
 				>
 					<ImageOverlay
 						//@ts-ignore
 						ref={imageRef}
 						url={image.url}
-						bounds={[
-							[0, 0],
-							[imageBoundsMax[0], imageBoundsMax[1]],
-						]}
+						bounds={[[0, 0], imageBounds]}
 					/>
 
 					{desks.length > 0 &&
