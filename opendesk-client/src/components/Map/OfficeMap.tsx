@@ -16,6 +16,7 @@ import DeskHighlightIcon from "resources/desk-highlight.svg";
 
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
 import { Desk, OfficeImage } from "types";
+import { useParams } from "react-router";
 
 interface Props {
 	image: OfficeImage;
@@ -25,6 +26,7 @@ interface Props {
 }
 
 function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
+	const { deskId } = useParams<any>();
 	let imageBoundsMax = [image.height, image.width];
 
 	let displayHeight = Math.min(image.width, 450); // maximum map display = 600 px
@@ -52,6 +54,13 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 				[imageBoundsMax[0] + 25, imageBoundsMax[1] + 25],
 			]);
 	}, [image]);
+
+	useEffect(() => {
+		if (deskId) {
+			let changedDesk = desks.find((d) => d.id === deskId);
+			changedDesk && onDeskSelected && onDeskSelected(changedDesk);
+		}
+	}, [desks]);
 
 	return (
 		<div className="map-container">

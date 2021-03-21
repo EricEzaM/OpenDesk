@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { Office } from "types";
 import apiRequest from "utils/requestUtils";
 
@@ -7,8 +8,15 @@ interface Props {
 }
 
 function OfficeSelector({ onChange }: Props) {
+	const { officeId } = useParams<any>();
+
 	const [offices, setOffices] = useState<Office[]>([]);
 	const [error, setError] = useState<string | undefined>();
+
+	function handleChange(officeId: string) {
+		let changedOffice = offices.find((o) => o.id === officeId);
+		changedOffice && onChange && onChange(changedOffice);
+	}
 
 	useEffect(() => {
 		apiRequest("offices").then(
@@ -23,16 +31,20 @@ function OfficeSelector({ onChange }: Props) {
 		);
 	}, []);
 
+	useEffect(() => {
+		if (officeId) {
+			handleChange(officeId);
+		}
+	}, [offices]);
+
 	return (
 		<div className="office-selector">
 			<select
 				className="office-selector__dropdown"
-				onChange={(e) => {
-					let changedOffice = offices.find((o) => o.id === e.target.value);
-					changedOffice && onChange && onChange(changedOffice);
-				}}
+				onChange={(e) => handleChange(e.target.value)}
+				defaultValue={officeId ?? ""}
 			>
-				<option value="" disabled selected>
+				<option value="" disabled>
 					-- Select an Office --
 				</option>
 				{offices && offices.map((o) => <option value={o.id}>{o.name}</option>)}
