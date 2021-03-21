@@ -14,9 +14,9 @@ function App() {
 				<div className="container">
 					<Nav />
 
-					<PrivateRoute exact path="/">
+					<Route exact path="/">
 						<Main />
-					</PrivateRoute>
+					</Route>
 					<PrivateRoute exact path="/me">
 						<Me />
 					</PrivateRoute>

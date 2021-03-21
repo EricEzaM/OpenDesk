@@ -1,12 +1,13 @@
 import { useState } from "react";
 
-import { Office, Desk, Booking } from "types";
+import { Office, Desk } from "types";
 
 import OfficeSelector from "components/OfficeSelector";
 import apiRequest from "utils/requestUtils";
 import DeskDetails from "components/DeskDetails";
 import OfficeMap from "components/map/OfficeMap";
-import { useAuth } from "hooks/useAuth";
+import Authenticated from "components/auth/Authenticated";
+import Unauthenticated from "components/auth/Unauthenticated";
 
 function Main() {
 	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
@@ -32,16 +33,21 @@ function Main() {
 
 	return (
 		<>
-			<OfficeSelector onChange={onOfficeSelected} />
-			{selectedOffice && (
-				<OfficeMap
-					image={selectedOffice.image}
-					desks={desks}
-					selectedDesk={selectedDesk}
-					onDeskSelected={onDeskSelected}
-				/>
-			)}
-			{selectedDesk && <DeskDetails desk={selectedDesk} />}
+			<Unauthenticated>
+				<p>Sign in is required</p>
+			</Unauthenticated>
+			<Authenticated>
+				<OfficeSelector onChange={onOfficeSelected} />
+				{selectedOffice && (
+					<OfficeMap
+						image={selectedOffice.image}
+						desks={desks}
+						selectedDesk={selectedDesk}
+						onDeskSelected={onDeskSelected}
+					/>
+				)}
+				{selectedDesk && <DeskDetails desk={selectedDesk} />}
+			</Authenticated>
 		</>
 	);
 }
