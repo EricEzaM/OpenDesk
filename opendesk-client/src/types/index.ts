@@ -8,6 +8,15 @@ export interface Booking {
 	user: User;
 }
 
+export interface FullBooking {
+	id: string;
+	startDateTime: Date;
+	endDateTime: Date;
+	office: Office;
+	desk: Desk;
+	user: User;
+}
+
 // DESK
 
 export interface Desk {

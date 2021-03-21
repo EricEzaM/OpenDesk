@@ -1,0 +1,30 @@
+.nav {
+	display: flex;
+	align-items: center;
+
+	&__title {
+		margin-right: 10px;
+	}
+
+	&__links-list {
+		display: flex;
+		list-style: none;
+		margin-right: auto;
+
+		li {
+			margin: 0 5px;
+		}
+	}
+
+	a {
+		text-decoration: none;
+		cursor: pointer;
+		color: black;
+		transition: 200ms color;
+
+		&:hover {
+			color: blueviolet;
+			transition: 200ms color;
+		}
+	}
+}

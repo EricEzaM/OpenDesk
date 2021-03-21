@@ -26,7 +26,7 @@ function SignInOut() {
 						alignItems: "center",
 					}}
 				>
-					<p>Welcome {user?.name}</p>
+					<p>{user?.name}</p>
 					<button
 						className="sign-in-out__out-btn"
 						onClick={() => signOut(window.location.origin)}
