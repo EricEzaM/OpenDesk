@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Common.DataTransferObjects
 {
-	public class UserBookingDTO
+	public class FullBookingDTO
 	{
 
 		public string Id { get; set; }
