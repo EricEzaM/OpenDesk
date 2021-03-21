@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SignInOut from "components/auth/SignInOut";
+import Authenticated from "./auth/Authenticated";
 
 function Nav() {
 	return (
@@ -12,9 +13,11 @@ function Nav() {
 				<li>
 					<Link to="/">Home</Link>
 				</li>
-				<li>
-					<Link to="/me">My Bookings</Link>
-				</li>
+				<Authenticated>
+					<li>
+						<Link to="/me">My Bookings</Link>
+					</li>
+				</Authenticated>
 				<li>
 					<Link to="/about">About</Link>
 				</li>

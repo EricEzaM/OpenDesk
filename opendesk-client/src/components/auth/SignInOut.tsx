@@ -10,7 +10,6 @@ function SignInOut() {
 	return (
 		<div className="sign-in-out">
 			<Unauthenticated>
-				<p>Sign in is required to use the app.</p>
 				<button
 					className="sign-in-out__in-btn"
 					onClick={() => signIn(window.location.href)}
