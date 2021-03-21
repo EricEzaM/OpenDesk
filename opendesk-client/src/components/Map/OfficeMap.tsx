@@ -33,15 +33,15 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 
 	let displayHeight = Math.min(image.width, 450); // maximum map display = 600 px
 
-	const ref = useRef<LImageOverlay>();
+	const imageRef = useRef<LImageOverlay>();
 	const mapRef = useRef<Map>();
 
 	// Image Change
 	useEffect(() => {
 		// Update image bounds so image scales properly
-		ref &&
-			ref.current &&
-			ref.current.setBounds(
+		imageRef &&
+			imageRef.current &&
+			imageRef.current.setBounds(
 				new LatLngBounds([
 					[0, 0],
 					[imageBoundsMax[0], imageBoundsMax[1]],
@@ -107,7 +107,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 				>
 					<ImageOverlay
 						//@ts-ignore
-						ref={ref}
+						ref={imageRef}
 						url={image.url}
 						bounds={[
 							[0, 0],
