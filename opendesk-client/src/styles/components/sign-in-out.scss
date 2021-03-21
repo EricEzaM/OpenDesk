@@ -8,6 +8,12 @@
 		cursor: pointer;
 	}
 
+	&__out-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	&__out-btn {
 		border: none;
 		line-height: 0;

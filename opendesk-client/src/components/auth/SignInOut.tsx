@@ -18,13 +18,7 @@ function SignInOut() {
 				</button>
 			</Unauthenticated>
 			<Authenticated>
-				<div
-					style={{
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "center",
-					}}
-				>
+				<div className="sign-in-out__out-container">
 					<p>{user?.name}</p>
 					<button
 						className="sign-in-out__out-btn"
