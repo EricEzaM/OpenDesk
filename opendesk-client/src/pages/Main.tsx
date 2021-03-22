@@ -12,12 +12,12 @@ import Unauthenticated from "components/auth/Unauthenticated";
 function Main() {
 	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
 
-	const [desks, setDesks] = useState<Desk[]>([]);
+	const [desks, setDesks] = useState<Desk[] | undefined>();
 	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
 
-	function onDeskSelected(desk: Desk) {
+	function onDeskSelected(desk?: Desk) {
 		setSelectedDesk(desk);
-		console.log("Selected desk " + desk.name);
+		console.log("Selected desk " + desk?.name);
 	}
 
 	function onOfficeSelected(office: Office) {

@@ -24,9 +24,9 @@ const MAP_IMAGE_BORDER = 25;
 
 interface Props {
 	image: OfficeImage;
-	desks: Desk[];
+	desks?: Desk[];
 	selectedDesk?: Desk;
-	onDeskSelected: (desk: Desk) => void;
+	onDeskSelected: (desk?: Desk) => void;
 }
 
 function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
@@ -57,7 +57,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 	}, [image]);
 
 	useEffect(() => {
-		pDeskId && handleSelection(pDeskId);
+		handleSelection(pDeskId);
 	}, [desks]);
 
 	// =============================================================
@@ -65,14 +65,25 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 	// =============================================================
 
 	function handleSelection(deskId: string) {
-		let changedDesk = desks.find((d) => d.id === deskId);
-		changedDesk && onDeskSelected && onDeskSelected(changedDesk);
-		history.replace({
-			pathname: compile(match.path)({
-				officeId: pOfficeId,
-				deskId: deskId,
-			}),
-		});
+		let changedDesk = deskId && desks?.find((d) => d.id === deskId);
+		if (changedDesk) {
+			onDeskSelected && onDeskSelected(changedDesk);
+			history.replace({
+				pathname: compile(match.path)({
+					officeId: pOfficeId,
+					deskId: deskId,
+				}),
+			});
+		} else if (desks) {
+			// Only clear out the selected desk if desks have been loaded (desks != undefined)
+			onDeskSelected && onDeskSelected(undefined);
+			history.replace({
+				pathname: compile(match.path)({
+					officeId: pOfficeId,
+					deskId: undefined,
+				}),
+			});
+		}
 	}
 
 	function updateMapMaxBounds() {
@@ -126,7 +137,7 @@ function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
 						bounds={[[0, 0], imageBounds]}
 					/>
 
-					{desks.length > 0 &&
+					{desks &&
 						desks.map((desk) => (
 							<Marker
 								position={[desk.diagramPosition.x, desk.diagramPosition.y]}
