@@ -4,6 +4,8 @@ import { createContext } from "react";
 import { User } from "types";
 import apiRequest from "utils/requestUtils";
 
+const AUTH_USER_KEY = "auth_user";
+
 interface AuthContextProps {
 	user?: User;
 	signIn: (returnUrl: string) => void;
@@ -45,7 +47,11 @@ export function useAuth(): AuthContextProps {
  * @returns The actual values of the AuthContextProps
  */
 function useAuthProvider(): AuthContextProps {
-	const [user, setUser] = useState<User | undefined>();
+	// Try use the localStorage stored user before the request to the API finishes.
+	const userJson = localStorage.getItem(AUTH_USER_KEY);
+	const userObj = userJson && JSON.parse(userJson);
+
+	const [user, setUser] = useState<User | undefined>(userObj ?? undefined);
 
 	// On application reload, check the user login status by querying the API (should use the existing cookie)
 	// Since the API redirects us to the application, this will be run after the auth Cookie has been set and will be successful.
@@ -55,10 +61,13 @@ function useAuthProvider(): AuthContextProps {
 	// 4. The redirect url is this application, so the app will reload, trigger this effect, hit the user endpoint successfully and give us the user object!
 	useEffect(() => {
 		apiRequest("me").then((res) => {
+			// Set user & update localStorage value.
 			if (res.ok) {
 				setUser(res.data);
+				localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
 			} else {
 				setUser(undefined);
+				localStorage.removeItem(AUTH_USER_KEY);
 			}
 		});
 	}, []);
