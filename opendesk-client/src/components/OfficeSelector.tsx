@@ -1,64 +1,82 @@
 import { useEffect, useState } from "react";
-import { useHistory, useParams, useRouteMatch } from "react-router";
 import { Office } from "types";
 import apiRequest from "utils/requestUtils";
-import { compile } from "path-to-regexp";
+import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 
 interface Props {
-	onChange?: (office: Office) => void;
+	onOfficeSelected?: (office?: Office) => void;
 }
 
-function OfficeSelector({ onChange }: Props) {
-	const { officeId: pOfficeId, ...pRest } = useParams<any>();
-	const history = useHistory();
-	const match = useRouteMatch();
+function OfficeSelector({ onOfficeSelected }: Props) {
+	// =============================================================
+	// Hooks and Variables
+	// =============================================================
 
-	const [offices, setOffices] = useState<Office[]>([]);
-	const [error, setError] = useState<string | undefined>();
+	const [selectedOfficeId, setSelectedOfficeId] = useState<string>("");
+	const [offices, setOffices] = useState<Office[]>();
 
-	function handleChange(officeId: string) {
-		let changedOffice = offices.find((o) => o.id === officeId);
-		changedOffice && onChange && onChange(changedOffice);
-		history.replace({
-			pathname: compile(match.path)({
-				...pRest,
-				officeId: officeId,
-			}),
-		});
-	}
+	const { officeIdParam, setOfficeParam } = useOfficeDeskRouteParams();
+
+	// =============================================================
+	// Effects
+	// =============================================================
 
 	useEffect(() => {
-		apiRequest("offices").then(
-			(res) => {
-				if (res.ok) {
-					setOffices(res.data);
-				}
-			},
-			(error) => {
-				setError(error);
+		apiRequest("offices").then((res) => {
+			if (res.ok) {
+				setOffices(res.data);
 			}
-		);
+		});
 	}, []);
 
 	useEffect(() => {
-		if (pOfficeId) {
-			handleChange(pOfficeId);
-		}
+		// When offices are loaded, check if the route parameter can select an office.
+		handleChange(officeIdParam);
 	}, [offices]);
+
+	useEffect(() => {
+		// When the parameter is changed, update the selection.
+		setSelectedOfficeId(officeIdParam ?? "");
+		if (!officeIdParam) {
+			handleChange(undefined);
+		}
+	}, [officeIdParam]);
+
+	// =============================================================
+	// Functions
+	// =============================================================
+
+	function handleChange(officeId?: string) {
+		setSelectedOfficeId(officeId ?? "");
+
+		let newOffice = offices?.find((o) => o.id === officeId);
+		if (newOffice) {
+			// Found a matching office.
+			onOfficeSelected && onOfficeSelected(newOffice);
+			setOfficeParam(officeId);
+		} else if (offices) {
+			// Offices loaded, but there was no match.
+			onOfficeSelected && onOfficeSelected(undefined);
+			setOfficeParam(undefined);
+		}
+	}
+
+	// =============================================================
+	// Render
+	// =============================================================
 
 	return (
 		<div className="office-selector">
 			<select
 				className="office-selector__dropdown"
 				onChange={(e) => handleChange(e.target.value)}
-				defaultValue={pOfficeId ?? ""}
+				value={selectedOfficeId}
 			>
 				<option value="" disabled>
 					-- Select an Office --
 				</option>
 				{offices && offices.map((o) => <option value={o.id}>{o.name}</option>)}
 			</select>
-			{error && <div style={{ fontSize: "small", color: "red" }}>{error}</div>}
 		</div>
 	);
 }

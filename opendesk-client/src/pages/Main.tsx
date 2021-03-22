@@ -10,26 +10,40 @@ import Authenticated from "components/auth/Authenticated";
 import Unauthenticated from "components/auth/Unauthenticated";
 
 function Main() {
-	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
+	// =============================================================
+	// Hooks and Variables
+	// =============================================================
 
 	const [desks, setDesks] = useState<Desk[] | undefined>();
 	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
+	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
+
+	// =============================================================
+	// Effects
+	// =============================================================
+
+	// =============================================================
+	// Functions
+	// =============================================================
 
 	function onDeskSelected(desk?: Desk) {
 		setSelectedDesk(desk);
-		console.log("Selected desk " + desk?.name);
 	}
 
-	function onOfficeSelected(office: Office) {
+	function onOfficeSelected(office?: Office) {
 		setSelectedOffice(office);
-		console.log("Selected office " + office.name);
 
-		apiRequest(`offices/${office.id}/desks`).then((res) => {
-			if (res.ok) {
-				setDesks(res.data);
-			}
-		});
+		office &&
+			apiRequest(`offices/${office.id}/desks`).then((res) => {
+				if (res.ok) {
+					setDesks(res.data);
+				}
+			});
 	}
+
+	// =============================================================
+	// Render
+	// =============================================================
 
 	return (
 		<>
@@ -37,7 +51,7 @@ function Main() {
 				<p>Sign in is required</p>
 			</Unauthenticated>
 			<Authenticated>
-				<OfficeSelector onChange={onOfficeSelected} />
+				<OfficeSelector onOfficeSelected={onOfficeSelected} />
 				{selectedOffice && (
 					<OfficeMap
 						image={selectedOffice.image}
