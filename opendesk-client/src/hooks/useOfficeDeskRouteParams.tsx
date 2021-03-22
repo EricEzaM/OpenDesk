@@ -15,7 +15,7 @@ function useOfficeDeskRouteParams() {
 	const match = useRouteMatch();
 
 	function setOfficeParam(value?: string) {
-		history.push({
+		history.replace({
 			pathname: compile(match.path)({
 				deskId: deskIdParam,
 				officeId: value,
@@ -24,7 +24,7 @@ function useOfficeDeskRouteParams() {
 	}
 
 	function setDeskParam(value?: string) {
-		history.push({
+		history.replace({
 			pathname: compile(match.path)({
 				deskId: value,
 				officeId: officeIdParam,
