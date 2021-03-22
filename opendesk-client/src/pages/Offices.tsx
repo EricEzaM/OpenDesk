@@ -9,7 +9,7 @@ import OfficeMap from "components/map/OfficeMap";
 import Authenticated from "components/auth/Authenticated";
 import Unauthenticated from "components/auth/Unauthenticated";
 
-function Main() {
+function Offices() {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
@@ -66,4 +66,4 @@ function Main() {
 	);
 }
 
-export default Main;
+export default Offices;

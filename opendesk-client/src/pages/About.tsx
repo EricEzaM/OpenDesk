@@ -1,7 +1,7 @@
 function About() {
 	return (
 		<div>
-			<p>Welcome to OpenDesk!</p>
+			<p>Welcome to OpenDesk! (About Page)</p>
 		</div>
 	);
 }
