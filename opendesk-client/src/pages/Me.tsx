@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { useAuth } from "hooks/useAuth";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FullBooking } from "types";
 import apiRequest from "utils/requestUtils";
 
@@ -58,6 +59,20 @@ function Me() {
 						<label style={{ fontSize: "small", fontWeight: "bold" }}>End</label>
 						<div>{format(fb.endDateTime, "dd/MM/yyyy hh:mm a")}</div>
 					</div>
+					<Link
+						style={{
+							border: "none",
+							backgroundColor: "powderblue",
+							padding: "5px 10px",
+							textDecoration: "none",
+							color: "black",
+							alignSelf: "center",
+							borderRadius: "5px",
+						}}
+						to={`/map/${fb.office.id}/${fb.desk.id}`}
+					>
+						Go To It
+					</Link>
 				</div>
 			))}
 		</div>
