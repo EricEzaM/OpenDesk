@@ -1,8 +1,11 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
+using OpenDesk.API.Models;
 using OpenDesk.Application.Common.Interfaces;
 using OpenDesk.Application.Common.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,38 +13,36 @@ using System.Threading.Tasks;
 namespace OpenDesk.API.Behaviours
 {
 	public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-	where TRequest : IValidatable
-	where TResponse : class
+	where TRequest : IRequest<TResponse>
+	where TResponse : ApiResponse, new()
 	{
-		private readonly IValidator<TRequest> _validator;
+		private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-		public ValidationBehaviour(IValidator<TRequest> validator)
+		public ValidationBehaviour(IEnumerable<IValidator<TRequest>> validators)
 		{
-			_validator = validator;
+			_validators = validators;
 		}
 
-		public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+		public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
 		{
-			var result = await _validator.ValidateAsync(request);
-
-			if (result.IsValid == false)
+			if (_validators.Any())
 			{
-				var responseType = typeof(TResponse);
+				List<ValidationFailure> failures = _validators
+					.Select(v => v.Validate(request))
+					.SelectMany(res => res.Errors)
+					.Where(failure => failure != null)
+					.ToList();
 
-				if (responseType.IsGenericType)
+				if (failures.Any())
 				{
-					var resultType = responseType.GetGenericArguments()[0];
-					var invalidResponseType = typeof(ValidatableResponse<>).MakeGenericType(resultType);
+					TResponse response = new();
+					response.Outcome = OperationOutcome.ValidationFailure(failures.Select(f => f.ErrorMessage), "Validation Failure.");
 
-					var invalidResponse = Activator.CreateInstance(invalidResponseType, null, result.Errors.Select(vf => vf.ErrorMessage).ToList()) as TResponse;
-
-					return invalidResponse;
+					return Task.FromResult(response);
 				}
 			}
 
-			var response = await next();
-
-			return response;
+			return next();
 		}
 	}
 }

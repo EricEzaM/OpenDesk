@@ -11,10 +11,11 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenDesk.API.Models;
 
 namespace OpenDesk.API.Features.Bookings
 {
-	public class CreateBookingCommand : IRequest<ValidatableResponse<BookingDTO>>, IValidatable
+	public class CreateBookingCommand : IRequest<ApiResponse<BookingDTO>>
 	{
 		[JsonIgnore]
 		public string UserId { get; set; }
@@ -24,7 +25,7 @@ namespace OpenDesk.API.Features.Bookings
 		public DateTimeOffset EndDateTime { get; set; }
 	}
 
-	public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, ValidatableResponse<BookingDTO>>
+	public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, ApiResponse<BookingDTO>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -33,7 +34,7 @@ namespace OpenDesk.API.Features.Bookings
 			_db = db;
 		}
 
-		public async Task<ValidatableResponse<BookingDTO>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
+		public async Task<ApiResponse<BookingDTO>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
 		{
 			var desk = await _db
 				.Desks
@@ -60,19 +61,20 @@ namespace OpenDesk.API.Features.Bookings
 
 			var user = _db.Users.FirstOrDefault(u => u.Id == request.UserId);
 
-			return new ValidatableResponse<BookingDTO>(new BookingDTO
-			{
-				Id = booking.Id,
-				DeskId = booking.Desk.Id,
-				StartDateTime = booking.StartDateTime,
-				EndDateTime = booking.EndDateTime,
-				User = new UserDTO
-				{
-					Id = user.Id,
-					UserName = user.UserName,
-					Name = "Name Placeholder"
-				}
-			});
+			return new ApiResponse<BookingDTO>(
+					new BookingDTO
+					{
+						Id = booking.Id,
+						DeskId = booking.Desk.Id,
+						StartDateTime = booking.StartDateTime,
+						EndDateTime = booking.EndDateTime,
+						User = new UserDTO
+						{
+							Id = user.Id,
+							UserName = user.UserName,
+							Name = "Name Placeholder"
+						}
+					});
 		}
 	}
 

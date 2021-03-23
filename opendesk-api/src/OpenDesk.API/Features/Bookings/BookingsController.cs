@@ -53,13 +53,13 @@ namespace OpenDesk.API.Features.Bookings
 			command.UserId = userId;
 			var result = await _mediator.Send(command);
 
-			if (result.IsValidResponse)
+			if (result.Outcome.IsSuccess)
 			{
-				return Ok(result.Result);
+				return Ok(result);
 			}
 			else
 			{
-				return BadRequest(result.Errors);
+				return BadRequest(result);
 			}
 
 		}
