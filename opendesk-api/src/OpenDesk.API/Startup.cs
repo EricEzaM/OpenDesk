@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using OpenDesk.API.Features.Bookings;
 using OpenDesk.Infrastructure;
 using System.IO;
 using FluentValidation;
+using OpenDesk.API.Behaviours;
 
 namespace OpenDesk.API
 {
