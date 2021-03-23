@@ -10,6 +10,12 @@ using OpenDesk.Infrastructure;
 using System.IO;
 using FluentValidation;
 using OpenDesk.API.Behaviours;
+using OpenDesk.API.Filters;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using OpenDesk.API.Models;
+using MediatR.Pipeline;
 
 namespace OpenDesk.API
 {
@@ -50,7 +56,27 @@ namespace OpenDesk.API
 				});
 			}
 
-			services.AddControllers();
+			services.AddControllers(o =>
+			{
+				o.Filters.Add(typeof(ExceptionFilter));
+			}).ConfigureApiBehaviorOptions(o =>
+			{
+				o.InvalidModelStateResponseFactory = context =>
+				{
+					var errors = new List<string>();
+					errors.AddRange(context.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)); // Add all ModelState errors if any.
+
+					var res = new ApiResponse()
+					{
+						Outcome = OperationOutcome.Error(errors, $"The request inputs were not valid.")
+					};
+					var result = new JsonResult(res);
+
+					context.HttpContext.Response.StatusCode = 400;
+					return result;
+				};
+			}); ;
+
 			services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "OpenDesk", Version = "v1" });

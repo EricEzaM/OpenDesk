@@ -11,6 +11,7 @@ namespace OpenDesk.API.Features.Bookings
 {
 	[Authorize]
 	[Route("api")]
+	[ApiController]
 	public class BookingsController : ControllerBase
 	{
 		private readonly IMediator _mediator;

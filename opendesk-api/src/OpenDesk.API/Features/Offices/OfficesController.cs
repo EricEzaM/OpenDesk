@@ -12,6 +12,7 @@ namespace OpenDesk.API.Features.Offices
 {
 	[Authorize]
 	[Route("api/offices")]
+	[ApiController]
 	public class OfficesController : ControllerBase
 	{
 		private readonly IMediator _mediator;
