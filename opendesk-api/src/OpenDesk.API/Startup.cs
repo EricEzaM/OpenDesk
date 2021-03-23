@@ -6,8 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using OpenDesk.API.Features.Bookings;
 using OpenDesk.Infrastructure;
 using System.IO;
+using FluentValidation;
 
 namespace OpenDesk.API
 {
@@ -29,6 +31,8 @@ namespace OpenDesk.API
 			services.AddInfrastructure(Configuration, _env);
 
 			services.AddMediatR(typeof(Startup));
+			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+			services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
 
 			services.AddHttpClient();
 

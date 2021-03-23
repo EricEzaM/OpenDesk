@@ -53,7 +53,15 @@ namespace OpenDesk.API.Features.Bookings
 			command.UserId = userId;
 			var result = await _mediator.Send(command);
 
-			return Ok(result);
+			if (result.IsValidResponse)
+			{
+				return Ok(result.Result);
+			}
+			else
+			{
+				return BadRequest(result.Errors);
+			}
+
 		}
 
 		[HttpGet("/api/users/{userId}/bookings")]

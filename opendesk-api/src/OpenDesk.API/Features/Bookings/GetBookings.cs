@@ -56,6 +56,7 @@ namespace OpenDesk.API.Features.Bookings
 					},
 					User = bu.User
 				})
+				.AsNoTracking()
 				.ToListAsync();
 		}
 	}
