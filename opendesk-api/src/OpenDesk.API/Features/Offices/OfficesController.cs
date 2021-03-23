@@ -29,7 +29,7 @@ namespace OpenDesk.API.Features.Offices
 		{
 			var result = await _mediator.Send(new GetOfficesCommand());
 
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 
 		// TODO: Add permissions / roles authentication.
@@ -37,7 +37,7 @@ namespace OpenDesk.API.Features.Offices
 		public async Task<IActionResult> Create(CreateOfficeCommand command)
 		{
 			var result = await _mediator.Send(command);
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 	}
 }

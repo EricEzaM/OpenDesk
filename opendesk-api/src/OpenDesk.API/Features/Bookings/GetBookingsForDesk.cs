@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using OpenDesk.API.Models;
 using OpenDesk.Application.Common.DataTransferObjects;
 using OpenDesk.Infrastructure.Persistence;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Bookings
 {
-	public class GetBookingsForDeskCommand : IRequest<IEnumerable<BookingDTO>>
+	public class GetBookingsForDeskCommand : IRequest<ApiResponse<IEnumerable<BookingDTO>>>
 	{
 		public GetBookingsForDeskCommand(string deskId)
 		{
@@ -20,7 +21,7 @@ namespace OpenDesk.API.Features.Bookings
 		public string DeskId { get; set; }
 	}
 
-	public class GetBookingsForDeskHandler : IRequestHandler<GetBookingsForDeskCommand, IEnumerable<BookingDTO>>
+	public class GetBookingsForDeskHandler : IRequestHandler<GetBookingsForDeskCommand, ApiResponse<IEnumerable<BookingDTO>>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -29,9 +30,10 @@ namespace OpenDesk.API.Features.Bookings
 			_db = db;
 		}
 
-		public async Task<IEnumerable<BookingDTO>> Handle(GetBookingsForDeskCommand request, CancellationToken cancellationToken)
+		public async Task<ApiResponse<IEnumerable<BookingDTO>>> Handle(GetBookingsForDeskCommand request, CancellationToken cancellationToken)
 		{
-			return await _db.Bookings
+			return new ApiResponse<IEnumerable<BookingDTO>>(
+				await _db.Bookings
 				.Include(b => b.Desk)
 				.Where(b => b.Desk.Id == request.DeskId)
 				.Join(_db.Users, b => b.UserId, u => u.Id, (b, u) => new
@@ -52,7 +54,7 @@ namespace OpenDesk.API.Features.Bookings
 					EndDateTime = bu.Booking.EndDateTime,
 					User = bu.User
 				})
-				.ToListAsync();
+				.ToListAsync());
 
 		}
 	}

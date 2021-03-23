@@ -25,7 +25,7 @@ namespace OpenDesk.API.Features.Desks
 		{
 			var result = await _mediator.Send(new GetDesksCommand(officeId));
 
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 
 		// TODO: Add permissions / roles authentication.
@@ -36,7 +36,7 @@ namespace OpenDesk.API.Features.Desks
 
 			var result = await _mediator.Send(command);
 
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 
 		[HttpDelete("{officeId}/desks/{deskId}")]

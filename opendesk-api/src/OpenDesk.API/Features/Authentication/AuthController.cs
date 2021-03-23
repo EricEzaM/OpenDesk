@@ -128,12 +128,12 @@ namespace OpenDesk.API.Features.Authentication
 		[Authorize]
 		public IActionResult GetUser()
 		{
-			return Ok(new UserDTO()
+			return Ok(new ApiResponse<UserDTO>(new UserDTO()
 			{
 				Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
 				Name = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
 				UserName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value
-			});
+			}));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using OpenDesk.API.Models;
 using OpenDesk.Application.Common.DataTransferObjects;
 using OpenDesk.Domain.Entities;
 using OpenDesk.Domain.ValueObjects;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Desks
 {
-	public class CreateDeskCommand : IRequest<DeskDTO>
+	public class CreateDeskCommand : IRequest<ApiResponse<DeskDTO>>
 	{
 		[JsonIgnore]
 		public string OfficeId { get; set; }
@@ -21,7 +22,7 @@ namespace OpenDesk.API.Features.Desks
 		public DiagramPosition DiagramPosition { get; set; }
 	}
 
-	public class CreateDeskHandler : IRequestHandler<CreateDeskCommand, DeskDTO>
+	public class CreateDeskHandler : IRequestHandler<CreateDeskCommand, ApiResponse<DeskDTO>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -30,7 +31,7 @@ namespace OpenDesk.API.Features.Desks
 			_db = db;
 		}
 
-		public async Task<DeskDTO> Handle(CreateDeskCommand request, CancellationToken cancellationToken)
+		public async Task<ApiResponse<DeskDTO>> Handle(CreateDeskCommand request, CancellationToken cancellationToken)
 		{
 			var office = await _db
 				.Offices
@@ -55,12 +56,13 @@ namespace OpenDesk.API.Features.Desks
 
 			await _db.SaveChangesAsync();
 
-			return new DeskDTO
-			{
-				Id = desk.Id,
-				Name = desk.Name,
-				DiagramPosition = desk.DiagramPosition,
-			};
+			return new ApiResponse<DeskDTO>(
+				new DeskDTO
+				{
+					Id = desk.Id,
+					Name = desk.Name,
+					DiagramPosition = desk.DiagramPosition,
+				});
 		}
 	}
 }

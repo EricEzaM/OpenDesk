@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using OpenDesk.API.Features;
 
 namespace OpenDesk.API.Features.Bookings
 {
@@ -26,7 +27,7 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			var result = await _mediator.Send(new GetBookingsCommand());
 
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 
 		[HttpGet("desks/{deskId}/bookings")]
@@ -34,7 +35,7 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			var result = await _mediator.Send(new GetBookingsForDeskCommand(deskId));
 
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 
 		[HttpPost("desks/{deskId}/bookings")]
@@ -54,15 +55,7 @@ namespace OpenDesk.API.Features.Bookings
 			command.UserId = userId;
 			var result = await _mediator.Send(command);
 
-			if (result.Outcome.IsSuccess)
-			{
-				return Ok(result);
-			}
-			else
-			{
-				return BadRequest(result);
-			}
-
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 
 		[HttpGet("/api/users/{userId}/bookings")]
@@ -87,7 +80,7 @@ namespace OpenDesk.API.Features.Bookings
 
 			var result = await _mediator.Send(new GetBookingsForUserCommand(userId));
 
-			return Ok(result);
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
 	}
 }
