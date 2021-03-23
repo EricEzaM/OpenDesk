@@ -84,45 +84,46 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			_db = db;
 
+			var allowedHours = new int[] { 6, 8, 10, 12, 14, 16, 18, 20 };
+			var hrsMessage = $"The hours component of {{PropertyName}} must be one of {allowedHours}";
+			var minsMessage = "The minutes component of {PropertyName} must be zero (00)";
+			var msMessage = "The milliseconds component of {PropertyName} must be zero (000)";
+
 			RuleFor(c => c.DeskId)
 				.NotEmpty()
-				.WithMessage("Desk must not be empty.")
 				.Must((c, deskId) => ValidateNoOverlappingBookingsOnDesk(c))
-				.WithMessage("There is already a booking on the desk in this timeslot.");
+				.WithMessage("The booking clashes with an existing booking on the desk.");
 
 			RuleFor(c => c.UserId)
 				.NotEmpty()
-				.WithMessage("User must not be empty.")
 				.Must((c, userId) => ValidateNoOverlappingBookingsForUser(c))
-				.WithMessage("This user already has a booking in this timeslot. Double booking of desks is not allowed.")
+				.WithMessage("The user already has a booking in this timeslot. Double booking of desks is not allowed.")
 				.Must((c, userId) => ValidateNoBookingsWithDifferentDesksOnSameDayForUser(c))
-				.WithMessage("This user already has a booking on another desk on this day.");
+				.WithMessage("This user already has a booking on another desk on this day. Booking of multiple desks on the same day is not allowed.");
 
 			RuleFor(c => c.StartDateTime)
 				.NotEmpty()
-				.WithMessage("Start must not be empty.")
 				.GreaterThanOrEqualTo(DateTimeOffset.Now)
-				.WithMessage("Start must be in the future.")
-				.Must(d => new int[] { 6, 8, 10, 12, 14, 16, 18, 20 }.Contains(d.Hour))
-				.WithMessage("Hours must be 6, 8, 10, 12, 14, 16, 18, 20.")
+				.WithMessage("{PropertyName} must be in the future.")
+				.Must(d => allowedHours.Contains(d.Hour))
+				.WithMessage(hrsMessage)
 				.Must(d => d.Minute == 0)
-				.WithMessage("Minute must be 0.")
+				.WithMessage(minsMessage)
 				.Must(d => d.Millisecond == 0)
-				.WithMessage("Millisecond must be 0.");
+				.WithMessage(msMessage);
 
 			RuleFor(c => c.EndDateTime)
 				.NotEmpty()
-				.WithMessage("End must not be empty.")
 				.GreaterThanOrEqualTo(DateTimeOffset.Now)
-				.WithMessage("End must be in the future.")
-				.GreaterThanOrEqualTo(c => c.StartDateTime)
-				.WithMessage("End must be in the future from start.")
-				.Must(d => new int[] { 6, 8, 10, 12, 14, 16, 18, 20 }.Contains(d.Hour))
-				.WithMessage("Hours must be 6, 8, 10, 12, 14, 16, 18, 20.")
+				.WithMessage("{PropertyName} must be in the future.")
+				.GreaterThan(c => c.StartDateTime)
+				.WithMessage(c => $"{{PropertyName}} must be after {nameof(c.StartDateTime)}.")
+				.Must(d => allowedHours.Contains(d.Hour))
+				.WithMessage(hrsMessage)
 				.Must(d => d.Minute == 0)
-				.WithMessage("Minute must be 0.")
+				.WithMessage(minsMessage)
 				.Must(d => d.Millisecond == 0)
-				.WithMessage("Millisecond must be 0.");
+				.WithMessage(msMessage);
 		}
 
 		private bool ValidateNoOverlappingBookingsOnDesk(CreateBookingCommand command)
