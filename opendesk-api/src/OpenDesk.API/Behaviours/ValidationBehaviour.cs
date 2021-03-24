@@ -36,7 +36,7 @@ namespace OpenDesk.API.Behaviours
 				if (failures.Any())
 				{
 					TResponse response = new();
-					response.Outcome = OperationOutcome.ValidationFailure(failures.Select(f => f.ErrorMessage), "Validation Failure.");
+					response.Outcome = OperationOutcome.ValidationFailure("Validation Failure.", failures.Select(f => f.ErrorMessage));
 
 					return Task.FromResult(response);
 				}

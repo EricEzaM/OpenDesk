@@ -40,8 +40,7 @@ namespace OpenDesk.API.Features.Desks
 
 			if (office == null)
 			{
-				// TODO Better error handling?
-				throw new Exception("office not found");
+				return new ApiResponse<DeskDTO>(OperationOutcome.ValidationFailure("The office could not be found."));
 			}
 
 			var desk = new Desk()

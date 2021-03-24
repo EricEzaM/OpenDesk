@@ -43,7 +43,14 @@ namespace OpenDesk.API.Features.Bookings
 
 			if (desk == null)
 			{
-				throw new Exception("desk not found");
+				return new ApiResponse<BookingDTO>(OperationOutcome.ValidationFailure("The desk could not be found."));
+			}
+
+			var user = _db.Users.FirstOrDefault(u => u.Id == request.UserId);
+
+			if (user == null)
+			{
+				return new ApiResponse<BookingDTO>(OperationOutcome.ValidationFailure("The user could not be found."));
 			}
 
 			var booking = new Booking
@@ -58,8 +65,6 @@ namespace OpenDesk.API.Features.Bookings
 			desk.Bookings.Add(booking);
 
 			await _db.SaveChangesAsync();
-
-			var user = _db.Users.FirstOrDefault(u => u.Id == request.UserId);
 
 			return new ApiResponse<BookingDTO>(
 					new BookingDTO

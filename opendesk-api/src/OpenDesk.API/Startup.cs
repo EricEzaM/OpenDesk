@@ -68,7 +68,7 @@ namespace OpenDesk.API
 
 					var res = new ApiResponse()
 					{
-						Outcome = OperationOutcome.Error(errors, $"The request inputs were not valid.")
+						Outcome = OperationOutcome.Error($"The request inputs were not valid.", errors)
 					};
 					var result = new JsonResult(res);
 

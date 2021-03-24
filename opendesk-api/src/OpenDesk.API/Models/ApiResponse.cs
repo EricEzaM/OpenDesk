@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Models
 {
-	public class ApiResponse<T> : ApiResponse
+	public class ApiResponse<T> : ApiResponse where T : class
 	{
 		public T Data { get; set; }
 
@@ -15,6 +15,13 @@ namespace OpenDesk.API.Models
 		{
 			Data = data;
 		}
+
+		public ApiResponse(T data, OperationOutcome outcome) : base(outcome)
+		{
+			Data = data;
+		}
+
+		public ApiResponse(OperationOutcome outcome) : this(null, outcome) { }
 	}
 
 	public class ApiResponse
@@ -22,6 +29,11 @@ namespace OpenDesk.API.Models
 		public ApiResponse()
 		{
 			Outcome = OperationOutcome.Success;
+		}
+
+		public ApiResponse(OperationOutcome outcome)
+		{
+			Outcome = outcome;
 		}
 
 		public OperationOutcome Outcome { get; set; }
@@ -43,7 +55,9 @@ namespace OpenDesk.API.Models
 			Message = string.Empty,
 		};
 
-		public static OperationOutcome Error(IEnumerable<string> errors, string message) => new OperationOutcome
+		public static OperationOutcome Error(string message) => Error(message, Enumerable.Empty<string>());
+
+		public static OperationOutcome Error(string message, IEnumerable<string> errors) => new OperationOutcome
 		{
 			IsError = true,
 			IsValidationFailure = false,
@@ -51,7 +65,9 @@ namespace OpenDesk.API.Models
 			Message = message,
 		};
 
-		public static OperationOutcome ValidationFailure(IEnumerable<string> errors, string message) => new OperationOutcome
+		public static OperationOutcome ValidationFailure(string message) => ValidationFailure(message, Enumerable.Empty<string>());
+
+		public static OperationOutcome ValidationFailure(string message, IEnumerable<string> errors) => new OperationOutcome
 		{
 			IsError = false,
 			IsValidationFailure = true,

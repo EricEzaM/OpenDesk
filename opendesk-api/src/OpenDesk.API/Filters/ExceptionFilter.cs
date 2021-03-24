@@ -19,7 +19,7 @@ namespace OpenDesk.API.Filters
 
 			var res = new ApiResponse()
 			{
-				Outcome = OperationOutcome.Error(errors, $"An error was encountered while processing the request '{context.ActionDescriptor.AttributeRouteInfo.Template}'.")
+				Outcome = OperationOutcome.Error($"An error was encountered while processing the request '{context.ActionDescriptor.AttributeRouteInfo.Template}'.", errors)
 			};
 
 			context.Result = new JsonResult(res);
