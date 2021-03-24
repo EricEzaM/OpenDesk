@@ -4,7 +4,7 @@ import { addDays } from "date-fns/esm";
 import { Booking } from "types";
 import { useAuth } from "hooks/useAuth";
 
-interface Props {
+interface BookingsTimelineProps {
 	existingBookings: Booking[];
 	newBookingStart?: Date;
 	newBookingEnd?: Date;
@@ -25,7 +25,7 @@ function BookingsTimeline({
 	existingBookings,
 	newBookingStart,
 	newBookingEnd,
-}: Props) {
+}: BookingsTimelineProps) {
 	let bookingInvalid = false;
 	if (newBookingStart && newBookingEnd) {
 		for (let i = 0; i < existingBookings.length; i++) {

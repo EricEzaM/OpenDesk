@@ -8,11 +8,11 @@ import { Desk, Booking } from "types";
 import "react-datepicker/dist/react-datepicker.css";
 import apiRequest from "utils/requestUtils";
 
-interface Props {
+interface DeskDetailsProps {
 	desk: Desk;
 }
 
-function DeskDetails({ desk }: Props) {
+function DeskDetails({ desk }: DeskDetailsProps) {
 	const defaultDate = set(new Date(), {
 		hours: 0,
 		minutes: 0,

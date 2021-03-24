@@ -20,14 +20,19 @@ import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 
 const MAP_IMAGE_BORDER = 25;
 
-interface Props {
+interface OfficeMapProps {
 	image: OfficeImage;
 	desks?: Desk[];
 	selectedDesk?: Desk;
 	onDeskSelected: (desk?: Desk) => void;
 }
 
-function OfficeMap({ image, desks, selectedDesk, onDeskSelected }: Props) {
+function OfficeMap({
+	image,
+	desks,
+	selectedDesk,
+	onDeskSelected,
+}: OfficeMapProps) {
 	// =============================================================
 	// Hooks & Variables
 	// =============================================================

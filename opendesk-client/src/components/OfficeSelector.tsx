@@ -3,11 +3,11 @@ import { Office } from "types";
 import apiRequest from "utils/requestUtils";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 
-interface Props {
+interface OfficeSelectorProps {
 	onOfficeSelected?: (office?: Office) => void;
 }
 
-function OfficeSelector({ onOfficeSelected }: Props) {
+function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
