@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
 import { set, setHours } from "date-fns";
 
 import BookingsTimeline from "components/BookingsTimeline";
+import DatePicker from "components/DatePicker";
 import { Desk, Booking } from "types";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -65,44 +65,6 @@ function DeskDetails({ desk }: Props) {
 		setBkEnd(date);
 	}
 
-	function disallowPast(date: Date) {
-		let currentDate = set(new Date(), {
-			hours: 0,
-			minutes: 0,
-			seconds: 0,
-			milliseconds: 0,
-		});
-		let dateOnly = set(date, {
-			hours: 0,
-			minutes: 0,
-			seconds: 0,
-			milliseconds: 0,
-		});
-
-		return dateOnly >= currentDate;
-	}
-
-	function CustomTimeInput({
-		value,
-		onChange,
-	}: {
-		value: string;
-		onChange: (event: string) => void;
-	}) {
-		return (
-			<select value={value} onChange={(e) => onChange(e.target.value)}>
-				<option value="06:00">6:00 AM</option>
-				<option value="08:00">8:00 AM</option>
-				<option value="10:00">10:00 AM</option>
-				<option value="12:00">12:00 PM</option>
-				<option value="14:00">2:00 PM</option>
-				<option value="16:00">4:00 PM</option>
-				<option value="18:00">6:00 PM</option>
-				<option value="20:00">8:00 PM</option>
-			</select>
-		);
-	}
-
 	function SubmitBooking() {
 		apiRequest<Booking>(`desks/${desk.id}/bookings`, {
 			method: "POST",
@@ -149,25 +111,13 @@ function DeskDetails({ desk }: Props) {
 				<DatePicker
 					placeholderText="Start Date & Time"
 					selected={bkStart}
-					onChange={(date) =>
-						date && date instanceof Date && handleStartChange(date)
-					}
-					dateFormat="MMMM d, yyyy h:mm aa"
-					filterDate={disallowPast}
-					showTimeInput
-					customTimeInput={React.createElement(CustomTimeInput)}
+					onChange={(date) => handleStartChange(date)}
 				/>
 				<p className="desk-details__datepickers-text">to</p>
 				<DatePicker
 					placeholderText="End Date & Time"
-					selected={bkEnd}
-					onChange={(date) =>
-						date && date instanceof Date && handleEndChange(date)
-					}
-					dateFormat="MMMM d, yyyy h:mm aa"
-					filterDate={disallowPast}
-					showTimeInput
-					customTimeInput={React.createElement(CustomTimeInput)}
+					selected={bkStart}
+					onChange={(date) => handleEndChange(date)}
 				/>
 				<button
 					className="desk-details__submit"
