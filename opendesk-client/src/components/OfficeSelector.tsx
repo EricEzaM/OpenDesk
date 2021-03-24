@@ -22,8 +22,8 @@ function OfficeSelector({ onOfficeSelected }: Props) {
 	// =============================================================
 
 	useEffect(() => {
-		apiRequest("offices").then((res) => {
-			if (res.ok) {
+		apiRequest<Office[]>("offices").then((res) => {
+			if (res.outcome.isSuccess) {
 				setOffices(res.data);
 			}
 		});

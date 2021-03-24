@@ -34,8 +34,8 @@ function Offices() {
 		setSelectedOffice(office);
 
 		office &&
-			apiRequest(`offices/${office.id}/desks`).then((res) => {
-				if (res.ok) {
+			apiRequest<Desk[]>(`offices/${office.id}/desks`).then((res) => {
+				if (res.outcome.isSuccess) {
 					setDesks(res.data);
 				}
 			});

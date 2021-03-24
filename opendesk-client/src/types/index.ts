@@ -1,3 +1,18 @@
+// API RESPONSES
+
+export interface ApiResponse<T> {
+	data?: T;
+	outcome: OperationOutcome;
+}
+
+interface OperationOutcome {
+	isError: boolean;
+	isValidationFailure: boolean;
+	isSuccess: boolean;
+	message: string;
+	errors: string[];
+}
+
 // BOOKING
 
 export interface Booking {

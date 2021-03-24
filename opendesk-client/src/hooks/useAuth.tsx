@@ -60,12 +60,12 @@ function useAuthProvider(): AuthContextProps {
 	// 3. After MS login success, the API will handle that and will create a user in the database. Then will redirect to the provided redirectUrl.
 	// 4. The redirect url is this application, so the app will reload, trigger this effect, hit the user endpoint successfully and give us the user object!
 	useEffect(() => {
-		apiRequest("me").then((res) => {
+		apiRequest<User>("me").then((res) => {
 			// Set user & update localStorage value.
-			if (res.ok) {
+			if (res.outcome.isSuccess) {
 				setUser(res.data);
 				localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
-			} else {
+			} else if (res.status === 401) {
 				setUser(undefined);
 				localStorage.removeItem(AUTH_USER_KEY);
 			}
@@ -78,12 +78,10 @@ function useAuthProvider(): AuthContextProps {
 	}
 
 	function signOut(returnUrl: string) {
-		apiRequest(`auth/signout`, {
+		apiRequest<void>(`auth/signout`, {
 			method: "POST",
-		}).then((res) => {
-			if (res.ok) {
-				window.location.href = returnUrl;
-			}
+		}).then(() => {
+			window.location.href = returnUrl;
 		});
 	}
 

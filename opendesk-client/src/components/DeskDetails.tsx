@@ -27,8 +27,8 @@ function DeskDetails({ desk }: Props) {
 
 	// Update bookings when desk is changed.
 	useEffect(() => {
-		apiRequest(`desks/${desk.id}/bookings`).then((res) => {
-			if (res.ok) {
+		apiRequest<Booking[]>(`desks/${desk.id}/bookings`).then((res) => {
+			if (res.outcome.isSuccess && res.data) {
 				// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
 				var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
 					const isDate = k === "startDateTime" || k === "endDateTime";
@@ -104,7 +104,7 @@ function DeskDetails({ desk }: Props) {
 	}
 
 	function SubmitBooking() {
-		apiRequest(`desks/${desk.id}/bookings`, {
+		apiRequest<Booking>(`desks/${desk.id}/bookings`, {
 			method: "POST",
 			headers: {
 				"content-type": "application/json",
@@ -114,10 +114,10 @@ function DeskDetails({ desk }: Props) {
 				endDateTime: bkEnd,
 			}),
 		}).then((res) => {
-			if (res.ok) {
+			if (res.outcome.isSuccess) {
 				// TODO: Don't Repeat Yourself... this is a duplicate of above code. Make a way to have it be shared/common.
-				apiRequest(`desks/${desk.id}/bookings`).then((res) => {
-					if (res.ok) {
+				apiRequest<Booking[]>(`desks/${desk.id}/bookings`).then((res) => {
+					if (res.outcome?.isSuccess) {
 						// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
 						var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
 							const isDate = k === "startDateTime" || k === "endDateTime";

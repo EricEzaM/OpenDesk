@@ -1,45 +1,36 @@
-interface ApiCallResult {
-	ok: boolean;
-	code: number;
-	data: any;
-}
+import { ApiResponse } from "types";
 
-function parseJson(response: Response): Promise<ApiCallResult> {
-	return new Promise((resolve) =>
-		response.text().then((text) => {
-			try {
-				const data = JSON.parse(text);
-				// Valid JSON
-				return resolve({
-					ok: response.ok,
-					code: response.status,
-					data: data,
-				});
-			} catch {
-				// Not Valid JSON
-				resolve({
-					ok: response.ok,
-					code: response.status,
-					data: {},
-				});
-			}
-		})
-	);
-}
-
-export default function apiRequest(
+export default async function apiRequest<T>(
 	url: string,
 	options?: RequestInit
-): Promise<ApiCallResult> {
-	return new Promise((resolve, reject) => {
-		options = {...options, credentials: "include" }
-		fetch(process.env.REACT_APP_API_URL + "/api/" + url, options)
-			.then(parseJson)
-			.then((response) => resolve(response))
-			.catch((error) => {
-				console.error("An error occurred in the API fetch request.");
-				console.error(error);
-				reject(error.message);
+): Promise<ApiResponse<T> & { status: number }> {
+	return new Promise(async (resolve, reject) => {
+		options = { ...options, credentials: "include" };
+
+		let response = await fetch(
+			process.env.REACT_APP_API_URL + "/api/" + url,
+			options
+		);
+
+		try {
+			// Valid JSON
+			let json = await response.json();
+			resolve({
+				status: response.status,
+				...json,
 			});
+		} catch (error) {
+			// Invalid JSON
+			resolve({
+				status: response.status,
+				outcome: {
+					isError: true,
+					isValidationFailure: false,
+					isSuccess: false,
+					message: "An invalid response was received from the API.",
+					errors: [],
+				},
+			});
+		}
 	});
 }
