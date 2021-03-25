@@ -13,6 +13,7 @@ using System.IO;
 using System.Drawing;
 using OpenDesk.Domain.ValueObjects;
 using OpenDesk.API.Models;
+using FluentValidation;
 
 namespace OpenDesk.API.Features.Offices
 {
@@ -65,6 +66,33 @@ namespace OpenDesk.API.Features.Offices
 				Name = office.Name,
 				Image = office.Image
 			});
+		}
+	}
+
+	public class CreateOfficeValidator : AbstractValidator<CreateOfficeCommand>
+	{
+		private readonly OpenDeskDbContext _db;
+
+		public CreateOfficeValidator(OpenDeskDbContext db)
+		{
+			_db = db;
+
+			RuleFor(o => o.Name)
+				.NotEmpty()
+				.Must((c, name) => ValidateNoOfficeWithSameName(c))
+				.WithMessage("A desk with the name '{PropertyValue}' already exists at this office.");
+
+			RuleFor(o => o.Image)
+				.NotEmpty();
+		}
+
+		private bool ValidateNoOfficeWithSameName(CreateOfficeCommand command)
+		{
+			var desksWithSameName = _db.Offices
+				.Where(o => o.Name == command.Name)
+				.ToList();
+
+			return desksWithSameName.Any() == false;
 		}
 	}
 }
