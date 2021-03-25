@@ -34,7 +34,7 @@ namespace OpenDesk.API.Features.Offices
 
 		// TODO: Add permissions / roles authentication.
 		[HttpPost]
-		public async Task<IActionResult> Create(CreateOfficeCommand command)
+		public async Task<IActionResult> Create([FromForm]CreateOfficeCommand command)
 		{
 			var result = await _mediator.Send(command);
 			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
