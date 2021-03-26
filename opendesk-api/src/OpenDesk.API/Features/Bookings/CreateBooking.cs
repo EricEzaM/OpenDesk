@@ -104,7 +104,7 @@ namespace OpenDesk.API.Features.Bookings
 			RuleFor(c => c.UserId)
 				.NotEmpty()
 				.Must((c, userId) => ValidateNoOverlappingBookingsForUser(c))
-				.WithMessage("The user already has a booking in this timeslot. Double booking of desks is not allowed.")
+				.WithMessage("The booking clashes with an existing booking on another desk for this user. Double booking of desks is not allowed.")
 				.Must((c, userId) => ValidateNoBookingsWithDifferentDesksOnSameDayForUser(c))
 				.WithMessage("This user already has a booking on another desk on this day. Booking of multiple desks on the same day is not allowed.");
 
@@ -156,7 +156,9 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			var overlappingBookings = _db
 				.Bookings
+				.Include(b => b.Desk)
 				.Where(b => b.UserId == command.UserId)
+				.Where(b => b.Desk.Id != command.DeskId) // Must be on different desk
 				.Where(b =>
 					// Start is between existing start and end
 					(command.StartDateTime >= b.StartDateTime && command.StartDateTime < b.EndDateTime) ||
