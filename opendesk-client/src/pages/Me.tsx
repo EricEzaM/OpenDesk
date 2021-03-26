@@ -69,7 +69,7 @@ function Me() {
 							alignSelf: "center",
 							borderRadius: "5px",
 						}}
-						to={`/map/${fb.office.id}/${fb.desk.id}`}
+						to={`/offices/${fb.office.id}/${fb.desk.id}`}
 					>
 						Go To It
 					</Link>
