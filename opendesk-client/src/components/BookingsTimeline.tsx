@@ -1,10 +1,12 @@
-import React from "react";
-import { format, set } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { format, set, setHours } from "date-fns";
 import { addDays } from "date-fns/esm";
 import { Booking } from "types";
 import { useAuth } from "hooks/useAuth";
 
 interface BookingsTimelineProps {
+	daysToDisplay: number;
+	daysToDisplayOffset: number;
 	existingBookings: Booking[];
 	newBookingStart?: Date;
 	newBookingEnd?: Date;
@@ -22,65 +24,87 @@ interface InnerDateBar {
 }
 
 function BookingsTimeline({
+	daysToDisplay,
+	daysToDisplayOffset,
 	existingBookings,
 	newBookingStart,
 	newBookingEnd,
 }: BookingsTimelineProps) {
-	let bookingInvalid = false;
-	if (newBookingStart && newBookingEnd) {
-		for (let i = 0; i < existingBookings.length; i++) {
-			const booking = existingBookings[i];
+	// =============================================================
+	// Hooks and Variables
+	// =============================================================
 
-			bookingInvalid =
-				// Start is between existing start and end
-				(newBookingStart >= booking.startDateTime &&
-					newBookingStart < booking.endDateTime) ||
-				// End is between existing start and end
-				(newBookingEnd > booking.startDateTime &&
-					newBookingEnd <= booking.endDateTime) ||
-				// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
-				(newBookingStart <= booking.startDateTime &&
-					newBookingEnd >= booking.endDateTime);
+	const [dateBars, setDateBars] = useState<DateBar[]>([]);
+	const [isBookingInvalid, setIsBookingInvalid] = useState<boolean>(false);
+	const { user } = useAuth();
 
-			if (bookingInvalid) {
-				break;
+	// =============================================================
+	// Effects
+	// =============================================================
+
+	useEffect(() => {
+		let bookingInvalid = false;
+		if (newBookingStart && newBookingEnd) {
+			for (let i = 0; i < existingBookings.length; i++) {
+				const booking = existingBookings[i];
+
+				bookingInvalid =
+					// Start is between existing start and end
+					(newBookingStart >= booking.startDateTime &&
+						newBookingStart < booking.endDateTime) ||
+					// End is between existing start and end
+					(newBookingEnd > booking.startDateTime &&
+						newBookingEnd <= booking.endDateTime) ||
+					// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
+					(newBookingStart <= booking.startDateTime &&
+						newBookingEnd >= booking.endDateTime);
+
+				if (bookingInvalid) {
+					break;
+				}
 			}
 		}
-	}
+		setIsBookingInvalid(bookingInvalid);
+	}, [newBookingStart, newBookingEnd, existingBookings]);
 
-	let currentDate = new Date();
+	useEffect(() => {}, [daysToDisplayOffset]);
 
-	let dateBarsStartDate = new Date(
-		currentDate.getFullYear(),
-		currentDate.getMonth(),
-		currentDate.getDate(),
-		6
-	);
-	let dateBarsEndDate = new Date(
-		currentDate.getFullYear(),
-		currentDate.getMonth(),
-		currentDate.getDate(),
-		20
-	);
-
-	let datebars: DateBar[] = [];
-
-	for (let i = 0; i < 7; i++) {
-		let start = addDays(new Date(dateBarsStartDate.getTime()), i);
-
-		let end = addDays(new Date(dateBarsEndDate.getTime()), i);
-
-		datebars.push({
-			start: start,
-			end: end,
+	useEffect(() => {
+		let datebars: DateBar[] = [];
+		let dateBarsStartTime = set(new Date(), {
+			hours: 6,
+			minutes: 0,
+			milliseconds: 0,
 		});
-	}
 
-	const { user } = useAuth();
+		const dateBarsEndTime = setHours(dateBarsStartTime, 20);
+
+		for (let i = 0; i < daysToDisplay; i++) {
+			let start = addDays(
+				new Date(dateBarsStartTime.getTime()),
+				i + daysToDisplayOffset
+			);
+			let end = addDays(
+				new Date(dateBarsEndTime.getTime()),
+				i + daysToDisplayOffset
+			);
+
+			datebars.push({
+				start: start,
+				end: end,
+			});
+		}
+
+		setDateBars(datebars);
+	}, [daysToDisplay, daysToDisplayOffset]);
+
+	// =============================================================
+	// Render
+	// =============================================================
 
 	return (
 		<div>
-			{datebars.map((bar) => {
+			{dateBars.map((bar) => {
 				const {
 					width: newBookingWidth,
 					offset: newBookingOffset,
@@ -139,7 +163,7 @@ function BookingsTimeline({
 							{newBookingStart && newBookingEnd && (
 								<div
 									className={`booking-timeline-bar__time-booked booking-timeline-bar__time-booked--prospective ${
-										bookingInvalid
+										isBookingInvalid
 											? "booking-timeline-bar__time-booked--clashes"
 											: ""
 									}`}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { set, setHours } from "date-fns";
+import { format, set, setHours } from "date-fns";
 
 import BookingsTimeline from "components/BookingsTimeline";
 import DatePicker from "components/DatePicker";
@@ -7,6 +7,7 @@ import { Desk, Booking } from "types";
 
 import "react-datepicker/dist/react-datepicker.css";
 import apiRequest from "utils/requestUtils";
+import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
 
 interface DeskDetailsProps {
 	desk: Desk;
@@ -20,27 +21,45 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 		milliseconds: 0,
 	});
 
+	// =============================================================
+	// Hooks and Variables
+	// =============================================================
+
+	const [daysToDisplayOffset, setDaysToDisplayOffset] = useState<number>(0);
+	const [daysToDisplay, setDaysToDisplay] = useState<number>(7);
 	const [bkStart, setBkStart] = useState<Date>(setHours(defaultDate, 6));
 	const [bkEnd, setBkEnd] = useState<Date>(setHours(defaultDate, 20));
 
 	const [bookings, setBookings] = useState<Booking[]>([]);
 
+	// =============================================================
+	// Effects
+	// =============================================================
+
 	// Update bookings when desk is changed.
 	useEffect(() => {
 		apiRequest<Booking[]>(`desks/${desk.id}/bookings`).then((res) => {
-			if (res.outcome.isSuccess && res.data) {
-				// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
-				var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
-					const isDate = k === "startDateTime" || k === "endDateTime";
-					return isDate ? new Date(value) : value;
-				});
-				setBookings(bookings);
-			}
+			res.outcome.isSuccess && res.data && handleBookingsApiResponse(res.data);
 		});
 	}, [desk]);
 
+	// =============================================================
+	// Functions
+	// =============================================================
+
+	function handleBookingsApiResponse(apiResponseBookings: Booking[]) {
+		// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
+		let bookings = JSON.parse(
+			JSON.stringify(apiResponseBookings),
+			(k, value) => {
+				const isDate = k === "startDateTime" || k === "endDateTime";
+				return isDate ? new Date(value) : value;
+			}
+		);
+		setBookings(bookings);
+	}
+
 	function handleStartChange(date: Date) {
-		// Don't allow starting bookings after
 		if (date.getHours() >= 20) {
 			return;
 		}
@@ -53,7 +72,6 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 	}
 
 	function handleEndChange(date: Date) {
-		// Don't allow end bookings before
 		if (date.getHours() <= 6) {
 			return;
 		}
@@ -72,26 +90,23 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 				"content-type": "application/json",
 			},
 			body: JSON.stringify({
-				startDateTime: bkStart,
-				endDateTime: bkEnd,
+				startDateTime: format(bkStart, FORMAT_ISO_WITH_TZ_STRING),
+				endDateTime: format(bkEnd, FORMAT_ISO_WITH_TZ_STRING),
 			}),
 		}).then((res) => {
 			if (res.outcome.isSuccess) {
-				// TODO: Don't Repeat Yourself... this is a duplicate of above code. Make a way to have it be shared/common.
 				apiRequest<Booking[]>(`desks/${desk.id}/bookings`).then((res) => {
-					if (res.outcome?.isSuccess) {
-						// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
-						var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
-							const isDate = k === "startDateTime" || k === "endDateTime";
-							return isDate ? new Date(value) : value;
-						});
-						setBookings(bookings);
-					}
+					res.outcome.isSuccess &&
+						res.data &&
+						handleBookingsApiResponse(res.data);
 				});
-				console.log("submitted");
 			}
 		});
 	}
+
+	// =============================================================
+	// Render
+	// =============================================================
 
 	return (
 		<div className="desk-details">
@@ -100,11 +115,33 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 					<h3>{desk.name}</h3>
 				</div>
 			)}
-			<BookingsTimeline
-				existingBookings={bookings}
-				newBookingStart={bkStart}
-				newBookingEnd={bkEnd}
-			/>
+			<button
+				onClick={() =>
+					setDaysToDisplayOffset(
+						daysToDisplayOffset - daysToDisplay <= 0
+							? 0
+							: daysToDisplayOffset - daysToDisplay
+					)
+				}
+			>
+				&lt;
+			</button>
+			<select
+				value={daysToDisplay}
+				onChange={(e) => setDaysToDisplay(parseInt(e.target.value))}
+			>
+				<option value={7}>7 Days</option>
+				<option value={14}>14 Days</option>
+				<option value={21}>21 Days</option>
+				<option value={28}>28 Days</option>
+			</select>
+			<button
+				onClick={() =>
+					setDaysToDisplayOffset(daysToDisplayOffset + daysToDisplay)
+				}
+			>
+				&gt;
+			</button>
 
 			<div className="desk-details__datepickers">
 				<p className="desk-details__datepickers-text">From</p>
@@ -116,7 +153,7 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 				<p className="desk-details__datepickers-text">to</p>
 				<DatePicker
 					placeholderText="End Date & Time"
-					selected={bkStart}
+					selected={bkEnd}
 					onChange={(date) => handleEndChange(date)}
 				/>
 				<button
@@ -126,6 +163,14 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 					Book Desk
 				</button>
 			</div>
+
+			<BookingsTimeline
+				existingBookings={bookings}
+				newBookingStart={bkStart}
+				newBookingEnd={bkEnd}
+				daysToDisplay={daysToDisplay}
+				daysToDisplayOffset={daysToDisplayOffset}
+			/>
 		</div>
 	);
 }
