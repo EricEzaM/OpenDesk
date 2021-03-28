@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState, Reducer } from "react";
 import { format, set, setHours } from "date-fns";
 
 import BookingsTimeline from "components/BookingsTimeline";
@@ -13,6 +13,47 @@ interface DeskDetailsProps {
 	desk: Desk;
 }
 
+interface State {
+	success?: boolean;
+	message: string;
+	errors: string[];
+}
+
+enum ActionType {
+	FAILURE,
+	SUCCESS,
+	CLEAR,
+}
+
+type Success = {
+	readonly type: ActionType.SUCCESS;
+};
+
+type Failure = {
+	readonly type: ActionType.FAILURE;
+	readonly message: string;
+	readonly errors: string[];
+};
+
+type Clear = {
+	readonly type: ActionType.CLEAR;
+};
+
+type Action = Success | Failure | Clear;
+
+function bookingSubmissionStatusReducer(state: State, action: Action): State {
+	switch (action.type) {
+		case ActionType.FAILURE:
+			return { success: false, message: action.message, errors: action.errors };
+		case ActionType.SUCCESS:
+			return { success: true, message: "Success", errors: [] };
+		case ActionType.CLEAR:
+			return { success: undefined, message: "", errors: [] };
+		default:
+			return state;
+	}
+}
+
 function DeskDetails({ desk }: DeskDetailsProps) {
 	const defaultDate = set(new Date(), {
 		hours: 0,
@@ -25,12 +66,21 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 	// Hooks and Variables
 	// =============================================================
 
+	const [bookings, setBookings] = useState<Booking[]>([]);
+
 	const [daysToDisplayOffset, setDaysToDisplayOffset] = useState<number>(0);
 	const [daysToDisplay, setDaysToDisplay] = useState<number>(7);
 	const [bkStart, setBkStart] = useState<Date>(setHours(defaultDate, 6));
 	const [bkEnd, setBkEnd] = useState<Date>(setHours(defaultDate, 20));
 
-	const [bookings, setBookings] = useState<Booking[]>([]);
+	const [statusState, statusDispatch] = useReducer<Reducer<State, Action>>(
+		bookingSubmissionStatusReducer,
+		{
+			success: undefined,
+			message: "",
+			errors: [],
+		}
+	);
 
 	// =============================================================
 	// Effects
@@ -84,6 +134,9 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 	}
 
 	function SubmitBooking() {
+		statusDispatch({
+			type: ActionType.CLEAR,
+		});
 		apiRequest<Booking>(`desks/${desk.id}/bookings`, {
 			method: "POST",
 			headers: {
@@ -95,10 +148,20 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 			}),
 		}).then((res) => {
 			if (res.outcome.isSuccess) {
+				statusDispatch({
+					type: ActionType.SUCCESS,
+				});
+
 				apiRequest<Booking[]>(`desks/${desk.id}/bookings`).then((res) => {
 					res.outcome.isSuccess &&
 						res.data &&
 						handleBookingsApiResponse(res.data);
+				});
+			} else {
+				statusDispatch({
+					type: ActionType.FAILURE,
+					message: res.outcome.message,
+					errors: res.outcome.errors,
 				});
 			}
 		});
@@ -143,25 +206,41 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 				&gt;
 			</button>
 
-			<div className="desk-details__datepickers">
-				<p className="desk-details__datepickers-text">From</p>
-				<DatePicker
-					placeholderText="Start Date & Time"
-					selected={bkStart}
-					onChange={(date) => handleStartChange(date)}
-				/>
-				<p className="desk-details__datepickers-text">to</p>
-				<DatePicker
-					placeholderText="End Date & Time"
-					selected={bkEnd}
-					onChange={(date) => handleEndChange(date)}
-				/>
-				<button
-					className="desk-details__submit"
-					onClick={() => SubmitBooking()}
-				>
-					Book Desk
-				</button>
+			<div>
+				<div className="desk-details__datepickers">
+					<p className="desk-details__datepickers-text">From</p>
+					<DatePicker
+						placeholderText="Start Date & Time"
+						selected={bkStart}
+						onChange={(date) => handleStartChange(date)}
+					/>
+					<p className="desk-details__datepickers-text">to</p>
+					<DatePicker
+						placeholderText="End Date & Time"
+						selected={bkEnd}
+						onChange={(date) => handleEndChange(date)}
+					/>
+					<button
+						className="desk-details__submit"
+						onClick={() => SubmitBooking()}
+					>
+						Book Desk
+					</button>
+				</div>
+				{statusState.success !== undefined && (
+					<div
+						className={`booking-submission-result booking-submission-result--${
+							statusState.success ? "success" : "failure"
+						}`}
+					>
+						<p className="booking-submission-result__title">
+							{statusState.message}
+						</p>
+						{statusState.errors.map((e) => (
+							<div>{e}</div>
+						))}
+					</div>
+				)}
 			</div>
 
 			<BookingsTimeline

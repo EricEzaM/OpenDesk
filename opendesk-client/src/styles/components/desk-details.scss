@@ -25,3 +25,24 @@
 		border-radius: 4px;
 	}
 }
+
+.booking-submission-result {
+	padding: 10px;
+	text-align: center;
+	margin-bottom: 0.5em;
+	border-radius: 4px;
+
+	&--failure {
+		color: #ce2323;
+		background-color: #ffdfdf;
+	}
+
+	&--success {
+		color: #21a71c;
+		background-color: #dfffe3;
+	}
+
+	&__title {
+		font-weight: bold;
+	}
+}
