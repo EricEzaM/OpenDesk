@@ -1,58 +1,58 @@
-.booking-container {
+.timeline {
 	display: flex;
-	align-items: center;
+	justify-content: space-between;
+	border-radius: 4px;
+	background-color: #f5f5f5;
+	border: solid 1px #ebebeb;
 
-	&__date {
-		margin: 0 10px;
-		width: 100px;
+	&__scroll-btn {
+		margin: 0.5em;
+		padding: 0 0.5em;
+		border: none;
+		background-color: #bdbdbd;
+		color: #7e7e7e;
+		border-radius: 4px;
+
+		&:hover {
+			background-color: #7e7e7e;
+			color: #bdbdbd;
+		}
 	}
 }
 
-.booking-timeline-bar {
+.bookings {
 	width: 100%;
-	height: 2em;
-	background-color: whitesmoke;
-	position: relative;
-	display: flex;
-	align-items: center;
+	text-align: center;
 
-	&__time-booked {
-		position: absolute;
-		height: 100%;
-		background-color: #bf391f;
+	&__title {
+		font-weight: bold;
+		padding: 0.25em 0;
+		margin: 0.5em;
+		background-color: #ebebeb;
+		border-radius: 4px;
+	}
 
-		&--owned {
-			opacity: 75%;
-			background-color: #3997a3;
-		}
+	&__booking {
+		border-radius: 4px;
+		margin: 0.5em;
+		color: $red-text;
+		background-color: $red-bg;
 
-		&--prospective {
-			opacity: 75%;
-			background-color: #5fa339;
-		}
-
-		&--clashes {
+		&--invalid {
+			color: $orange-text;
 			background-color: none;
 			background: repeating-linear-gradient(
 				45deg,
-				#bf391f,
-				#bf391f 5px,
-				orange 5px,
-				orange 10px
+				$red-bg,
+				$red-bg 5px,
+				$orange-bg 5px,
+				$orange-bg 10px
 			);
 		}
-	}
 
-	&__time-display {
-		display: flex;
-		justify-content: space-between;
-		position: absolute;
-		width: 100%;
-		pointer-events: none;
-
-		& span {
-			margin: 0 5px 0 5px;
-			font-size: 0.7em;
+		&--prospective {
+			color: $blue-text;
+			background-color: $blue-bg;
 		}
 	}
 }

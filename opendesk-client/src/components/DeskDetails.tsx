@@ -68,8 +68,6 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 
 	const [bookings, setBookings] = useState<Booking[]>([]);
 
-	const [daysToDisplayOffset, setDaysToDisplayOffset] = useState<number>(0);
-	const [daysToDisplay, setDaysToDisplay] = useState<number>(7);
 	const [bkStart, setBkStart] = useState<Date>(setHours(defaultDate, 6));
 	const [bkEnd, setBkEnd] = useState<Date>(setHours(defaultDate, 20));
 
@@ -88,6 +86,9 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 
 	// Update bookings when desk is changed.
 	useEffect(() => {
+		statusDispatch({
+			type: ActionType.CLEAR,
+		});
 		apiRequest<Booking[]>(`desks/${desk.id}/bookings`).then((res) => {
 			res.outcome.isSuccess && res.data && handleBookingsApiResponse(res.data);
 		});
@@ -178,33 +179,6 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 					<h3>{desk.name}</h3>
 				</div>
 			)}
-			<button
-				onClick={() =>
-					setDaysToDisplayOffset(
-						daysToDisplayOffset - daysToDisplay <= 0
-							? 0
-							: daysToDisplayOffset - daysToDisplay
-					)
-				}
-			>
-				&lt;
-			</button>
-			<select
-				value={daysToDisplay}
-				onChange={(e) => setDaysToDisplay(parseInt(e.target.value))}
-			>
-				<option value={7}>7 Days</option>
-				<option value={14}>14 Days</option>
-				<option value={21}>21 Days</option>
-				<option value={28}>28 Days</option>
-			</select>
-			<button
-				onClick={() =>
-					setDaysToDisplayOffset(daysToDisplayOffset + daysToDisplay)
-				}
-			>
-				&gt;
-			</button>
 
 			<div>
 				<div className="desk-details__datepickers">
@@ -247,8 +221,6 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 				existingBookings={bookings}
 				newBookingStart={bkStart}
 				newBookingEnd={bkEnd}
-				daysToDisplay={daysToDisplay}
-				daysToDisplayOffset={daysToDisplayOffset}
 			/>
 		</div>
 	);
