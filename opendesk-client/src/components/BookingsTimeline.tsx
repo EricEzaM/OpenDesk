@@ -84,23 +84,15 @@ function BookingsTimeline({
 		const startTime = format(start, "haaa");
 		const endTime = format(end, "haaa");
 
-		const isAllDay = start <= setHours(date, 6) && end >= setHours(date, 20); // starts <= 6am and ends >= 8pm
-
 		const startsToday = start >= date && start < addDays(date, 1);
-
 		const endsToday = end >= date && end < addDays(date, 1);
+		const isInMiddle = start <= date && end >= addDays(date, 1);
+
+		const valid = startsToday || endsToday || isInMiddle;
 
 		let display = "";
-		if (isAllDay) {
-			display = "All Day";
-		} else if (startsToday && endsToday) {
-			if (getHours(start) === 6) {
-				display = `Until ${endTime}`;
-			} else if (getHours(end) === 20) {
-				display = `Until ${endTime}`;
-			} else {
-				display = `${startTime} to ${endTime}`;
-			}
+		if (startsToday && endsToday) {
+			display = `${startTime} to ${endTime}`;
 		} else if (startsToday && !endsToday) {
 			display = `From ${startTime}`;
 		} else if (!startsToday && endsToday) {
@@ -116,11 +108,7 @@ function BookingsTimeline({
 			bookingClasses.push("bookings__booking" + bookingClassSuffix);
 		}
 
-		return display !== "" ? (
-			<div className={bookingClasses.join(" ")}>{display}</div>
-		) : (
-			<></>
-		);
+		return <div className={bookingClasses.join(" ")}>{display}</div>;
 	}
 
 	// =============================================================
