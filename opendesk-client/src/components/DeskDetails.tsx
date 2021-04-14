@@ -219,8 +219,8 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 
 			<BookingsTimeline
 				existingBookings={bookings}
-				newBookingStart={bkStart}
-				newBookingEnd={bkEnd}
+				newStart={bkStart}
+				newEnd={bkEnd}
 			/>
 		</div>
 	);

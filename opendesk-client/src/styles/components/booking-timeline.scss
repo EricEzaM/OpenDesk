@@ -1,57 +1,133 @@
 .timeline {
-	display: flex;
-	justify-content: space-between;
-	border-radius: 4px;
-	background-color: #f5f5f5;
-	border: solid 1px #ebebeb;
+	position: relative;
+	max-width: 1200px;
+	margin: 0 5%;
 
-	&__scroll-btn {
-		margin: 0.5em;
-		padding: 0 0.5em;
-		border: none;
-		background-color: #bdbdbd;
-		color: #7e7e7e;
-		border-radius: 4px;
+	// Timeline line
+	&::after {
+		content: "";
+		position: absolute;
+		width: 6px;
+		background-color: rgb(226, 226, 226);
+		top: 5px;
+		bottom: 5px;
+	}
 
-		&:hover {
-			background-color: #7e7e7e;
-			color: #bdbdbd;
+	&__break {
+		padding: 5px 30px;
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: -20px;
+			bottom: -10px;
+			left: 0;
+			width: 6px;
+			background: repeating-linear-gradient(
+				0deg,
+				rgb(226, 226, 226),
+				rgb(226, 226, 226) 5px,
+				white 5px,
+				white 10px
+			);
+			z-index: 1;
 		}
 	}
-}
 
-.bookings {
-	width: 100%;
-	text-align: center;
+	&__container {
+		padding: 10px 30px;
+		position: relative;
+		background-color: inherit;
 
-	&__title {
-		font-weight: bold;
-		padding: 0.25em 0;
-		margin: 0.5em;
-		background-color: #ebebeb;
-		border-radius: 4px;
-	}
+		// Circles
+		&::after {
+			content: "";
+			position: absolute;
+			width: 15px;
+			height: 15px;
+			background-color: white;
+			border: 4px solid rgb(46, 180, 46);
+			top: 20px;
+			border-radius: 9999px;
+			z-index: 1;
+			left: -8px;
+		}
 
-	&__booking {
-		margin: 0.5em 0;
-		color: $red-text;
-		background-color: $red-bg;
+		// Content Arrow
+		&::before {
+			content: " ";
+			height: 0;
+			position: absolute;
+			top: 22px;
+			width: 0;
+			z-index: 1;
+			left: 20px;
+			border: medium solid rgb(46, 180, 46);
+			border-width: 10px 10px 10px 0;
+			border-color: transparent rgb(46, 180, 46) transparent transparent;
+		}
+
+		&--long {
+			&::after {
+				height: 45px;
+			}
+		}
+
+		&--existing {
+			&::after {
+				border-color: rgb(243, 163, 43);
+			}
+
+			&::before {
+				border-color: transparent rgb(243, 163, 43) transparent transparent;
+			}
+
+			& > * {
+				border-color: rgb(243, 163, 43) !important;
+			}
+		}
+
+		&--new {
+			& > * {
+				border-style: dashed !important;
+			}
+		}
 
 		&--invalid {
-			color: $orange-text;
-			background-color: none;
-			background: repeating-linear-gradient(
-				45deg,
-				$red-bg,
-				$red-bg 5px,
-				$orange-bg 5px,
-				$orange-bg 10px
-			);
+			&::after {
+				border-color: rgb(180, 46, 46);
+			}
+
+			&::before {
+				border-color: transparent rgb(180, 46, 46) transparent transparent;
+			}
+
+			& > * {
+				border-color: rgb(180, 46, 46) !important;
+			}
 		}
 
-		&--prospective {
-			color: $blue-text;
-			background-color: $blue-bg;
+		&--valid {
+			&::after {
+				border-color: rgb(46, 180, 46);
+			}
+
+			&::before {
+				border-color: transparent rgb(46, 180, 46) transparent transparent;
+			}
+
+			& > * {
+				border-color: rgb(46, 180, 46) !important;
+			}
+		}
+
+		& > * {
+			padding: 10px 20px;
+			position: relative;
+			border-radius: 6px;
+			border: solid 2px rgb(46, 180, 46);
+			background-color: transparent;
 		}
 	}
 }
