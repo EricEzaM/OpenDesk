@@ -111,7 +111,7 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 	}
 
 	function handleStartChange(date: Date) {
-		if (date.getHours() >= 20) {
+		if (date.getHours() > 20) {
 			return;
 		}
 		// If start was moved to after end, adjust end to still be after start
@@ -123,7 +123,7 @@ function DeskDetails({ desk }: DeskDetailsProps) {
 	}
 
 	function handleEndChange(date: Date) {
-		if (date.getHours() <= 6) {
+		if (date.getHours() < 6) {
 			return;
 		}
 		// If end date was moved to before start, adjust start.

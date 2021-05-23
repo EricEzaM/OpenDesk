@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { format, differenceInDays } from "date-fns";
+import {
+	format,
+	differenceInDays,
+	isSameDay,
+	differenceInCalendarDays,
+} from "date-fns";
 import { Booking } from "types";
 
 interface BookingsTimelineProps {
@@ -70,34 +75,19 @@ function BookingsTimeline({
 
 	return (
 		<div className="timeline">
-			{existingBookings.map((b, i) => {
-				const insert =
-					i === insertBookingAt ||
-					(insertBookingAt >= existingBookings.length &&
-						i === existingBookings.length - 1);
-
-				const insertBefore = i === insertBookingAt;
-
-				const newBookingElement =
-					newStart &&
-					newEnd &&
-					getTimelineContent(newStart, newEnd, "You", !isNewInvalid, false);
-
-				const bookingElement = getTimelineContent(
-					b.startDateTime,
-					b.endDateTime,
-					b.user.name,
-					true
-				);
-
-				return (
-					<>
-						{insert && insertBefore && newBookingElement}
-						{bookingElement}
-						{insert && !insertBefore && newBookingElement}
-					</>
-				);
-			})}
+			{existingBookings
+				.filter((b, i) => i < insertBookingAt)
+				.map((b) =>
+					getTimelineContent(b.startDateTime, b.endDateTime, b.user.name, true)
+				)}
+			{newStart &&
+				newEnd &&
+				getTimelineContent(newStart, newEnd, "You", !isNewInvalid, false)}
+			{existingBookings
+				.filter((b, i) => i >= insertBookingAt)
+				.map((b) =>
+					getTimelineContent(b.startDateTime, b.endDateTime, b.user.name, true)
+				)}
 		</div>
 	);
 }
@@ -111,7 +101,8 @@ function getTimelineContent(
 	isValid: boolean,
 	isExisting: boolean = true
 ) {
-	const dayDiff = differenceInDays(e, s);
+	const dayDiff = differenceInCalendarDays(e, s);
+	const sameDay = isSameDay(e, s);
 
 	const longClass = dayDiff > 0 ? "timeline__container--long" : "";
 
@@ -135,13 +126,12 @@ function getTimelineContent(
 			>
 				<div>
 					<h4>
-						{format(s, "LLLL d haaa")} to{" "}
-						{dayDiff === 0 ? format(e, "haaa") : ""}
+						{format(s, "LLLL d haaa")} to {sameDay ? format(e, "haaa") : ""}
 					</h4>
-					{dayDiff !== 0 && (
+					{!sameDay && (
 						<div style={{ display: "flex", alignContent: "flex-end" }}>
 							<h4>{format(e, "LLLL d haaa")}</h4>
-							<p>&nbsp;({differenceInDays(e, s) + 1} days)</p>
+							<p>&nbsp;(Over {dayDiff + 1} days)</p>
 						</div>
 					)}
 				</div>
