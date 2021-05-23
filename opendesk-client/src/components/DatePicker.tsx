@@ -9,7 +9,7 @@ interface DatePickerProps {
 }
 
 function DatePicker({ selected, onChange, placeholderText }: DatePickerProps) {
-	function disallowPast(date: Date) {
+	function disallowPastDatesFilter(date: Date) {
 		let currentDate = set(new Date(), {
 			hours: 0,
 			minutes: 0,
@@ -34,7 +34,7 @@ function DatePicker({ selected, onChange, placeholderText }: DatePickerProps) {
 				date && date instanceof Date && onChange && onChange(date)
 			}
 			dateFormat="MMMM d, yyyy h:mm aa"
-			filterDate={disallowPast}
+			filterDate={disallowPastDatesFilter}
 			showTimeInput
 			customTimeInput={React.createElement(CustomTimeInput)}
 		/>
