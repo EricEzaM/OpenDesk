@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-	format,
-	differenceInDays,
-	isSameDay,
-	differenceInCalendarDays,
-} from "date-fns";
+import { format, isSameDay, differenceInCalendarDays } from "date-fns";
 import { Booking } from "types";
 
 interface BookingsTimelineProps {
