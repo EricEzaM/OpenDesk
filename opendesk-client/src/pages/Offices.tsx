@@ -8,14 +8,18 @@ import DeskDetails from "components/DeskDetails";
 import OfficeMap from "components/map/OfficeMap";
 import Authenticated from "components/auth/Authenticated";
 import Unauthenticated from "components/auth/Unauthenticated";
+import BookingSubmissionForm from "components/BookingSubmissionForm";
+import { useOfficeDesks } from "hooks/useOfficeDesks";
 
 function Offices() {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
 
-	const [desks, setDesks] = useState<Desk[] | undefined>();
-	const [selectedDesk, setSelectedDesk] = useState<Desk | undefined>();
+	const {
+		desksState: [desks, setDesks],
+		selectedDeskState: [selectedDesk, setSelectedDesk],
+	} = useOfficeDesks();
 	const [selectedOffice, setSelectedOffice] = useState<Office | undefined>();
 
 	// =============================================================
@@ -36,7 +40,7 @@ function Offices() {
 		office &&
 			apiRequest<Desk[]>(`offices/${office.id}/desks`).then((res) => {
 				if (res.outcome.isSuccess) {
-					setDesks(res.data);
+					setDesks(res.data ?? []);
 				}
 			});
 	}
@@ -51,14 +55,20 @@ function Offices() {
 				<p>Sign in is required</p>
 			</Unauthenticated>
 			<Authenticated>
-				<OfficeSelector onOfficeSelected={onOfficeSelected} />
+				<div style={{ display: "flex", justifyContent: "center" }}>
+					<p style={{ alignSelf: "center", margin: "0 0.5em" }}>
+						Looking for a desk at
+					</p>
+					<OfficeSelector onOfficeSelected={onOfficeSelected} />
+					<BookingSubmissionForm />
+				</div>
 				{selectedOffice && (
-					<OfficeMap
-						image={selectedOffice.image}
-						desks={desks}
-						selectedDesk={selectedDesk}
-						onDeskSelected={onDeskSelected}
-					/>
+					<>
+						<OfficeMap
+							image={selectedOffice.image}
+							onDeskSelected={onDeskSelected}
+						/>
+					</>
 				)}
 				{selectedDesk && <DeskDetails desk={selectedDesk} />}
 			</Authenticated>

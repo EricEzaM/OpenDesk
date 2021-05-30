@@ -6,18 +6,19 @@ interface BookingsTimelineProps {
 	existingBookings: Booking[];
 	newStart?: Date;
 	newEnd?: Date;
+	isNewValid: boolean;
 }
 
 function BookingsTimeline({
 	existingBookings,
 	newStart,
 	newEnd,
+	isNewValid,
 }: BookingsTimelineProps) {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
 
-	const [isNewInvalid, setIsNewInvalid] = useState(false);
 	const [insertBookingAt, setInsertBookingAt] = useState<number>(-1);
 
 	// =============================================================
@@ -25,27 +26,7 @@ function BookingsTimeline({
 	// =============================================================
 
 	useEffect(() => {
-		let bookingInvalid = false;
-		if (newStart && newEnd) {
-			for (let i = 0; i < existingBookings.length; i++) {
-				const booking = existingBookings[i];
-
-				bookingInvalid =
-					// Start is between existing start and end
-					(newStart >= booking.startDateTime &&
-						newStart < booking.endDateTime) ||
-					// End is between existing start and end
-					(newEnd > booking.startDateTime && newEnd <= booking.endDateTime) ||
-					// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
-					(newStart <= booking.startDateTime && newEnd >= booking.endDateTime);
-
-				if (bookingInvalid) {
-					break;
-				}
-			}
-		}
-		setIsNewInvalid(bookingInvalid);
-
+		// Determine where to insert the new booking in the display, depending on the existing bookings.
 		if (newStart && newEnd) {
 			for (let i = 0; i < existingBookings.length; i++) {
 				const booking = existingBookings[i];
@@ -77,7 +58,7 @@ function BookingsTimeline({
 				)}
 			{newStart &&
 				newEnd &&
-				getTimelineContent(newStart, newEnd, "You", !isNewInvalid, false)}
+				getTimelineContent(newStart, newEnd, "You", isNewValid, false)}
 			{existingBookings
 				.filter((b, i) => i >= insertBookingAt)
 				.map((b) =>

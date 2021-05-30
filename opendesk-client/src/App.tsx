@@ -7,27 +7,36 @@ import PrivateRoute from "router/PrivateRoute";
 import Nav from "components/Nav";
 import About from "pages/About";
 import Home from "pages/Home";
+import { OfficeDesksProvider } from "hooks/useOfficeDesks";
+import { DeskBookingsProvider } from "hooks/useDeskBookings";
+import { OfficesProvider } from "hooks/useOffices";
 
 function App() {
 	return (
 		<Router>
 			<AuthProvider>
-				<div className="container">
-					<Nav />
+				<OfficesProvider>
+					<OfficeDesksProvider>
+						<DeskBookingsProvider>
+							<div className="container">
+								<Nav />
 
-					<Route exact path="/">
-						<Home />
-					</Route>
-					<Route exact path="/offices/:officeId?/:deskId?">
-						<Offices />
-					</Route>
-					<PrivateRoute exact path="/me">
-						<Me />
-					</PrivateRoute>
-					<Route exact path="/about">
-						<About />
-					</Route>
-				</div>
+								<Route exact path="/">
+									<Home />
+								</Route>
+								<Route exact path="/offices/:officeId?/:deskId?">
+									<Offices />
+								</Route>
+								<PrivateRoute exact path="/me">
+									<Me />
+								</PrivateRoute>
+								<Route exact path="/about">
+									<About />
+								</Route>
+							</div>
+						</DeskBookingsProvider>
+					</OfficeDesksProvider>
+				</OfficesProvider>
 			</AuthProvider>
 		</Router>
 	);

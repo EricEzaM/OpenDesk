@@ -1,0 +1,55 @@
+.booking-submission {
+	display: flex;
+	justify-content: center;
+	margin: $margin;
+	align-items: center;
+
+	&__text {
+		margin: 0 $margin;
+	}
+
+	&__submit {
+		$col: #0e94cd;
+
+		margin: 0 $margin;
+		padding: 0.5em;
+		white-space: nowrap;
+		color: white;
+		background-color: $col;
+		border: none;
+		border-radius: 4px;
+
+		&:disabled {
+			background-color: #a5a5a5;
+		}
+
+		&:hover:enabled {
+			background-color: #1fa8e2;
+		}
+
+		&:active:enabled {
+			background-color: #0881b4;
+		}
+	}
+}
+
+.booking-submission-result {
+	padding: 10px;
+	text-align: center;
+	margin-bottom: 0.5em;
+	border-radius: 4px;
+
+	&--failure {
+		color: $red-text;
+		background-color: $red-bg;
+	}
+
+	&--success {
+		color: $green-text;
+		background-color: $green-bg;
+	}
+
+	&__title {
+		font-weight: bold;
+	}
+}

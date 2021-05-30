@@ -17,6 +17,7 @@ import DeskHighlightIcon from "resources/desk-highlight.svg";
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
 import { Desk, OfficeImage } from "types";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
+import { useOfficeDesks } from "hooks/useOfficeDesks";
 
 const MAP_IMAGE_BORDER = 25;
 
@@ -27,23 +28,19 @@ interface OfficeMapProps {
 	onDeskSelected: (desk?: Desk) => void;
 }
 
-function OfficeMap({
-	image,
-	desks,
-	selectedDesk,
-	onDeskSelected,
-}: OfficeMapProps) {
+function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
 	// =============================================================
 	// Hooks & Variables
 	// =============================================================
 
 	const { deskIdParam, setDeskParam } = useOfficeDeskRouteParams();
+	const {
+		desksState: [desks, setDesks],
+		selectedDeskState: [selectedDesk, setSelectedDesk],
+	} = useOfficeDesks();
 
 	const imageRef = useRef<LImageOverlay>();
 	const mapRef = useRef<Map>();
-
-	// let imageBounds: [number, number] = [image.height, image.width];
-	// let imageCenter: [number, number] = [image.height / 2, image.width / 2];
 
 	// =============================================================
 	// Effects
@@ -69,11 +66,12 @@ function OfficeMap({
 	// =============================================================
 
 	function handleSelection(deskId?: string) {
+		debugger;
 		let changedDesk = deskId && desks?.find((d) => d.id === deskId);
 		if (changedDesk) {
 			onDeskSelected && onDeskSelected(changedDesk);
 			setDeskParam(deskId);
-		} else if (desks) {
+		} else if (desks.length > 0) {
 			// Only clear out the selected desk if desks have been loaded
 			onDeskSelected && onDeskSelected(undefined);
 			setDeskParam(undefined);
