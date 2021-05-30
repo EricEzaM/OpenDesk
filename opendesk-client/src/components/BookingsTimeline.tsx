@@ -102,11 +102,11 @@ function getTimelineContent(
 			>
 				<div>
 					<h4>
-						{format(s, "LLLL d haaa")} to {sameDay ? format(e, "haaa") : ""}
+						{format(s, "haaa EEE LLLL d")} to {sameDay ? format(e, "haaa") : ""}
 					</h4>
 					{!sameDay && (
 						<div style={{ display: "flex", alignContent: "flex-end" }}>
-							<h4>{format(e, "LLLL d haaa")}</h4>
+							<h4>{format(e, "haaa EEE LLLL d")}</h4>
 							<p>&nbsp;(Over {dayDiff + 1} days)</p>
 						</div>
 					)}
