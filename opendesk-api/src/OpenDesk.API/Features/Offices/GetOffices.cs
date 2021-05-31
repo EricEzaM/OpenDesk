@@ -30,6 +30,8 @@ namespace OpenDesk.API.Features.Offices
 				.Select(o => new OfficeDTO
 				{
 					Id = o.Id,
+					Location = o.Location,
+					SubLocation = o.SubLocation,
 					Name = o.Name,
 					Image = o.Image
 				})

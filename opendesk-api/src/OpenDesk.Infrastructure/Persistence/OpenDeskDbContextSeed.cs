@@ -34,6 +34,8 @@ namespace OpenDesk.Infrastructure.Persistence
 
 			context.Offices.Add(new Office
 			{
+				Location = "Brisbane, Australia",
+				SubLocation = "Queen Street",
 				Name = "Office 1",
 				Image = new OfficeImage()
 				{

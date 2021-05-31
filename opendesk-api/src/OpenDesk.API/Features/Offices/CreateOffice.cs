@@ -19,6 +19,8 @@ namespace OpenDesk.API.Features.Offices
 {
 	public class CreateOfficeCommand : IRequest<ApiResponse<OfficeDTO>>
 	{
+		public string Location { get; set; }
+		public string SubLocation { get; set; }
 		public string Name { get; set; }
 		public IFormFile Image { get; set; }
 	}
@@ -48,6 +50,8 @@ namespace OpenDesk.API.Features.Offices
 
 			var office = new Office
 			{
+				Location = request.Location,
+				SubLocation = request.SubLocation,
 				Name = request.Name,
 				Image = new OfficeImage()
 				{
@@ -63,6 +67,8 @@ namespace OpenDesk.API.Features.Offices
 			return new ApiResponse<OfficeDTO>(new OfficeDTO
 			{
 				Id = office.Id,
+				Location = office.Location, 
+				SubLocation = office.SubLocation,
 				Name = office.Name,
 				Image = office.Image
 			});
@@ -76,6 +82,12 @@ namespace OpenDesk.API.Features.Offices
 		public CreateOfficeValidator(OpenDeskDbContext db)
 		{
 			_db = db;
+
+			RuleFor(o => o.Location)
+				.NotEmpty();
+
+			RuleFor(o => o.SubLocation)
+				.NotEmpty();
 
 			RuleFor(o => o.Name)
 				.NotEmpty()

@@ -10,6 +10,8 @@ namespace OpenDesk.Application.Common.DataTransferObjects
 	public class OfficeDTO
 	{
 		public string Id { get; set; }
+		public string Location { get; set; }
+		public string SubLocation { get; set; }
 		public string Name { get; set; }
 		public OfficeImage Image { get; set;}
 	}
