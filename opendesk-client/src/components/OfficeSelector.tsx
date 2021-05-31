@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Office } from "types";
 import apiRequest from "utils/requestUtils";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 import { Breadcrumbs, Select, MenuItem } from "@material-ui/core";
-import { NavigateNext, ExpandMore } from "@material-ui/icons";
+import { NavigateNext } from "@material-ui/icons";
 
 interface OfficeSelectorProps {
 	onOfficeSelected?: (office?: Office) => void;
@@ -16,10 +16,39 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 
 	const [selectedOfficeId, setSelectedOfficeId] = useState<string>("");
 	const [offices, setOffices] = useState<Office[]>();
-
+	const [selectedLocation, setSelectedLocation] = useState("");
+	const [selectedSubLocation, setSelectedSublocation] = useState("");
 	const { officeIdParam, setOfficeParam } = useOfficeDeskRouteParams();
 
-	const [menuAnchorEl, setMenuAnchorEl] = useState<Element>();
+	// Get unique locations.
+	const locations = useMemo(
+		() =>
+			offices
+				?.map((o) => o.location)
+				.filter((ol, i, arr) => arr.indexOf(ol) === i),
+		[offices]
+	);
+
+	// Get unique sublocations for selected location.
+	const subLocations = useMemo(
+		() =>
+			offices
+				?.filter((o) => o.location === selectedLocation)
+				.map((o) => o.subLocation)
+				.filter((osl, i, arr) => arr.indexOf(osl) === i),
+		[offices, selectedLocation]
+	);
+
+	// Get offices, filtered by the selected location and sublocation.
+	const availableOffices = useMemo(
+		() =>
+			offices?.filter(
+				(o) =>
+					o.location === selectedLocation &&
+					o.subLocation === selectedSubLocation
+			),
+		[offices, selectedLocation, selectedSubLocation]
+	);
 
 	// =============================================================
 	// Effects
@@ -58,6 +87,8 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 			// Found a matching office.
 			onOfficeSelected && onOfficeSelected(newOffice);
 			setOfficeParam(officeId);
+			setSelectedLocation(newOffice.location);
+			setSelectedSublocation(newOffice.subLocation);
 		} else if (offices) {
 			// Offices loaded, but there was no match.
 			onOfficeSelected && onOfficeSelected(undefined);
@@ -72,17 +103,59 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 	return (
 		<>
 			<Breadcrumbs separator={<NavigateNext />}>
-				<Select value="Brisbane, Australia">
-					<MenuItem value="Brisbane, Australia">Brisbane, Australia</MenuItem>
-					<MenuItem value="Level 11">Perth, Australia</MenuItem>
+				{/* Location */}
+				<Select
+					value={selectedLocation}
+					onChange={(e) => {
+						setSelectedLocation(e.target.value as string);
+						// Reset downstream options.
+						setSelectedSublocation("");
+						handleChange("");
+					}}
+					displayEmpty
+				>
+					<MenuItem value="">
+						<em>No Selection</em>
+					</MenuItem>
+					{locations?.map((ol) => (
+						<MenuItem value={ol}>{ol}</MenuItem>
+					))}
 				</Select>
-				<Select value="Edward Street">
-					<MenuItem value="Edward Street">Edward Street</MenuItem>
-					<MenuItem value="Level 11">Milton</MenuItem>
+
+				{/* Sub Location */}
+
+				<Select
+					value={selectedSubLocation}
+					onChange={(e) => {
+						setSelectedSublocation(e.target.value as string);
+						// Reset downstream options.
+						handleChange("");
+					}}
+					disabled={selectedLocation === ""}
+					displayEmpty
+				>
+					<MenuItem value="">
+						<em>No Selection</em>
+					</MenuItem>
+					{subLocations?.map((osl) => (
+						<MenuItem value={osl}>{osl}</MenuItem>
+					))}
 				</Select>
-				<Select value="Level 3">
-					<MenuItem value="Level 3">Level 3</MenuItem>
-					<MenuItem value="Level 11">Level 11</MenuItem>
+
+				{/* Office */}
+
+				<Select
+					value={selectedOfficeId}
+					onChange={(e) => handleChange(e.target.value as string)}
+					disabled={selectedSubLocation === ""}
+					displayEmpty
+				>
+					<MenuItem value="">
+						<em>No Selection</em>
+					</MenuItem>
+					{availableOffices?.map((o) => (
+						<MenuItem value={o.id}>{o.name}</MenuItem>
+					))}
 				</Select>
 			</Breadcrumbs>
 		</>

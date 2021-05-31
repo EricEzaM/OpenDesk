@@ -49,6 +49,8 @@ export interface DiagramPosition {
 
 export interface Office {
 	id: string;
+	location: string;
+	subLocation: string;
 	name: string;
 	image: OfficeImage;
 }
