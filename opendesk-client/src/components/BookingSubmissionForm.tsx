@@ -8,6 +8,19 @@ import apiRequest from "utils/requestUtils";
 import { Booking } from "types";
 import { useDeskBookings } from "hooks/useDeskBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
+import {
+	createStyles,
+	FormControl,
+	Grid,
+	InputLabel,
+	makeStyles,
+	MenuItem,
+	Select,
+	TextField,
+	Theme,
+	Button,
+	Typography,
+} from "@material-ui/core";
 
 interface State {
 	success?: boolean;
@@ -50,6 +63,19 @@ function bookingSubmissionStatusReducer(state: State, action: Action): State {
 	}
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		formControl: {
+			minWidth: 120,
+			width: "100%",
+		},
+		flexEndItem: {
+			display: "flex",
+			justifyContent: "flex-end",
+		},
+	})
+);
+
 export default function BookingSubmissionForm() {
 	const {
 		selectedDeskState: [desk],
@@ -71,6 +97,8 @@ export default function BookingSubmissionForm() {
 			errors: [],
 		}
 	);
+
+	const classes = useStyles();
 
 	useEffect(() => {
 		console.log("valid", isNewBookingValid, "desk", desk);
@@ -137,45 +165,53 @@ export default function BookingSubmissionForm() {
 		}
 	}
 
+	function renderTimePicker(label: string, onChange: () => void) {
+		const labelId = `datepicker-${label.replace(" ", "-")}-label`;
+
+		return (
+			<FormControl variant="outlined" className={classes.formControl}>
+				<InputLabel id={labelId}>{label}</InputLabel>
+				<Select labelId={labelId} label={label}>
+					<MenuItem value={8}>8am</MenuItem>
+					<MenuItem value={10}>10am</MenuItem>
+					<MenuItem value={12}>12pm</MenuItem>
+					<MenuItem value={14}>2pm</MenuItem>
+					<MenuItem value={16}>4pm</MenuItem>
+					<MenuItem value={18}>6pm</MenuItem>
+				</Select>
+			</FormControl>
+		);
+	}
+
 	return (
 		<div>
-			<div className="booking-submission">
-				<p className="booking-submission__text">From</p>
-				<DatePicker
-					placeholderText="Start Date & Time"
-					selected={bookingStart}
-					onChange={(date) => handleStartChange(date)}
-				/>
-				<p className="booking-submission__text">to</p>
-				<DatePicker
-					placeholderText="End Date & Time"
-					selected={bookingEnd}
-					onChange={(date) => handleEndChange(date)}
-				/>
-				<button
-					className="booking-submission__submit"
-					disabled={!allowSubmit}
-					onClick={() => SubmitBooking()}
-				>
-					Book Desk
-				</button>
-			</div>
-			<div>
-				{statusState.success !== undefined && (
-					<div
-						className={`booking-submission-result booking-submission-result--${
-							statusState.success ? "success" : "failure"
-						}`}
-					>
-						<p className="booking-submission-result__title">
-							{statusState.message}
-						</p>
-						{statusState.errors.map((e) => (
-							<div>{e}</div>
-						))}
-					</div>
-				)}
-			</div>
+			<Grid container spacing={2}>
+				<Grid item xs={12}>
+					<Typography variant="h6" component="h2">
+						Booking Details
+					</Typography>
+				</Grid>
+				<Grid item xs={12}>
+					<TextField
+						variant="outlined"
+						label="Date"
+						type="date"
+						defaultValue={format(new Date(), "yyyy-MM-dd")}
+						className={classes.formControl}
+					/>
+				</Grid>
+				<Grid item xs={6}>
+					{renderTimePicker("Start Time", () => {})}
+				</Grid>
+				<Grid item xs={6}>
+					{renderTimePicker("End Time", () => {})}
+				</Grid>
+				<Grid item xs={12} className={classes.flexEndItem}>
+					<Button disabled variant="contained" color="primary">
+						Book
+					</Button>
+				</Grid>
+			</Grid>
 		</div>
 	);
 }

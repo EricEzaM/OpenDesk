@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Office } from "types";
 import apiRequest from "utils/requestUtils";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
+import { Breadcrumbs, Select, MenuItem } from "@material-ui/core";
+import { NavigateNext, ExpandMore } from "@material-ui/icons";
 
 interface OfficeSelectorProps {
 	onOfficeSelected?: (office?: Office) => void;
@@ -16,6 +18,8 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 	const [offices, setOffices] = useState<Office[]>();
 
 	const { officeIdParam, setOfficeParam } = useOfficeDeskRouteParams();
+
+	const [menuAnchorEl, setMenuAnchorEl] = useState<Element>();
 
 	// =============================================================
 	// Effects
@@ -66,18 +70,22 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 	// =============================================================
 
 	return (
-		<div className="office-selector">
-			<select
-				className="office-selector__dropdown"
-				onChange={(e) => handleChange(e.target.value)}
-				value={selectedOfficeId}
-			>
-				<option value="" disabled>
-					-- Select an Office --
-				</option>
-				{offices && offices.map((o) => <option value={o.id}>{o.name}</option>)}
-			</select>
-		</div>
+		<>
+			<Breadcrumbs separator={<NavigateNext />}>
+				<Select value="Brisbane, Australia">
+					<MenuItem value="Brisbane, Australia">Brisbane, Australia</MenuItem>
+					<MenuItem value="Level 11">Perth, Australia</MenuItem>
+				</Select>
+				<Select value="Edward Street">
+					<MenuItem value="Edward Street">Edward Street</MenuItem>
+					<MenuItem value="Level 11">Milton</MenuItem>
+				</Select>
+				<Select value="Level 3">
+					<MenuItem value="Level 3">Level 3</MenuItem>
+					<MenuItem value="Level 11">Level 11</MenuItem>
+				</Select>
+			</Breadcrumbs>
+		</>
 	);
 }
 

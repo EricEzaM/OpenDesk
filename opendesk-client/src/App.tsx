@@ -11,6 +11,8 @@ import { OfficeDesksProvider } from "hooks/useOfficeDesks";
 import { DeskBookingsProvider } from "hooks/useDeskBookings";
 import { OfficesProvider } from "hooks/useOffices";
 
+import { Container } from "@material-ui/core";
+
 function App() {
 	return (
 		<Router>
@@ -18,9 +20,9 @@ function App() {
 				<OfficesProvider>
 					<OfficeDesksProvider>
 						<DeskBookingsProvider>
-							<div className="container">
-								<Nav />
+							<Nav />
 
+							<div style={{ margin: "20px" }}>
 								<Route exact path="/">
 									<Home />
 								</Route>
