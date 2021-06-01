@@ -9,6 +9,7 @@
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.1",
     "@types/material-ui": "^0.21.8",
+    "clsx": "^1.1.1",
     "date-fns": "^2.19.0",
     "leaflet": "^1.7.1",
     "path-to-regexp": "^6.2.0",

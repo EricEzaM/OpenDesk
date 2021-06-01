@@ -2,7 +2,7 @@ import BookingsTimeline from "components/BookingsTimeline";
 import { Desk } from "types";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { useDeskBookings } from "hooks/useDeskBookings";
+import { useBookings } from "hooks/useBookings";
 
 interface DeskDetailsProps {
 	desk: Desk;
@@ -18,7 +18,7 @@ export default function DeskDetails({ desk }: DeskDetailsProps) {
 		newBookingStartState: [bookingStart],
 		newBookingEndState: [bookingEnd],
 		isNewBookingValid,
-	} = useDeskBookings();
+	} = useBookings();
 
 	// =============================================================
 	// Effects

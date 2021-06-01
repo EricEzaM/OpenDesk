@@ -8,10 +8,8 @@ import Nav from "components/Nav";
 import About from "pages/About";
 import Home from "pages/Home";
 import { OfficeDesksProvider } from "hooks/useOfficeDesks";
-import { DeskBookingsProvider } from "hooks/useDeskBookings";
+import { BookingsProvider } from "hooks/useBookings";
 import { OfficesProvider } from "hooks/useOffices";
-
-import { Container } from "@material-ui/core";
 
 function App() {
 	return (
@@ -19,7 +17,7 @@ function App() {
 			<AuthProvider>
 				<OfficesProvider>
 					<OfficeDesksProvider>
-						<DeskBookingsProvider>
+						<BookingsProvider>
 							<Nav />
 
 							<div style={{ margin: "20px" }}>
@@ -36,7 +34,7 @@ function App() {
 									<About />
 								</Route>
 							</div>
-						</DeskBookingsProvider>
+						</BookingsProvider>
 					</OfficeDesksProvider>
 				</OfficesProvider>
 			</AuthProvider>

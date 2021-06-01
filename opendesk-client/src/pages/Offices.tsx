@@ -6,7 +6,7 @@ import BookingSubmissionForm from "components/BookingSubmissionForm";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
 import { Grid, Typography } from "@material-ui/core";
 import { useOffices } from "hooks/useOffices";
-import BookingsOverview from "components/BookingsOverview";
+import BookingsOverview from "components/BookingsTable";
 
 function Offices() {
 	// =============================================================

@@ -82,5 +82,13 @@ namespace OpenDesk.API.Features.Bookings
 
 			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
 		}
+
+		[HttpGet("offices/{officeId}/bookings")]
+		public async Task<IActionResult> GetForOffice(string officeId)
+		{
+			var result = await _mediator.Send(new GetBookingsForOfficeCommand(officeId));
+
+			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
+		}
 	}
 }

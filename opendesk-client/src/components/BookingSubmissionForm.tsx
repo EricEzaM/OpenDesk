@@ -5,7 +5,7 @@ import { format, set, setHours } from "date-fns";
 import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
 import apiRequest from "utils/requestUtils";
 import { Booking } from "types";
-import { useDeskBookings } from "hooks/useDeskBookings";
+import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
 import {
 	createStyles,
@@ -93,7 +93,7 @@ export default function BookingSubmissionForm() {
 		newBookingEndState: [bookingEnd, setBookingEnd],
 		isNewBookingValid,
 		clashedBooking,
-	} = useDeskBookings();
+	} = useBookings();
 
 	const [allowSubmit, setAllowSubmit] = useState(false);
 
