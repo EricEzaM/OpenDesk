@@ -1,24 +1,22 @@
 import { useEffect, useState, useMemo } from "react";
-import { Office } from "types";
-import apiRequest from "utils/requestUtils";
-import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 import { Breadcrumbs, Select, MenuItem } from "@material-ui/core";
 import { NavigateNext } from "@material-ui/icons";
+import { useOffices } from "hooks/useOffices";
+import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 
-interface OfficeSelectorProps {
-	onOfficeSelected?: (office?: Office) => void;
-}
-
-function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
+function OfficeSelector() {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
 
-	const [selectedOfficeId, setSelectedOfficeId] = useState<string>("");
-	const [offices, setOffices] = useState<Office[]>();
 	const [selectedLocation, setSelectedLocation] = useState("");
 	const [selectedSubLocation, setSelectedSublocation] = useState("");
+
 	const { officeIdParam, setOfficeParam } = useOfficeDeskRouteParams();
+	const {
+		officesState: [offices],
+		selectedOfficeState: [selectedOffice, setSelectedOffice],
+	} = useOffices();
 
 	// Get unique locations.
 	const locations = useMemo(
@@ -54,44 +52,38 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 	// Effects
 	// =============================================================
 
+	// Handle office changes when the param id or office list is changed
 	useEffect(() => {
-		apiRequest<Office[]>("offices").then((res) => {
-			if (res.outcome.isSuccess) {
-				setOffices(res.data);
-			}
-		});
-	}, []);
-
-	useEffect(() => {
-		// When offices are loaded, check if the route parameter can select an office.
-		handleChange(officeIdParam);
-	}, [offices]);
-
-	useEffect(() => {
-		// When the parameter is changed, update the selection.
-		setSelectedOfficeId(officeIdParam ?? "");
-		if (!officeIdParam) {
-			handleChange(undefined);
-		}
-	}, [officeIdParam]);
+		handleOfficeChange(officeIdParam);
+	}, [officeIdParam, offices]);
 
 	// =============================================================
 	// Functions
 	// =============================================================
 
-	function handleChange(officeId?: string) {
-		setSelectedOfficeId(officeId ?? "");
+	function handleLocationChange(location: string) {
+		setSelectedLocation(location);
+		// Reset downstream options.
+		setSelectedSublocation("");
+		handleOfficeChange("");
+	}
 
+	function handleSubLocationChange(subLocation: string) {
+		setSelectedSublocation(subLocation);
+		// Reset downstream options.
+		handleOfficeChange("");
+	}
+
+	function handleOfficeChange(officeId?: string) {
 		let newOffice = offices?.find((o) => o.id === officeId);
 		if (newOffice) {
-			// Found a matching office.
-			onOfficeSelected && onOfficeSelected(newOffice);
-			setOfficeParam(officeId);
 			setSelectedLocation(newOffice.location);
 			setSelectedSublocation(newOffice.subLocation);
-		} else if (offices) {
-			// Offices loaded, but there was no match.
-			onOfficeSelected && onOfficeSelected(undefined);
+			setSelectedOffice(newOffice);
+			// Update route parameter
+			setOfficeParam(newOffice.id);
+		} else {
+			setSelectedOffice(undefined);
 			setOfficeParam(undefined);
 		}
 	}
@@ -107,10 +99,7 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 				<Select
 					value={selectedLocation}
 					onChange={(e) => {
-						setSelectedLocation(e.target.value as string);
-						// Reset downstream options.
-						setSelectedSublocation("");
-						handleChange("");
+						handleLocationChange(e.target.value as string);
 					}}
 					displayEmpty
 				>
@@ -127,9 +116,7 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 				<Select
 					value={selectedSubLocation}
 					onChange={(e) => {
-						setSelectedSublocation(e.target.value as string);
-						// Reset downstream options.
-						handleChange("");
+						handleSubLocationChange(e.target.value as string);
 					}}
 					disabled={selectedLocation === ""}
 					displayEmpty
@@ -145,8 +132,8 @@ function OfficeSelector({ onOfficeSelected }: OfficeSelectorProps) {
 				{/* Office */}
 
 				<Select
-					value={selectedOfficeId}
-					onChange={(e) => handleChange(e.target.value as string)}
+					value={selectedOffice?.id ?? ""}
+					onChange={(e) => handleOfficeChange(e.target.value as string)}
 					disabled={selectedSubLocation === ""}
 					displayEmpty
 				>

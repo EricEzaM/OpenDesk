@@ -24,6 +24,7 @@ interface BookingsContextProps {
 	newBookingStartState: [Date, (d: Date) => void];
 	newBookingEndState: [Date, (d: Date) => void];
 	isNewBookingValid: boolean;
+	clashedBooking?: Booking;
 }
 
 export const SelectedDeskBookingsContext = createContext<BookingsContextProps>({
@@ -53,19 +54,27 @@ function useDeskBookingsProvider(): BookingsContextProps {
 	const [start, setStart] = useState(setHours(defaultDate, 6));
 	const [end, setEnd] = useState(setHours(defaultDate, 20));
 	const [isNewValid, setIsNewValid] = useState(false);
+	const [clashedBooking, setClashedBooking] = useState<Booking>();
 
-	// Update bookings when desk is changed.
 	useEffect(() => {
+		// Update bookings when desk is changed.
 		refreshBookings();
+
+		// If a desk is not selected, reset validity and clashed booking
+		if (!desk) {
+			setIsNewValid(false);
+			setClashedBooking(undefined);
+		}
 	}, [desk]);
 
 	useEffect(() => {
-		let bookingInvalid = false;
+		let isInvalid = false;
+
 		if (start && end) {
 			for (let i = 0; i < bookings.length; i++) {
 				const booking = bookings[i];
 
-				bookingInvalid =
+				isInvalid =
 					// Start is between existing start and end
 					(start >= booking.startDateTime && start < booking.endDateTime) ||
 					// End is between existing start and end
@@ -73,12 +82,18 @@ function useDeskBookingsProvider(): BookingsContextProps {
 					// Start is before existing start and end is after existing end (i.e. fully surrounds existing)
 					(start <= booking.startDateTime && end >= booking.endDateTime);
 
-				if (bookingInvalid) {
+				if (isInvalid) {
+					setClashedBooking(booking);
 					break;
 				}
 			}
 		}
-		setIsNewValid(!bookingInvalid);
+
+		if (!isInvalid) {
+			setClashedBooking(undefined);
+		}
+
+		setIsNewValid(!isInvalid);
 	}, [start, end, bookings]);
 
 	function refreshBookings() {
@@ -102,6 +117,7 @@ function useDeskBookingsProvider(): BookingsContextProps {
 		newBookingStartState: [start, setStart],
 		newBookingEndState: [end, setEnd],
 		isNewBookingValid: isNewValid,
+		clashedBooking: clashedBooking,
 	};
 }
 

@@ -1,9 +1,16 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+	createContext,
+	ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 import { Office } from "types";
+import apiRequest from "utils/requestUtils";
 
 interface OfficesContextProps {
 	officesState: [Office[], (o: Office[]) => void];
-	selectedOfficeState: [Office | undefined, (o: Office) => void];
+	selectedOfficeState: [Office | undefined, (o: Office | undefined) => void];
 }
 
 export const OfficesContext = createContext<OfficesContextProps>({
@@ -22,12 +29,20 @@ export function OfficesProvider({ children }: { children: ReactNode }) {
 }
 
 function useOfficesProvider(): OfficesContextProps {
-	const officesState = useState<Office[]>([]);
-	const selectedOfficeState = useState<Office>();
+	const [offices, setOffices] = useState<Office[]>([]);
+	const [selectedOffice, setSelectedOffice] = useState<Office>();
+
+	useEffect(() => {
+		apiRequest<Office[]>("offices").then((res) => {
+			if (res.outcome.isSuccess) {
+				setOffices(res.data ?? []);
+			}
+		});
+	}, []);
 
 	return {
-		officesState,
-		selectedOfficeState,
+		officesState: [offices, setOffices],
+		selectedOfficeState: [selectedOffice, setSelectedOffice],
 	};
 }
 

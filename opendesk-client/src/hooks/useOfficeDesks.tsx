@@ -45,6 +45,9 @@ function useOfficeDesksProvider(): OfficeDesksContextProps {
 					setDesks(res.data ?? []);
 				}
 			});
+		} else {
+			setSelectedDesk(undefined);
+			setDesks([]);
 		}
 	}, [selectedOffice]);
 

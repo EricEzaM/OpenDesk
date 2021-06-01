@@ -1,7 +1,6 @@
 import { Reducer, useEffect, useReducer, useState } from "react";
 
-import DatePicker from "components/DatePicker";
-import { format, set } from "date-fns";
+import { format, set, setHours } from "date-fns";
 
 import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
 import apiRequest from "utils/requestUtils";
@@ -77,17 +76,26 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function BookingSubmissionForm() {
+	// =============================================================
+	// Hooks and Variables
+	// =============================================================
+
+	const classes = useStyles();
+
 	const {
 		selectedDeskState: [desk],
 	} = useOfficeDesks();
+
 	const {
 		refreshBookings,
+		bookingsState: [bookings],
 		newBookingStartState: [bookingStart, setBookingStart],
 		newBookingEndState: [bookingEnd, setBookingEnd],
 		isNewBookingValid,
+		clashedBooking,
 	} = useDeskBookings();
 
-	const [allowSubmit, setAllowSubmit] = useState(desk !== undefined);
+	const [allowSubmit, setAllowSubmit] = useState(false);
 
 	const [statusState, statusDispatch] = useReducer<Reducer<State, Action>>(
 		bookingSubmissionStatusReducer,
@@ -98,86 +106,132 @@ export default function BookingSubmissionForm() {
 		}
 	);
 
-	const classes = useStyles();
+	// =============================================================
+	// Effects
+	// =============================================================
 
 	useEffect(() => {
-		console.log("valid", isNewBookingValid, "desk", desk);
 		statusDispatch({
 			type: ActionType.CLEAR,
 		});
 		setAllowSubmit(desk !== undefined && isNewBookingValid);
-	}, [desk, isNewBookingValid]);
 
-	function handleStartChange(date: Date) {
-		if (date.getHours() > 20) {
-			return;
-		}
-		// If start was moved to after end, adjust end to still be after start
-		if (date > bookingEnd) {
-			setBookingEnd(set(date, { hours: bookingEnd.getHours(), minutes: 0 }));
-		}
-
-		setBookingStart(date);
-	}
-
-	function handleEndChange(date: Date) {
-		if (date.getHours() < 6) {
-			return;
-		}
-		// If end date was moved to before start, adjust start.
-		if (date < bookingStart) {
-			setBookingStart(
-				set(date, { hours: bookingStart.getHours(), minutes: 0 })
-			);
-		}
-
-		setBookingEnd(date);
-	}
-
-	function SubmitBooking() {
-		if (desk) {
+		clashedBooking &&
 			statusDispatch({
-				type: ActionType.CLEAR,
+				type: ActionType.FAILURE,
+				message: "Clash",
+				errors: [
+					`The booking clashes with another booking on this desk by ${
+						clashedBooking.user.name
+					} from ${format(clashedBooking.startDateTime, "haaa")} to ${format(
+						clashedBooking.endDateTime,
+						"haaa"
+					)}`,
+				],
 			});
-			apiRequest<Booking>(`desks/${desk.id}/bookings`, {
-				method: "POST",
-				headers: {
-					"content-type": "application/json",
-				},
-				body: JSON.stringify({
-					startDateTime: format(bookingStart, FORMAT_ISO_WITH_TZ_STRING),
-					endDateTime: format(bookingEnd, FORMAT_ISO_WITH_TZ_STRING),
-				}),
-			}).then((res) => {
-				if (res.outcome.isSuccess) {
-					statusDispatch({
-						type: ActionType.SUCCESS,
-					});
-					refreshBookings();
-				} else {
-					statusDispatch({
-						type: ActionType.FAILURE,
-						message: res.outcome.message,
-						errors: res.outcome.errors,
-					});
-				}
-			});
-		}
+	}, [desk, isNewBookingValid, clashedBooking]);
+
+	// =============================================================
+	// Functions
+	// =============================================================
+
+	/**
+	 * @param dateString In format "YYYY-MM-DD"
+	 */
+	function handleDateChange(dateString: string) {
+		const date = new Date(dateString);
+		const newDateOnly = new Date(
+			date.getFullYear(),
+			date.getMonth(),
+			date.getDate()
+		);
+
+		const startTime = bookingStart && {
+			hours: bookingStart.getHours(),
+			minutes: bookingStart.getMinutes(),
+		};
+
+		const endTime = bookingEnd && {
+			hours: bookingEnd.getHours(),
+			minutes: bookingEnd.getMinutes(),
+		};
+
+		setBookingStart(set(newDateOnly, startTime));
+		setBookingEnd(set(newDateOnly, endTime));
 	}
 
-	function renderTimePicker(label: string, onChange: () => void) {
+	function handleStartTimeChange(hoursValue: number) {
+		setBookingStart(setHours(bookingStart, hoursValue));
+	}
+
+	function handleEndTimeChange(hoursValue: number) {
+		setBookingEnd(setHours(bookingEnd, hoursValue));
+	}
+
+	function submitBooking() {
+		if (!desk) {
+			return;
+		}
+
+		// Clear status when submitting a booking.
+		statusDispatch({
+			type: ActionType.CLEAR,
+		});
+
+		// Post the booking
+		apiRequest<Booking>(`desks/${desk.id}/bookings`, {
+			method: "POST",
+			headers: {
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({
+				startDateTime: format(bookingStart, FORMAT_ISO_WITH_TZ_STRING),
+				endDateTime: format(bookingEnd, FORMAT_ISO_WITH_TZ_STRING),
+			}),
+		}).then((res) => {
+			if (res.outcome.isSuccess) {
+				refreshBookings();
+				statusDispatch({
+					type: ActionType.SUCCESS,
+				});
+			} else {
+				statusDispatch({
+					type: ActionType.FAILURE,
+					message: res.outcome.message,
+					errors: res.outcome.errors,
+				});
+			}
+		});
+	}
+
+	// =============================================================
+	// Render
+	// =============================================================
+
+	function renderTimePicker(
+		label: string,
+		selectedValue: number,
+		onChange: (hours: number) => void
+	) {
 		const labelId = `datepicker-${label.replace(" ", "-")}-label`;
 
 		return (
 			<FormControl variant="outlined" className={classes.formControl}>
 				<InputLabel id={labelId}>{label}</InputLabel>
-				<Select labelId={labelId} label={label}>
+				<Select
+					labelId={labelId}
+					label={label}
+					onChange={(e) => onChange(e.target.value as number)}
+					value={selectedValue}
+				>
+					<MenuItem value={6}>6am</MenuItem>
 					<MenuItem value={8}>8am</MenuItem>
 					<MenuItem value={10}>10am</MenuItem>
 					<MenuItem value={12}>12pm</MenuItem>
 					<MenuItem value={14}>2pm</MenuItem>
 					<MenuItem value={16}>4pm</MenuItem>
 					<MenuItem value={18}>6pm</MenuItem>
+					<MenuItem value={20}>8pm</MenuItem>
 				</Select>
 			</FormControl>
 		);
@@ -197,19 +251,49 @@ export default function BookingSubmissionForm() {
 						label="Date"
 						type="date"
 						defaultValue={format(new Date(), "yyyy-MM-dd")}
+						onChange={(e) => handleDateChange(e.target.value)}
 						className={classes.formControl}
 					/>
 				</Grid>
 				<Grid item xs={6}>
-					{renderTimePicker("Start Time", () => {})}
+					{renderTimePicker(
+						"Start Time",
+						bookingStart.getHours(),
+						handleStartTimeChange
+					)}
 				</Grid>
 				<Grid item xs={6}>
-					{renderTimePicker("End Time", () => {})}
+					{renderTimePicker(
+						"End Time",
+						bookingEnd.getHours(),
+						handleEndTimeChange
+					)}
 				</Grid>
 				<Grid item xs={12} className={classes.flexEndItem}>
-					<Button disabled variant="contained" color="primary">
+					<Button
+						variant="contained"
+						color="primary"
+						disabled={!allowSubmit}
+						onClick={submitBooking}
+					>
 						Book
 					</Button>
+				</Grid>
+				<Grid item xs={12}>
+					{statusState.success !== undefined && (
+						<div
+							className={`booking-submission-result booking-submission-result--${
+								statusState.success ? "success" : "failure"
+							}`}
+						>
+							<p className="booking-submission-result__title">
+								{statusState.message}
+							</p>
+							{statusState.errors.map((e) => (
+								<div>{e}</div>
+							))}
+						</div>
+					)}
 				</Grid>
 			</Grid>
 		</div>

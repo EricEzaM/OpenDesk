@@ -33,14 +33,14 @@ function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
 	// Hooks & Variables
 	// =============================================================
 
-	const { deskIdParam, setDeskParam } = useOfficeDeskRouteParams();
-	const {
-		desksState: [desks, setDesks],
-		selectedDeskState: [selectedDesk, setSelectedDesk],
-	} = useOfficeDesks();
-
 	const imageRef = useRef<LImageOverlay>();
 	const mapRef = useRef<Map>();
+
+	const { deskIdParam, setDeskParam } = useOfficeDeskRouteParams();
+	const {
+		desksState: [desks],
+		selectedDeskState: [selectedDesk],
+	} = useOfficeDesks();
 
 	// =============================================================
 	// Effects
@@ -66,7 +66,6 @@ function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
 	// =============================================================
 
 	function handleSelection(deskId?: string) {
-		debugger;
 		let changedDesk = deskId && desks?.find((d) => d.id === deskId);
 		if (changedDesk) {
 			onDeskSelected && onDeskSelected(changedDesk);
