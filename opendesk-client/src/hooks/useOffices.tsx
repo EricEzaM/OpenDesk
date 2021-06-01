@@ -9,7 +9,7 @@ import { Office } from "types";
 import apiRequest from "utils/requestUtils";
 
 interface OfficesContextProps {
-	officesState: [Office[], (o: Office[]) => void];
+	officesState: [Office[] | undefined, (o: Office[] | undefined) => void];
 	selectedOfficeState: [Office | undefined, (o: Office | undefined) => void];
 }
 
@@ -29,7 +29,7 @@ export function OfficesProvider({ children }: { children: ReactNode }) {
 }
 
 function useOfficesProvider(): OfficesContextProps {
-	const [offices, setOffices] = useState<Office[]>([]);
+	const [offices, setOffices] = useState<Office[]>();
 	const [selectedOffice, setSelectedOffice] = useState<Office>();
 
 	useEffect(() => {

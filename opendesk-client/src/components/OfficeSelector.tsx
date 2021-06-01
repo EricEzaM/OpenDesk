@@ -82,7 +82,8 @@ function OfficeSelector() {
 			setSelectedOffice(newOffice);
 			// Update route parameter
 			setOfficeParam(newOffice.id);
-		} else {
+		} else if (offices) {
+			// Office are loaded, but there was no match.
 			setSelectedOffice(undefined);
 			setOfficeParam(undefined);
 		}
