@@ -15,6 +15,7 @@ import clsx from "clsx";
 import { format, isSameDay } from "date-fns";
 import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
+import { useOffices } from "hooks/useOffices";
 import { useMemo } from "react";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -57,7 +58,7 @@ export default function BookingsTable() {
 	return (
 		<div>
 			<Typography variant="h6" component="h2">
-				Bookings Overview
+				Bookings for {format(newStart, "dd/MM/yyyy")}
 			</Typography>
 			<TableContainer component={Paper}>
 				<Table>
