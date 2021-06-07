@@ -41,7 +41,7 @@ function useOfficeDesksProvider(): OfficeDesksContextProps {
 	useEffect(() => {
 		if (selectedOffice) {
 			apiRequest<Desk[]>(`offices/${selectedOffice.id}/desks`).then((res) => {
-				if (res.outcome.isSuccess) {
+				if (res.data) {
 					setDesks(res.data ?? []);
 				}
 			});

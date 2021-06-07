@@ -34,7 +34,7 @@ function useOfficesProvider(): OfficesContextProps {
 
 	useEffect(() => {
 		apiRequest<Office[]>("offices").then((res) => {
-			if (res.outcome.isSuccess) {
+			if (res.data) {
 				setOffices(res.data ?? []);
 			}
 		});

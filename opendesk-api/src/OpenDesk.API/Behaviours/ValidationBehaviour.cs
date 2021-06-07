@@ -14,7 +14,6 @@ namespace OpenDesk.API.Behaviours
 {
 	public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
 	where TRequest : IRequest<TResponse>
-	where TResponse : ApiResponse, new()
 	{
 		private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -35,10 +34,7 @@ namespace OpenDesk.API.Behaviours
 
 				if (failures.Any())
 				{
-					TResponse response = new();
-					response.Outcome = OperationOutcome.ValidationFailure("Validation Failure.", failures.Select(f => f.ErrorMessage));
-
-					return Task.FromResult(response);
+					throw new ValidationException("Validation failure.", failures);
 				}
 			}
 

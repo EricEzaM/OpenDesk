@@ -12,10 +12,11 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenDesk.API.Models;
+using OpenDesk.API.Errors;
 
 namespace OpenDesk.API.Features.Bookings
 {
-	public class CreateBookingCommand : IRequest<ApiResponse<BookingDTO>>
+	public class CreateBookingCommand : IRequest<BookingDTO>
 	{
 		[JsonIgnore]
 		public string UserId { get; set; }
@@ -25,7 +26,7 @@ namespace OpenDesk.API.Features.Bookings
 		public DateTimeOffset EndDateTime { get; set; }
 	}
 
-	public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, ApiResponse<BookingDTO>>
+	public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BookingDTO>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -34,7 +35,7 @@ namespace OpenDesk.API.Features.Bookings
 			_db = db;
 		}
 
-		public async Task<ApiResponse<BookingDTO>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
+		public async Task<BookingDTO> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
 		{
 			var desk = await _db
 				.Desks
@@ -43,14 +44,14 @@ namespace OpenDesk.API.Features.Bookings
 
 			if (desk == null)
 			{
-				return new ApiResponse<BookingDTO>(OperationOutcome.ValidationFailure("The desk could not be found."));
+				throw new EntityNotFoundException("Desk");
 			}
 
 			var user = _db.Users.FirstOrDefault(u => u.Id == request.UserId);
 
 			if (user == null)
 			{
-				return new ApiResponse<BookingDTO>(OperationOutcome.ValidationFailure("The user could not be found."));
+				throw new EntityNotFoundException("User");
 			}
 
 			var booking = new Booking
@@ -66,20 +67,19 @@ namespace OpenDesk.API.Features.Bookings
 
 			await _db.SaveChangesAsync();
 
-			return new ApiResponse<BookingDTO>(
-					new BookingDTO
-					{
-						Id = booking.Id,
-						DeskId = booking.Desk.Id,
-						StartDateTime = booking.StartDateTime,
-						EndDateTime = booking.EndDateTime,
-						User = new UserDTO
-						{
-							Id = user.Id,
-							UserName = user.UserName,
-							Name = "Name Placeholder"
-						}
-					});
+			return new BookingDTO
+			{
+				Id = booking.Id,
+				DeskId = booking.Desk.Id,
+				StartDateTime = booking.StartDateTime,
+				EndDateTime = booking.EndDateTime,
+				User = new UserDTO
+				{
+					Id = user.Id,
+					UserName = user.UserName,
+					Name = "Name Placeholder"
+				}
+			};
 		}
 	}
 

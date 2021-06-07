@@ -4,7 +4,7 @@ import { format, set, setHours } from "date-fns";
 
 import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
 import apiRequest from "utils/requestUtils";
-import { Booking } from "types";
+import { Booking, ValidationError } from "types";
 import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
 import {
@@ -189,16 +189,18 @@ export default function BookingSubmissionForm() {
 				endDateTime: format(bookingEnd, FORMAT_ISO_WITH_TZ_STRING),
 			}),
 		}).then((res) => {
-			if (res.outcome.isSuccess) {
+			if (res.data) {
 				refreshBookings();
 				statusDispatch({
 					type: ActionType.SUCCESS,
 				});
-			} else {
+			} else if (res.problem) {
 				statusDispatch({
 					type: ActionType.FAILURE,
-					message: res.outcome.message,
-					errors: res.outcome.errors,
+					message: res.problem.title,
+					errors: (res.problem?.errors as ValidationError[])?.map(
+						(ve: ValidationError) => ve.message
+					),
 				});
 			}
 		});

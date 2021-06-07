@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using OpenDesk.API.Features;
+using OpenDesk.API.Errors;
 
 namespace OpenDesk.API.Features.Bookings
 {
@@ -27,7 +28,7 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			var result = await _mediator.Send(new GetBookingsCommand());
 
-			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
+			return Ok(result);
 		}
 
 		[HttpGet("desks/{deskId}/bookings")]
@@ -35,7 +36,7 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			var result = await _mediator.Send(new GetBookingsForDeskCommand(deskId));
 
-			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
+			return Ok(result);
 		}
 
 		[HttpPost("desks/{deskId}/bookings")]
@@ -46,16 +47,13 @@ namespace OpenDesk.API.Features.Bookings
 
 			if (userId == null)
 			{
-				return BadRequest(new
-				{
-					Error = "User not found."
-				});
+				throw new EntityNotFoundException("User");
 			}
 
 			command.UserId = userId;
 			var result = await _mediator.Send(command);
 
-			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
+			return Ok(result);
 		}
 
 		[HttpGet("/api/users/{userId}/bookings")]
@@ -65,10 +63,7 @@ namespace OpenDesk.API.Features.Bookings
 
 			if (signedInUserId == null)
 			{
-				return BadRequest(new
-				{
-					Error = "User not found."
-				});
+				throw new EntityNotFoundException("User");
 			}
 
 			if (signedInUserId != userId)
@@ -80,7 +75,7 @@ namespace OpenDesk.API.Features.Bookings
 
 			var result = await _mediator.Send(new GetBookingsForUserCommand(userId));
 
-			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
+			return Ok(result);
 		}
 
 		[HttpGet("offices/{officeId}/bookings")]
@@ -88,7 +83,7 @@ namespace OpenDesk.API.Features.Bookings
 		{
 			var result = await _mediator.Send(new GetBookingsForOfficeCommand(officeId));
 
-			return result.Outcome.IsSuccess ? Ok(result) : BadRequest(result);
+			return Ok(result);
 		}
 	}
 }

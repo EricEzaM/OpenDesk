@@ -17,7 +17,7 @@ using FluentValidation;
 
 namespace OpenDesk.API.Features.Offices
 {
-	public class CreateOfficeCommand : IRequest<ApiResponse<OfficeDTO>>
+	public class CreateOfficeCommand : IRequest<OfficeDTO>
 	{
 		public string Location { get; set; }
 		public string SubLocation { get; set; }
@@ -25,7 +25,7 @@ namespace OpenDesk.API.Features.Offices
 		public IFormFile Image { get; set; }
 	}
 
-	public class CreateOfficeHandler : IRequestHandler<CreateOfficeCommand, ApiResponse<OfficeDTO>>
+	public class CreateOfficeHandler : IRequestHandler<CreateOfficeCommand, OfficeDTO>
 	{
 		private readonly OpenDeskDbContext _db;
 		private readonly IWebHostEnvironment _env;
@@ -36,7 +36,7 @@ namespace OpenDesk.API.Features.Offices
 			_env = env;
 		}
 
-		public async Task<ApiResponse<OfficeDTO>> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
+		public async Task<OfficeDTO> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
 		{
 			// TODO Re-write this to make it more secure. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
 			// Store in blob storage somewhere and replace ImageUrl with one from a storage provider in the Office database model?
@@ -64,14 +64,14 @@ namespace OpenDesk.API.Features.Offices
 			_db.Offices.Add(office);
 			await _db.SaveChangesAsync(cancellationToken);
 
-			return new ApiResponse<OfficeDTO>(new OfficeDTO
+			return new OfficeDTO
 			{
 				Id = office.Id,
-				Location = office.Location, 
+				Location = office.Location,
 				SubLocation = office.SubLocation,
 				Name = office.Name,
 				Image = office.Image
-			});
+			};
 		}
 	}
 

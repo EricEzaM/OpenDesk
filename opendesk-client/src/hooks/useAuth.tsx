@@ -62,7 +62,7 @@ function useAuthProvider(): AuthContextProps {
 	useEffect(() => {
 		apiRequest<User>("me").then((res) => {
 			// Set user & update localStorage value.
-			if (res.outcome.isSuccess) {
+			if (res.data) {
 				setUser(res.data);
 				localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
 			} else if (res.status === 401) {

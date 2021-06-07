@@ -112,7 +112,7 @@ function useBookingsProvider(): BookingsContextProps {
 		if (selectedOffice) {
 			apiRequest<Booking[]>(`offices/${selectedOffice.id}/bookings`).then(
 				(res) => {
-					if (res.outcome.isSuccess && res.data) {
+					if (res.data) {
 						// Parse the bookings from the data, converting ISO date to JS Date Object when the JSON contains a date.
 						let bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
 							const isDate = k === "startDateTime" || k === "endDateTime";

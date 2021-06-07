@@ -10,12 +10,16 @@ using OpenDesk.Infrastructure;
 using System.IO;
 using FluentValidation;
 using OpenDesk.API.Behaviours;
-using OpenDesk.API.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using OpenDesk.API.Models;
 using MediatR.Pipeline;
+using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
+using OpenDesk.API.Errors;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace OpenDesk.API
 {
@@ -34,6 +38,28 @@ namespace OpenDesk.API
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddProblemDetails(o =>
+			{
+				o.ExceptionDetailsPropertyName = "internalErrors";
+
+				o.Map<EntityNotFoundException>(ex => new ProblemDetails()
+				{
+					Title = $"{ex.EntityName} could not be found.",
+					Type = "https://example.net/entity-not-found",
+					Status = StatusCodes.Status404NotFound,
+				});
+
+				o.Map<ValidationException>(ex => 
+					new FluentValidationProblemDetails(ex.Errors.Select(f => new FluentValidationProblemDetailsError(f)))
+					{
+						Title = ex.Message,
+						Type = "https://example.net/validation",
+						Status = StatusCodes.Status400BadRequest
+					});
+
+				o.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
+			});
+
 			services.AddInfrastructure(Configuration, _env);
 
 			services.AddMediatR(typeof(Startup));
@@ -56,26 +82,8 @@ namespace OpenDesk.API
 				});
 			}
 
-			services.AddControllers(o =>
-			{
-				o.Filters.Add(typeof(ExceptionFilter));
-			}).ConfigureApiBehaviorOptions(o =>
-			{
-				o.InvalidModelStateResponseFactory = context =>
-				{
-					var errors = new List<string>();
-					errors.AddRange(context.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)); // Add all ModelState errors if any.
-
-					var res = new ApiResponse()
-					{
-						Outcome = OperationOutcome.Error($"The request inputs were not valid.", errors)
-					};
-					var result = new JsonResult(res);
-
-					context.HttpContext.Response.StatusCode = 400;
-					return result;
-				};
-			}); ;
+			services.AddControllers()
+				.AddProblemDetailsConventions(); // Adds MVC conventions to work better with the ProblemDetails middleware.
 
 			services.AddSwaggerGen(c =>
 			{
@@ -92,6 +100,8 @@ namespace OpenDesk.API
 				app.UseSwagger();
 				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenDesk v1"));
 			}
+
+			app.UseProblemDetails();
 
 			app.UseHttpsRedirection();
 

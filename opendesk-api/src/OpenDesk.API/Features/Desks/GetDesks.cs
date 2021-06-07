@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Desks
 {
-	public class GetDesksCommand : IRequest<ApiResponse<IEnumerable<DeskDTO>>>
+	public class GetDesksCommand : IRequest<IEnumerable<DeskDTO>>
 	{
 		public GetDesksCommand(string officeId)
 		{
@@ -21,7 +21,7 @@ namespace OpenDesk.API.Features.Desks
 		public string OfficeId { get; set; }
 	}
 
-	public class GetDesksHandler : IRequestHandler<GetDesksCommand, ApiResponse<IEnumerable<DeskDTO>>>
+	public class GetDesksHandler : IRequestHandler<GetDesksCommand, IEnumerable<DeskDTO>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -30,10 +30,9 @@ namespace OpenDesk.API.Features.Desks
 			_db = db;
 		}
 
-		public async Task<ApiResponse<IEnumerable<DeskDTO>>> Handle(GetDesksCommand request, CancellationToken cancellationToken)
+		public async Task<IEnumerable<DeskDTO>> Handle(GetDesksCommand request, CancellationToken cancellationToken)
 		{
-			return new ApiResponse<IEnumerable<DeskDTO>>(
-				await _db
+			return await _db
 				.Desks
 				.Where(d => d.Office.Id == request.OfficeId)
 				.Select(d => new DeskDTO
@@ -43,7 +42,7 @@ namespace OpenDesk.API.Features.Desks
 					DiagramPosition = d.DiagramPosition
 				})
 				.AsNoTracking() // As No Tracking so that EF does not complain about Diagram Position not having an owner.
-				.ToListAsync());
+				.ToListAsync();
 		}
 	}
 }

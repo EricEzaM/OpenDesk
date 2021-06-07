@@ -1,16 +1,26 @@
 // API RESPONSES
 
 export interface ApiResponse<T> {
+	status: number;
 	data?: T;
-	outcome: OperationOutcome;
+	problem?: ProblemDetails;
 }
 
-interface OperationOutcome {
-	isError: boolean;
-	isValidationFailure: boolean;
-	isSuccess: boolean;
+export interface ValidationError {
 	message: string;
-	errors: string[];
+	errorCode: string;
+	attemptedValue: unknown;
+	state: unknown;
+	severity: number;
+}
+
+export interface ProblemDetails {
+	type: string;
+	title: string;
+	status: number;
+	detail: string;
+	instance: string;
+	[extension: string]: number | string | ValidationError[];
 }
 
 // BOOKING

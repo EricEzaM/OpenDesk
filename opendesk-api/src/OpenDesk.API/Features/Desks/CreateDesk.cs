@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using OpenDesk.API.Errors;
 using OpenDesk.API.Models;
 using OpenDesk.Application.Common.DataTransferObjects;
 using OpenDesk.Domain.Entities;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Desks
 {
-	public class CreateDeskCommand : IRequest<ApiResponse<DeskDTO>>
+	public class CreateDeskCommand : IRequest<DeskDTO>
 	{
 		[JsonIgnore]
 		public string OfficeId { get; set; }
@@ -23,7 +24,7 @@ namespace OpenDesk.API.Features.Desks
 		public DiagramPosition DiagramPosition { get; set; }
 	}
 
-	public class CreateDeskHandler : IRequestHandler<CreateDeskCommand, ApiResponse<DeskDTO>>
+	public class CreateDeskHandler : IRequestHandler<CreateDeskCommand, DeskDTO>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -32,7 +33,7 @@ namespace OpenDesk.API.Features.Desks
 			_db = db;
 		}
 
-		public async Task<ApiResponse<DeskDTO>> Handle(CreateDeskCommand request, CancellationToken cancellationToken)
+		public async Task<DeskDTO> Handle(CreateDeskCommand request, CancellationToken cancellationToken)
 		{
 			var office = await _db
 				.Offices
@@ -41,7 +42,7 @@ namespace OpenDesk.API.Features.Desks
 
 			if (office == null)
 			{
-				return new ApiResponse<DeskDTO>(OperationOutcome.ValidationFailure("The office could not be found."));
+				throw new EntityNotFoundException("Office");
 			}
 
 			var desk = new Desk()
@@ -56,13 +57,12 @@ namespace OpenDesk.API.Features.Desks
 
 			await _db.SaveChangesAsync();
 
-			return new ApiResponse<DeskDTO>(
-				new DeskDTO
-				{
-					Id = desk.Id,
-					Name = desk.Name,
-					DiagramPosition = desk.DiagramPosition,
-				});
+			return new DeskDTO
+			{
+				Id = desk.Id,
+				Name = desk.Name,
+				DiagramPosition = desk.DiagramPosition,
+			};
 		}
 	}
 

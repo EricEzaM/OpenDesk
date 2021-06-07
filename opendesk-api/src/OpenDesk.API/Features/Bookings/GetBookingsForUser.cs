@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Bookings
 {
-	public class GetBookingsForUserCommand : IRequest<ApiResponse<IEnumerable<FullBookingDTO>>>
+	public class GetBookingsForUserCommand : IRequest<IEnumerable<FullBookingDTO>>
 	{
 		public GetBookingsForUserCommand(string userId)
 		{
@@ -21,7 +21,7 @@ namespace OpenDesk.API.Features.Bookings
 
 		public string UserId { get; }
 
-		public class GetBookingsForUserHandler : IRequestHandler<GetBookingsForUserCommand, ApiResponse<IEnumerable<FullBookingDTO>>>
+		public class GetBookingsForUserHandler : IRequestHandler<GetBookingsForUserCommand, IEnumerable<FullBookingDTO>>
 		{
 			private readonly OpenDeskDbContext _db;
 
@@ -30,10 +30,9 @@ namespace OpenDesk.API.Features.Bookings
 				_db = db;
 			}
 
-			public async Task<ApiResponse<IEnumerable<FullBookingDTO>>> Handle(GetBookingsForUserCommand request, CancellationToken cancellationToken)
+			public async Task<IEnumerable<FullBookingDTO>> Handle(GetBookingsForUserCommand request, CancellationToken cancellationToken)
 			{
-				return new ApiResponse<IEnumerable<FullBookingDTO>>(
-					await _db.Bookings
+				return await _db.Bookings
 					.Include(b => b.Desk)
 					.ThenInclude(d => d.Office)
 					.Where(b => b.UserId == request.UserId)
@@ -70,7 +69,7 @@ namespace OpenDesk.API.Features.Bookings
 						User = bu.User
 					})
 				.AsNoTracking()
-				.ToListAsync());
+				.ToListAsync();
 			}
 		}
 	}

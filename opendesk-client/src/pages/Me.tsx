@@ -12,7 +12,7 @@ function Me() {
 	useEffect(() => {
 		// API Call to get bookings and stuff
 		apiRequest<FullBooking[]>(`users/${user?.id}/bookings`).then((res) => {
-			if (res.outcome.isSuccess) {
+			if (res.data) {
 				var bookings = JSON.parse(JSON.stringify(res.data), (k, value) => {
 					const isDate = k === "startDateTime" || k === "endDateTime";
 					return isDate ? new Date(value) : value;
