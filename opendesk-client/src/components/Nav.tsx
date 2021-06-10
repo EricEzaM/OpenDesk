@@ -50,13 +50,23 @@ export default function Nav() {
 				open={drawerOpen}
 				onClose={(e) => setDrawerOpen(false)}
 			>
-				<List>
-					{getMenuListItem("Book a Desk", "/offices", <CollectionsBookmark />)}
-					<Authenticated>
-						{getMenuListItem("My Bookings", "/me", <Person />)}
-						{getMenuListItem("Management Portal", "/manage", <Settings />)}
-					</Authenticated>
-				</List>
+				<div
+					onClick={() => {
+						setDrawerOpen(false);
+					}}
+				>
+					<List>
+						{getMenuListItem(
+							"Book a Desk",
+							"/offices",
+							<CollectionsBookmark />
+						)}
+						<Authenticated>
+							{getMenuListItem("My Bookings", "/me", <Person />)}
+							{getMenuListItem("Management Portal", "/manage", <Settings />)}
+						</Authenticated>
+					</List>
+				</div>
 			</Drawer>
 		</>
 	);
@@ -64,7 +74,7 @@ export default function Nav() {
 
 function getMenuListItem(text: string, linkTo: string, icon: ReactNode) {
 	return (
-		<ListItem component={Link} to={linkTo}>
+		<ListItem button component={Link} to={linkTo}>
 			<ListItemIcon>{icon}</ListItemIcon>
 			<ListItemText primary={text} />
 		</ListItem>
