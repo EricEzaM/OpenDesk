@@ -108,7 +108,9 @@ function OfficeSelector() {
 						<em>No Selection</em>
 					</MenuItem>
 					{locations?.map((ol) => (
-						<MenuItem value={ol}>{ol}</MenuItem>
+						<MenuItem key={ol} value={ol}>
+							{ol}
+						</MenuItem>
 					))}
 				</Select>
 
@@ -126,7 +128,9 @@ function OfficeSelector() {
 						<em>No Selection</em>
 					</MenuItem>
 					{subLocations?.map((osl) => (
-						<MenuItem value={osl}>{osl}</MenuItem>
+						<MenuItem key={osl} value={osl}>
+							{osl}
+						</MenuItem>
 					))}
 				</Select>
 
@@ -142,7 +146,9 @@ function OfficeSelector() {
 						<em>No Selection</em>
 					</MenuItem>
 					{availableOffices?.map((o) => (
-						<MenuItem value={o.id}>{o.name}</MenuItem>
+						<MenuItem key={o.id} value={o.id}>
+							{o.name}
+						</MenuItem>
 					))}
 				</Select>
 			</Breadcrumbs>
