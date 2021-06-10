@@ -3,9 +3,19 @@ import Authenticated from "components/auth/Authenticated";
 
 import { ReactComponent as MsSigningDarkButton } from "resources/ms-signin-dark.svg";
 import { useAuth } from "hooks/useAuth";
+import { Button, createStyles, makeStyles, Theme } from "@material-ui/core";
+
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		signOutButton: {
+			marginLeft: "1em",
+		},
+	})
+);
 
 function SignInOut() {
 	const { user, signIn, signOut } = useAuth();
+	const classes = useStyles();
 
 	return (
 		<div className="sign-in-out">
@@ -20,12 +30,13 @@ function SignInOut() {
 			<Authenticated>
 				<div className="sign-in-out__out-container">
 					<p>{user?.name}</p>
-					<button
-						className="sign-in-out__out-btn"
+					<Button
+						className={classes.signOutButton}
+						variant="contained"
 						onClick={() => signOut(window.location.origin)}
 					>
 						Sign Out
-					</button>
+					</Button>
 				</div>
 			</Authenticated>
 		</div>
