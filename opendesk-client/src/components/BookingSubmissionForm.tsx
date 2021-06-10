@@ -1,12 +1,5 @@
 import { Reducer, useEffect, useReducer, useState } from "react";
-
 import { format, set, setHours } from "date-fns";
-
-import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
-import apiRequest from "utils/requestUtils";
-import { Booking, ValidationError } from "types";
-import { useBookings } from "hooks/useBookings";
-import { useOfficeDesks } from "hooks/useOfficeDesks";
 import {
 	createStyles,
 	FormControl,
@@ -20,9 +13,17 @@ import {
 	Button,
 	Typography,
 } from "@material-ui/core";
+import { Alert, AlertTitle } from "@material-ui/lab";
 
-interface State {
-	success?: boolean;
+import apiRequest from "utils/requestUtils";
+import { Booking, ValidationError } from "types";
+import { useBookings } from "hooks/useBookings";
+import { useOfficeDesks } from "hooks/useOfficeDesks";
+import { useAuth } from "hooks/useAuth";
+import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
+
+interface StatusState {
+	severity?: "info" | "error";
 	message: string;
 	errors: string[];
 }
@@ -31,11 +32,8 @@ enum ActionType {
 	FAILURE,
 	SUCCESS,
 	CLEAR,
+	INFO,
 }
-
-type Success = {
-	readonly type: ActionType.SUCCESS;
-};
 
 type Failure = {
 	readonly type: ActionType.FAILURE;
@@ -47,16 +45,32 @@ type Clear = {
 	readonly type: ActionType.CLEAR;
 };
 
-type Action = Success | Failure | Clear;
+type Info = {
+	readonly type: ActionType.INFO;
+	readonly message: string;
+};
 
-function bookingSubmissionStatusReducer(state: State, action: Action): State {
+type Action = Failure | Clear | Info;
+
+function bookingSubmissionStatusReducer(
+	state: StatusState,
+	action: Action
+): StatusState {
 	switch (action.type) {
 		case ActionType.FAILURE:
-			return { success: false, message: action.message, errors: action.errors };
-		case ActionType.SUCCESS:
-			return { success: true, message: "Success", errors: [] };
+			return {
+				severity: "error",
+				message: action.message,
+				errors: action.errors,
+			};
+		case ActionType.INFO:
+			return {
+				severity: "info",
+				message: action.message,
+				errors: [],
+			};
 		case ActionType.CLEAR:
-			return { success: undefined, message: "", errors: [] };
+			return { severity: undefined, message: "", errors: [] };
 		default:
 			return state;
 	}
@@ -88,23 +102,23 @@ export default function BookingSubmissionForm() {
 
 	const {
 		refreshBookings,
-		bookingsState: [bookings],
 		newBookingStartState: [bookingStart, setBookingStart],
 		newBookingEndState: [bookingEnd, setBookingEnd],
 		isNewBookingValid,
 		clashedBooking,
 	} = useBookings();
 
+	const { user } = useAuth();
+
 	const [allowSubmit, setAllowSubmit] = useState(false);
 
-	const [statusState, statusDispatch] = useReducer<Reducer<State, Action>>(
-		bookingSubmissionStatusReducer,
-		{
-			success: undefined,
-			message: "",
-			errors: [],
-		}
-	);
+	const [statusState, statusDispatch] = useReducer<
+		Reducer<StatusState, Action>
+	>(bookingSubmissionStatusReducer, {
+		severity: undefined,
+		message: "",
+		errors: [],
+	});
 
 	// =============================================================
 	// Effects
@@ -116,20 +130,26 @@ export default function BookingSubmissionForm() {
 		});
 		setAllowSubmit(desk !== undefined && isNewBookingValid);
 
-		clashedBooking &&
-			statusDispatch({
-				type: ActionType.FAILURE,
-				message: "Clash",
-				errors: [
-					`The booking clashes with another booking on this desk by ${
-						clashedBooking.user.name
-					} from ${format(clashedBooking.startDateTime, "haaa")} to ${format(
-						clashedBooking.endDateTime,
-						"haaa"
-					)}`,
-				],
-			});
-	}, [desk, isNewBookingValid, clashedBooking]);
+		if (clashedBooking) {
+			const startTime = format(clashedBooking.startDateTime, "haaa");
+			const endTime = format(clashedBooking.endDateTime, "haaa");
+
+			if (clashedBooking.user.id === user?.id) {
+				statusDispatch({
+					type: ActionType.INFO,
+					message: `You already have a booking on this desk from ${startTime} to ${endTime}`,
+				});
+			} else {
+				statusDispatch({
+					type: ActionType.FAILURE,
+					message: "Clash",
+					errors: [
+						`The booking clashes with another booking on this desk by ${clashedBooking.user.name} from ${startTime} to ${endTime}`,
+					],
+				});
+			}
+		}
+	}, [desk, isNewBookingValid, clashedBooking, user]);
 
 	// =============================================================
 	// Functions
@@ -191,9 +211,6 @@ export default function BookingSubmissionForm() {
 		}).then((res) => {
 			if (res.data) {
 				refreshBookings();
-				statusDispatch({
-					type: ActionType.SUCCESS,
-				});
 			} else if (res.problem) {
 				statusDispatch({
 					type: ActionType.FAILURE,
@@ -282,19 +299,15 @@ export default function BookingSubmissionForm() {
 					</Button>
 				</Grid>
 				<Grid item xs={12}>
-					{statusState.success !== undefined && (
-						<div
-							className={`booking-submission-result booking-submission-result--${
-								statusState.success ? "success" : "failure"
-							}`}
-						>
-							<p className="booking-submission-result__title">
-								{statusState.message}
-							</p>
-							{statusState.errors.map((e) => (
-								<div>{e}</div>
-							))}
-						</div>
+					{statusState.severity !== undefined && (
+						<Alert severity={statusState.severity}>
+							<AlertTitle>{statusState.message}</AlertTitle>
+							<ul>
+								{statusState.errors.map((e) => (
+									<li>{e}</li>
+								))}
+							</ul>
+						</Alert>
 					)}
 				</Grid>
 			</Grid>

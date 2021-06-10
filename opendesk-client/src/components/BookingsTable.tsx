@@ -13,9 +13,9 @@ import {
 } from "@material-ui/core";
 import clsx from "clsx";
 import { format, isSameDay } from "date-fns";
+import { useAuth } from "hooks/useAuth";
 import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
-import { useOffices } from "hooks/useOffices";
 import { useMemo } from "react";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,6 +25,9 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		clashingBookingRow: {
 			backgroundColor: theme.palette.error.light,
+		},
+		selfClashingBookingRow: {
+			backgroundColor: theme.palette.info.light,
 		},
 	})
 );
@@ -45,6 +48,8 @@ export default function BookingsTable() {
 		newBookingStartState: [newStart],
 		clashedBooking,
 	} = useBookings();
+
+	const { user } = useAuth();
 
 	const sameDateBookings = useMemo(
 		() => bookings.filter((b) => isSameDay(b.startDateTime, newStart)),
@@ -73,9 +78,14 @@ export default function BookingsTable() {
 						{sameDateBookings.map((b) => (
 							<TableRow
 								key={b.id}
-								className={clsx(
-									clashedBooking?.id === b.id && classes.clashingBookingRow
-								)}
+								className={clsx({
+									[classes.selfClashingBookingRow]:
+										clashedBooking?.id === b.id &&
+										clashedBooking.user.id === user?.id,
+									[classes.clashingBookingRow]:
+										clashedBooking?.id === b.id &&
+										clashedBooking.user.id !== user?.id,
+								})}
 							>
 								<TableCell>
 									{desks.find((d) => d.id === b.deskId)?.name}
