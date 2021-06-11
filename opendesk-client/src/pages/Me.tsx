@@ -1,3 +1,16 @@
+import {
+	createStyles,
+	IconButton,
+	makeStyles,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableRow,
+	Theme,
+	Tooltip,
+} from "@material-ui/core";
+import { Delete, Room } from "@material-ui/icons";
 import { format } from "date-fns";
 import { useAuth } from "hooks/useAuth";
 import { useEffect, useState } from "react";
@@ -5,7 +18,17 @@ import { Link } from "react-router-dom";
 import { FullBooking } from "types";
 import apiRequest from "utils/requestUtils";
 
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		centeredCell: {
+			textAlign: "center",
+		},
+	})
+);
+
 function Me() {
+	const classes = useStyles();
+
 	const { user } = useAuth();
 	const [userBookings, setUserBookings] = useState<FullBooking[]>([]);
 
@@ -26,56 +49,52 @@ function Me() {
 	return (
 		<div>
 			<p>You have {userBookings.length} bookings.</p>
-			{userBookings.map((fb) => (
-				<div
-					key={fb.id}
-					style={{
-						display: "flex",
-						gap: "30px",
-						backgroundColor: "#f7f7f7",
-						margin: "12px 0",
-						padding: "5px 10px",
-						borderRadius: "10px",
-					}}
-				>
-					<div>
-						<label style={{ fontSize: "small", fontWeight: "bold" }}>
-							Office
-						</label>
-						<div>{fb.office.name}</div>
-					</div>
-					<div>
-						<label style={{ fontSize: "small", fontWeight: "bold" }}>
-							Desk
-						</label>
-						<div>{fb.desk.name}</div>
-					</div>
-					<div>
-						<label style={{ fontSize: "small", fontWeight: "bold" }}>
-							Start
-						</label>
-						<div>{format(fb.startDateTime, "dd/MM/yyyy hh:mm a")}</div>
-					</div>
-					<div>
-						<label style={{ fontSize: "small", fontWeight: "bold" }}>End</label>
-						<div>{format(fb.endDateTime, "dd/MM/yyyy hh:mm a")}</div>
-					</div>
-					<Link
-						style={{
-							border: "none",
-							backgroundColor: "powderblue",
-							padding: "5px 10px",
-							textDecoration: "none",
-							color: "black",
-							alignSelf: "center",
-							borderRadius: "5px",
-						}}
-						to={`/offices/${fb.office.id}/${fb.desk.id}`}
-					>
-						Go To It
-					</Link>
-				</div>
-			))}
+
+			<Table>
+				<TableHead>
+					<TableRow>
+						<TableCell>Office</TableCell>
+						<TableCell>Desk</TableCell>
+						<TableCell>Date</TableCell>
+						<TableCell>Time</TableCell>
+						<TableCell>Action</TableCell>
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{userBookings.map((b) => (
+						<TableRow key={b.id}>
+							<TableCell>{b.office.name}</TableCell>
+							<TableCell>{b.desk.name}</TableCell>
+							<TableCell>{format(b.startDateTime, "dd/MM/yyyy")}</TableCell>
+							<TableCell>
+								{format(b.startDateTime, "haaa")} to{" "}
+								{format(b.endDateTime, "haaa")}
+							</TableCell>
+							<TableCell>
+								<Link to={`/offices/${b.office.id}/${b.desk.id}`}>
+									<Tooltip title="Go to map">
+										<IconButton>
+											<Room />
+										</IconButton>
+									</Tooltip>
+								</Link>
+								<Tooltip title="Delete">
+									<IconButton>
+										<Delete />
+									</IconButton>
+								</Tooltip>
+							</TableCell>
+						</TableRow>
+					))}
+					{userBookings.length === 0 && (
+						<TableRow>
+							<TableCell colSpan={3} className={classes.centeredCell}>
+								There are no bookings in the office on this day.
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
 		</div>
 	);
 }
