@@ -21,6 +21,7 @@ import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
 import { useAuth } from "hooks/useAuth";
 import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
+import { useOffices } from "hooks/useOffices";
 
 interface StatusState {
 	severity?: "info" | "error";
@@ -97,8 +98,12 @@ export default function BookingSubmissionForm() {
 	const classes = useStyles();
 
 	const {
-		selectedDeskState: [desk],
+		selectedDeskState: [selectedDesk],
 	} = useOfficeDesks();
+
+	const {
+		selectedOfficeState: [selectedOffice],
+	} = useOffices();
 
 	const {
 		refreshBookings,
@@ -128,7 +133,7 @@ export default function BookingSubmissionForm() {
 		statusDispatch({
 			type: ActionType.CLEAR,
 		});
-		setAllowSubmit(desk !== undefined && isNewBookingValid);
+		setAllowSubmit(selectedDesk !== undefined && isNewBookingValid);
 
 		if (clashedBooking) {
 			const startTime = format(clashedBooking.startDateTime, "haaa");
@@ -149,7 +154,7 @@ export default function BookingSubmissionForm() {
 				});
 			}
 		}
-	}, [desk, isNewBookingValid, clashedBooking, user]);
+	}, [selectedDesk, isNewBookingValid, clashedBooking, user]);
 
 	// =============================================================
 	// Functions
@@ -189,7 +194,7 @@ export default function BookingSubmissionForm() {
 	}
 
 	function submitBooking() {
-		if (!desk) {
+		if (!selectedDesk) {
 			return;
 		}
 
@@ -199,7 +204,7 @@ export default function BookingSubmissionForm() {
 		});
 
 		// Post the booking
-		apiRequest<Booking>(`desks/${desk.id}/bookings`, {
+		apiRequest<Booking>(`desks/${selectedDesk.id}/bookings`, {
 			method: "POST",
 			headers: {
 				"content-type": "application/json",
@@ -287,6 +292,28 @@ export default function BookingSubmissionForm() {
 						bookingEnd.getHours(),
 						handleEndTimeChange
 					)}
+				</Grid>
+				<Grid item xs={12}>
+					<TextField
+						variant="outlined"
+						label="Office"
+						type="text"
+						defaultValue="No Selection"
+						disabled={true}
+						value={selectedOffice?.name ?? "No Selection"}
+						className={classes.formControl}
+					></TextField>
+				</Grid>
+				<Grid item xs={12}>
+					<TextField
+						variant="outlined"
+						label="Desk"
+						type="text"
+						defaultValue="No Selection"
+						disabled={true}
+						value={selectedDesk?.name ?? "No Selection"}
+						className={classes.formControl}
+					></TextField>
 				</Grid>
 				<Grid item xs={12} className={classes.flexEndItem}>
 					<Button
