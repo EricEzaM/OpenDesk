@@ -48,7 +48,7 @@ function Me() {
 
 	return (
 		<div>
-			<Table>
+			<Table size="small">
 				<TableHead>
 					<TableRow>
 						<TableCell>Office</TableCell>
