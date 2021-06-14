@@ -2,6 +2,7 @@ import {
 	createStyles,
 	IconButton,
 	makeStyles,
+	Paper,
 	Table,
 	TableBody,
 	TableCell,
@@ -48,7 +49,7 @@ function Me() {
 
 	return (
 		<div>
-			<Table size="small">
+			<Table size="small" component={Paper}>
 				<TableHead>
 					<TableRow>
 						<TableCell>Office</TableCell>
