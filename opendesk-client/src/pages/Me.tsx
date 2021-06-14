@@ -48,8 +48,6 @@ function Me() {
 
 	return (
 		<div>
-			<p>You have {userBookings.length} bookings.</p>
-
 			<Table>
 				<TableHead>
 					<TableRow>
@@ -88,8 +86,9 @@ function Me() {
 					))}
 					{userBookings.length === 0 && (
 						<TableRow>
-							<TableCell colSpan={3} className={classes.centeredCell}>
-								There are no bookings in the office on this day.
+							<TableCell colSpan={5} className={classes.centeredCell}>
+								You have no bookings. &nbsp;
+								<Link to="/offices">Make a booking</Link>
 							</TableCell>
 						</TableRow>
 					)}
