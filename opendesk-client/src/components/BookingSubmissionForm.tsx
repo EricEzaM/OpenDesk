@@ -1,5 +1,5 @@
-import { Reducer, useEffect, useReducer, useState } from "react";
-import { format, set, setHours } from "date-fns";
+import { Reducer, useEffect, useMemo, useReducer, useState } from "react";
+import { differenceInHours, format, isSameDay, set, setHours } from "date-fns";
 import {
 	createStyles,
 	FormControl,
@@ -13,7 +13,7 @@ import {
 	Button,
 	Typography,
 } from "@material-ui/core";
-import { Alert, AlertTitle } from "@material-ui/lab";
+import { Alert, AlertTitle, Autocomplete } from "@material-ui/lab";
 
 import apiRequest from "utils/requestUtils";
 import { Booking, ValidationError } from "types";
@@ -98,7 +98,8 @@ export default function BookingSubmissionForm() {
 	const classes = useStyles();
 
 	const {
-		selectedDeskState: [selectedDesk],
+		desksState: [desks],
+		selectedDeskState: [selectedDesk, setSelectedDesk],
 	} = useOfficeDesks();
 
 	const {
@@ -106,6 +107,7 @@ export default function BookingSubmissionForm() {
 	} = useOffices();
 
 	const {
+		bookingsState: [bookings],
 		refreshBookings,
 		newBookingStartState: [bookingStart, setBookingStart],
 		newBookingEndState: [bookingEnd, setBookingEnd],
@@ -124,6 +126,33 @@ export default function BookingSubmissionForm() {
 		message: "",
 		errors: [],
 	});
+
+	const deskOptions = useMemo(
+		() =>
+			desks.map((d) => {
+				const hoursBooked = bookings
+					.filter((b) => b.deskId === d.id)
+					.filter((b) => isSameDay(b.startDateTime, bookingStart))
+					.map((b) => differenceInHours(b.endDateTime, b.startDateTime))
+					.reduce((acc, cv) => (acc += cv), 0);
+
+				const color =
+					hoursBooked <= 0
+						? "green"
+						: hoursBooked <= 3
+						? "yellow"
+						: hoursBooked <= 6
+						? "orange"
+						: "red";
+
+				return {
+					desk: d,
+					color: color,
+					hoursBooked: hoursBooked,
+				};
+			}),
+		[desks, bookings, bookingStart]
+	);
 
 	// =============================================================
 	// Effects
@@ -305,15 +334,42 @@ export default function BookingSubmissionForm() {
 					></TextField>
 				</Grid>
 				<Grid item xs={12}>
-					<TextField
-						variant="outlined"
-						label="Desk"
-						type="text"
-						defaultValue="No Selection"
-						disabled={true}
-						value={selectedDesk?.name ?? "No Selection"}
-						className={classes.formControl}
-					></TextField>
+					<Autocomplete
+						options={deskOptions}
+						getOptionLabel={(opt) => opt.desk.name}
+						getOptionSelected={(opt, val) => opt.desk.id === val.desk.id}
+						disabled={!Boolean(selectedOffice)}
+						onChange={(evt, val) => setSelectedDesk(val?.desk)}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								disabled={!Boolean(selectedOffice)}
+								label="Desk"
+								variant="outlined"
+								placeholder="Type to select desk..."
+								className={classes.formControl}
+								InputLabelProps={{
+									shrink: true,
+								}}
+							/>
+						)}
+						renderOption={(option, state) => {
+							return (
+								<div
+									style={{
+										width: "100%",
+										display: "flex",
+										justifyContent: "space-between",
+									}}
+								>
+									<span style={{ color: option.color }}>
+										{option.desk.name}
+									</span>
+									<span>{option.hoursBooked} hours booked.</span>
+								</div>
+							);
+						}}
+					/>
 				</Grid>
 				<Grid item xs={12} className={classes.flexEndItem}>
 					<Button
