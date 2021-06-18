@@ -42,7 +42,7 @@ namespace OpenDesk.API.Features.Bookings
 					{
 						Id = u.Id,
 						UserName = u.UserName,
-						Name = "Name Placeholder"
+						DisplayName = u.DisplayName
 					}
 				})
 				.Select(bu => new BookingDTO

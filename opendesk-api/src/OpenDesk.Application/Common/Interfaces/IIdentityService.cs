@@ -16,5 +16,7 @@ namespace OpenDesk.Application.Common.Interfaces
 		Task<(Result Result, string UserId)> GetUserIdAsync(string userName);
 		Task<(Result Result, string UserId)> GetUserIdAsync(string loginProvider, string providerKey);
 		Task<string> GetUserNameAsync(string userId);
+		Task<string> GetDisplayNameAsync(string userId);
+		Task<Result> SetDisplayNameAsync(string userId, string displayName);
 	}
 }

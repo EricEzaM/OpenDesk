@@ -29,7 +29,7 @@ function SignInOut() {
 			</Unauthenticated>
 			<Authenticated>
 				<div className="sign-in-out__out-container">
-					<p>{user?.name}</p>
+					<p>{user?.displayName}</p>
 					<Button
 						className={classes.signOutButton}
 						variant="contained"

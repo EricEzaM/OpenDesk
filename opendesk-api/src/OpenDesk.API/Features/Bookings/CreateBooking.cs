@@ -77,7 +77,7 @@ namespace OpenDesk.API.Features.Bookings
 				{
 					Id = user.Id,
 					UserName = user.UserName,
-					Name = "Name Placeholder"
+					DisplayName = user.DisplayName
 				}
 			};
 		}

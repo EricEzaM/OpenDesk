@@ -178,7 +178,7 @@ export default function BookingSubmissionForm() {
 					type: ActionType.FAILURE,
 					message: "Clash",
 					errors: [
-						`The booking clashes with another booking on this desk by ${clashedBooking.user.name} from ${startTime} to ${endTime}`,
+						`The booking clashes with another booking on this desk by ${clashedBooking.user.displayName} from ${startTime} to ${endTime}`,
 					],
 				});
 			}

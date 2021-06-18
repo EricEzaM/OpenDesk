@@ -16,6 +16,7 @@ namespace OpenDesk.Infrastructure.Identity
 			Id = Guid.NewGuid().ToString();
 		}
 
+		public string DisplayName { get; set; }
 		public List<Booking> Bookings { get; set; }
 	}
 }

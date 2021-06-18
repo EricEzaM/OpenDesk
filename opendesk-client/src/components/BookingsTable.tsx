@@ -90,7 +90,7 @@ export default function BookingsTable() {
 								<TableCell>
 									{desks.find((d) => d.id === b.deskId)?.name}
 								</TableCell>
-								<TableCell>{b.user.name}</TableCell>
+								<TableCell>{b.user.displayName}</TableCell>
 								<TableCell>
 									{format(b.startDateTime, "haaa")} -{" "}
 									{format(b.endDateTime, "haaa")}

@@ -18,7 +18,10 @@ namespace OpenDesk.Infrastructure.Persistence
 	{
 		public static async Task SeedDefaults(OpenDeskDbContext context, IHostEnvironment env)
 		{
-			var userEntity = context.Users.Add(new OpenDeskUser("test.user@testuser.com"));
+			var userEntity = context.Users.Add(new OpenDeskUser("test.user@testuser.com") 
+			{
+				DisplayName = "Test User",
+			});
 
 			var existingFile =
 				Path.Combine(

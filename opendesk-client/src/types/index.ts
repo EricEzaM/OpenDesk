@@ -75,6 +75,6 @@ export interface OfficeImage {
 
 export interface User {
 	id: string;
-	name: string;
 	username: string;
+	displayName: string;
 }

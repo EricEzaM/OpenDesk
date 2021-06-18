@@ -10,6 +10,7 @@ using OpenDesk.Infrastructure.Persistence;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace OpenDesk.Infrastructure
 {
@@ -29,7 +30,8 @@ namespace OpenDesk.Infrastructure
 			// IDENTITY
 
 			services.AddIdentityCore<OpenDeskUser>() // "Core" version does not set up the cookies. We want to do it ourselves.
-				.AddEntityFrameworkStores<OpenDeskDbContext>();
+				.AddEntityFrameworkStores<OpenDeskDbContext>()
+				.AddClaimsPrincipalFactory<OpenDeskUserClaimsPrincipalFactory>(); // Custom factory for adding our own claims.
 
 			// AUTHENTICATION & AUTHORIZATION
 

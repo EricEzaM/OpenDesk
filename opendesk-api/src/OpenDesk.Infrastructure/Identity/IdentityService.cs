@@ -82,5 +82,26 @@ namespace OpenDesk.Infrastructure.Identity
 
 			return user.UserName;
 		}
+
+		public async Task<string> GetDisplayNameAsync(string userId)
+		{
+			var user = await userManager.FindByIdAsync(userId);
+
+			return user.DisplayName;
+		}
+
+		public async Task<Result> SetDisplayNameAsync(string userId, string displayName)
+		{
+			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return Result.Failure("Could not find user.");
+			}
+
+			user.DisplayName = displayName;
+			await userManager.UpdateAsync(user);
+
+			return Result.Success();
+		}
 	}
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenDesk.API.Models;
+using OpenDesk.Application;
 using OpenDesk.Application.Common.DataTransferObjects;
 using OpenDesk.Application.Common.Interfaces;
 using System;
@@ -35,6 +36,11 @@ namespace OpenDesk.API.Features.Authentication
 		[HttpGet(MicrosoftAuthName)]
 		public async Task<IActionResult> Authenticate(string returnUrl)
 		{
+			if (string.IsNullOrEmpty(returnUrl))
+			{
+				return BadRequest("Return URL cannot be empty.");
+			}
+
 			var queryContent = new FormUrlEncodedContent(new Dictionary<string, string>()
 				{
 					{ "client_id", "961880c5-5302-41fa-9da3-98adada694d9" },
@@ -101,6 +107,9 @@ namespace OpenDesk.API.Features.Authentication
 					{
 						return BadRequest("Could not add external login information to user.");
 					}
+
+					var display = idToken.Claims.FirstOrDefault(c => c.Type == "name").Value;
+					await _identityService.SetDisplayNameAsync(userId, display);
 				}
 				else
 				{
@@ -131,8 +140,8 @@ namespace OpenDesk.API.Features.Authentication
 			return Ok(new UserDTO()
 			{
 				Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
-				Name = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
-				UserName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value
+				UserName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
+				DisplayName = User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.DisplayName)?.Value,
 			});
 		}
 	}
