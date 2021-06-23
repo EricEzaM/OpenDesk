@@ -12,12 +12,6 @@ function Offices() {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
-
-	const {
-		desksState: [desks, setDesks],
-		selectedDeskState: [selectedDesk, setSelectedDesk],
-	} = useOfficeDesks();
-
 	const {
 		selectedOfficeState: [selectedOffice],
 	} = useOffices();
@@ -29,10 +23,6 @@ function Offices() {
 	// =============================================================
 	// Functions
 	// =============================================================
-
-	function onDeskSelected(desk?: Desk) {
-		setSelectedDesk(desk);
-	}
 
 	// =============================================================
 	// Render
@@ -53,7 +43,6 @@ function Offices() {
 						<>
 							<OfficeMap
 								image={selectedOffice.image}
-								onDeskSelected={onDeskSelected}
 							/>
 						</>
 					)}

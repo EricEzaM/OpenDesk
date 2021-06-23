@@ -154,6 +154,8 @@ export default function BookingSubmissionForm() {
 		[desks, bookings, bookingStart]
 	);
 
+	const selectedDeskOption = deskOptions.find(d => d.desk.id === selectedDesk?.id) ?? null;
+
 	// =============================================================
 	// Effects
 	// =============================================================
@@ -261,6 +263,7 @@ export default function BookingSubmissionForm() {
 	// Render
 	// =============================================================
 
+	// TODO: Break into own component?
 	function renderTimePicker(
 		label: string,
 		selectedValue: number,
@@ -327,7 +330,6 @@ export default function BookingSubmissionForm() {
 						variant="outlined"
 						label="Office"
 						type="text"
-						defaultValue="No Selection"
 						disabled={true}
 						value={selectedOffice?.name ?? "No Selection"}
 						className={classes.formControl}
@@ -339,7 +341,8 @@ export default function BookingSubmissionForm() {
 						getOptionLabel={(opt) => opt.desk.name}
 						getOptionSelected={(opt, val) => opt.desk.id === val.desk.id}
 						disabled={!Boolean(selectedOffice)}
-						onChange={(evt, val) => setSelectedDesk(val?.desk)}
+						onChange={(evt, val) => { setSelectedDesk(val?.desk) }}
+						value={selectedDeskOption}
 						renderInput={(params) => (
 							<TextField
 								{...params}

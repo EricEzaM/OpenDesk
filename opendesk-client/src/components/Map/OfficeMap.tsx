@@ -1,34 +1,35 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import ReactDOMServer from "react-dom/server";
 
 import { MapContainer, Marker, ImageOverlay } from "react-leaflet";
 import {
 	CRS,
-	icon,
 	point,
 	ImageOverlay as LImageOverlay,
 	LatLngBounds,
 	Map,
+	divIcon,
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import DeskLocationIcon from "resources/desk-location.svg";
-import DeskHighlightIcon from "resources/desk-highlight.svg";
+import { ReactComponent as DeskLocationIcon } from "resources/desk-location.svg";
 
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
-import { Desk, OfficeImage } from "types";
+import { OfficeImage } from "types";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
+import { useBookings } from "hooks/useBookings";
+import { differenceInHours } from "date-fns";
+import { darken, lighten } from "@material-ui/core";
+import isSameDay from "date-fns/esm/fp/isSameDay/index.js";
 
 const MAP_IMAGE_BORDER = 25;
 
 interface OfficeMapProps {
 	image: OfficeImage;
-	desks?: Desk[];
-	selectedDesk?: Desk;
-	onDeskSelected: (desk?: Desk) => void;
 }
 
-function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
+function OfficeMap({ image }: OfficeMapProps) {
 	// =============================================================
 	// Hooks & Variables
 	// =============================================================
@@ -39,8 +40,13 @@ function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
 	const { deskIdParam, setDeskParam } = useOfficeDeskRouteParams();
 	const {
 		desksState: [desks],
-		selectedDeskState: [selectedDesk],
+		selectedDeskState: [selectedDesk, setSelectedDesk],
 	} = useOfficeDesks();
+
+	const {
+		bookingsState: [bookings],
+		newBookingStartState: [newBookingStart]
+	} = useBookings();
 
 	// =============================================================
 	// Effects
@@ -68,11 +74,11 @@ function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
 	function handleSelection(deskId?: string) {
 		let changedDesk = deskId && desks?.find((d) => d.id === deskId);
 		if (changedDesk) {
-			onDeskSelected && onDeskSelected(changedDesk);
+			setSelectedDesk(changedDesk);
 			setDeskParam(deskId);
 		} else if (desks.length > 0) {
 			// Only clear out the selected desk if desks have been loaded
-			onDeskSelected && onDeskSelected(undefined);
+			setSelectedDesk(undefined);
 			setDeskParam(undefined);
 		}
 	}
@@ -137,24 +143,51 @@ function OfficeMap({ image, onDeskSelected }: OfficeMapProps) {
 					/>
 
 					{desks &&
-						desks.map((desk) => (
-							<Marker
-								position={[desk.diagramPosition.x, desk.diagramPosition.y]}
-								icon={icon({
-									iconUrl:
-										desk.id === selectedDesk?.id
-											? DeskHighlightIcon
-											: DeskLocationIcon,
-									iconSize: point(30, 30),
-								})}
-								eventHandlers={{
-									click: () => {
-										handleSelection(desk.id);
-									},
-								}}
-							/>
-						))}
+						desks.map((desk) => {
 
+							const fillFree = "#49A078";
+							const fillBooked = "#c42525"; 
+							const fillHalf = "#de9a26";
+
+							const hours = bookings
+								.filter(b => b.deskId === desk.id && isSameDay(b.startDateTime, newBookingStart))
+								.reduce((acc, curr) => acc = differenceInHours(curr.endDateTime, curr.startDateTime), 0)
+
+							let fill = fillFree;
+							if (hours > 7) {
+								fill = fillBooked;
+							} else if (hours > 0) {
+								fill = fillHalf;
+							}
+
+							return (
+								<Marker
+									position={[desk.diagramPosition.x, desk.diagramPosition.y]}
+									icon={divIcon({
+										html: ReactDOMServer.renderToString(
+											<DeskLocationIcon
+												style={{
+													width: "100%",
+													height: "100%",
+													fill:
+														desk.id === selectedDesk?.id ? fill : lighten(fill, 0.6),
+													stroke: desk.id === selectedDesk?.id ? darken(fill, 0.6) : fill,
+													strokeWidth: "2px",
+												}}
+											/>
+										),
+										iconSize: point(30, 30),
+										className: "", // Do not delete: this stops white box from appearing behind marker icons.
+									})}
+									eventHandlers={{
+										click: () => {
+											handleSelection(desk.id);
+										},
+									}}
+								/>
+								)
+						})
+					}
 					<MapClickedAtLocationPopup />
 				</MapContainer>
 			</div>
