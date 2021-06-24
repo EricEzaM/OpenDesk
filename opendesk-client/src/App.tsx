@@ -7,6 +7,7 @@ import PrivateRoute from "router/PrivateRoute";
 import Nav from "components/Nav";
 import About from "pages/About";
 import Home from "pages/Home";
+import Manage from "pages/Manage";
 import { OfficeDesksProvider } from "hooks/useOfficeDesks";
 import { BookingsProvider } from "hooks/useBookings";
 import { OfficesProvider } from "hooks/useOffices";
@@ -33,6 +34,9 @@ function App() {
 								<Route exact path="/about">
 									<About />
 								</Route>
+								<PrivateRoute exact path="/manage">
+									<Manage />
+								</PrivateRoute>
 							</div>
 						</BookingsProvider>
 					</OfficeDesksProvider>
