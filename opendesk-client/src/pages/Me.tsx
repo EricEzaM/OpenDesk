@@ -49,56 +49,58 @@ function Me() {
 
 	return (
 		<div>
-			<Table size="small" component={Paper}>
-				<TableHead>
-					<TableRow>
-						<TableCell>Office</TableCell>
-						<TableCell>Desk</TableCell>
-						<TableCell>Date</TableCell>
-						<TableCell>Time</TableCell>
-						<TableCell>Action</TableCell>
-					</TableRow>
-				</TableHead>
-				<TableBody>
-					{userBookings
-						.sort(
-							(a, b) => a.startDateTime.getDate() - b.startDateTime.getDate()
-						)
-						.map((b) => (
-							<TableRow key={b.id}>
-								<TableCell>{b.office.name}</TableCell>
-								<TableCell>{b.desk.name}</TableCell>
-								<TableCell>{format(b.startDateTime, "dd/MM/yyyy")}</TableCell>
-								<TableCell>
-									{format(b.startDateTime, "haaa")} to{" "}
-									{format(b.endDateTime, "haaa")}
-								</TableCell>
-								<TableCell>
-									<Link to={`/offices/${b.office.id}/${b.desk.id}`}>
-										<Tooltip title="Go to map">
+			<Paper>
+				<Table size="small">
+					<TableHead>
+						<TableRow>
+							<TableCell>Office</TableCell>
+							<TableCell>Desk</TableCell>
+							<TableCell>Date</TableCell>
+							<TableCell>Time</TableCell>
+							<TableCell>Action</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{userBookings
+							.sort(
+								(a, b) => a.startDateTime.getDate() - b.startDateTime.getDate()
+							)
+							.map((b) => (
+								<TableRow key={b.id}>
+									<TableCell>{b.office.name}</TableCell>
+									<TableCell>{b.desk.name}</TableCell>
+									<TableCell>{format(b.startDateTime, "dd/MM/yyyy")}</TableCell>
+									<TableCell>
+										{format(b.startDateTime, "haaa")} to{" "}
+										{format(b.endDateTime, "haaa")}
+									</TableCell>
+									<TableCell>
+										<Link to={`/offices/${b.office.id}/${b.desk.id}`}>
+											<Tooltip title="Go to map">
+												<IconButton>
+													<Room />
+												</IconButton>
+											</Tooltip>
+										</Link>
+										<Tooltip title="Delete">
 											<IconButton>
-												<Room />
+												<Delete />
 											</IconButton>
 										</Tooltip>
-									</Link>
-									<Tooltip title="Delete">
-										<IconButton>
-											<Delete />
-										</IconButton>
-									</Tooltip>
+									</TableCell>
+								</TableRow>
+							))}
+						{userBookings.length === 0 && (
+							<TableRow>
+								<TableCell colSpan={5} className={classes.centeredCell}>
+									You have no bookings. &nbsp;
+									<Link to="/offices">Make a booking</Link>
 								</TableCell>
 							</TableRow>
-						))}
-					{userBookings.length === 0 && (
-						<TableRow>
-							<TableCell colSpan={5} className={classes.centeredCell}>
-								You have no bookings. &nbsp;
-								<Link to="/offices">Make a booking</Link>
-							</TableCell>
-						</TableRow>
-					)}
-				</TableBody>
-			</Table>
+						)}
+					</TableBody>
+				</Table>
+			</Paper>
 		</div>
 	);
 }
