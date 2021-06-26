@@ -3,14 +3,12 @@ import { Breadcrumbs, Select, MenuItem } from "@material-ui/core";
 import { NavigateNext } from "@material-ui/icons";
 import { useOffices } from "hooks/useOffices";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
+import useOfficeLocationFilter from "hooks/useOfficeLocationFilter";
 
 function OfficeSelector() {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
-
-	const [selectedLocation, setSelectedLocation] = useState("");
-	const [selectedSubLocation, setSelectedSublocation] = useState("");
 
 	const { officeIdParam, setOfficeParam } = useOfficeDeskRouteParams();
 	const {
@@ -18,35 +16,13 @@ function OfficeSelector() {
 		selectedOfficeState: [selectedOffice, setSelectedOffice],
 	} = useOffices();
 
-	// Get unique locations.
-	const locations = useMemo(
-		() =>
-			offices
-				?.map((o) => o.location)
-				.filter((ol, i, arr) => arr.indexOf(ol) === i),
-		[offices]
-	);
-
-	// Get unique sublocations for selected location.
-	const subLocations = useMemo(
-		() =>
-			offices
-				?.filter((o) => o.location === selectedLocation)
-				.map((o) => o.subLocation)
-				.filter((osl, i, arr) => arr.indexOf(osl) === i),
-		[offices, selectedLocation]
-	);
-
-	// Get offices, filtered by the selected location and sublocation.
-	const availableOffices = useMemo(
-		() =>
-			offices?.filter(
-				(o) =>
-					o.location === selectedLocation &&
-					o.subLocation === selectedSubLocation
-			),
-		[offices, selectedLocation, selectedSubLocation]
-	);
+	const {
+		availableOffices,
+		locations,
+		subLocations,
+		selectedLocationState: [selectedLocation, setSelectedLocation],
+		selectedSublocationState: [selectedSubLocation, setSelectedSublocation],
+	} = useOfficeLocationFilter();
 
 	// =============================================================
 	// Effects
@@ -98,7 +74,7 @@ function OfficeSelector() {
 			<Breadcrumbs separator={<NavigateNext />}>
 				{/* Location */}
 				<Select
-					value={selectedLocation}
+					value={selectedLocation ?? ""}
 					onChange={(e) => {
 						handleLocationChange(e.target.value as string);
 					}}
