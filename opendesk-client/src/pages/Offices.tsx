@@ -3,10 +3,13 @@ import { Desk } from "types";
 import OfficeSelector from "components/OfficeSelector";
 import OfficeMap from "components/map/OfficeMap";
 import BookingSubmissionForm from "components/BookingSubmissionForm";
-import { useOfficeDesks } from "hooks/useOfficeDesks";
 import { Grid, Typography } from "@material-ui/core";
 import { useOffices } from "hooks/useOffices";
 import BookingsOverview from "components/BookingsTable";
+import { useEffect } from "react";
+import { useBookings } from "hooks/useBookings";
+import { useOfficeDesks } from "hooks/useOfficeDesks";
+import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 
 function Offices() {
 	// =============================================================
@@ -16,13 +19,44 @@ function Offices() {
 		selectedOfficeState: [selectedOffice],
 	} = useOffices();
 
+	const { deskIdParam, setDeskParam } = useOfficeDeskRouteParams();
+	const {
+		desksState: [desks],
+		selectedDeskState: [selectedDesk, setSelectedDesk],
+	} = useOfficeDesks();
+
+	const {
+		bookingsState: [bookings],
+		newBookingStartState: [newBookingStart],
+	} = useBookings();
+
 	// =============================================================
 	// Effects
 	// =============================================================
 
+	useEffect(() => {
+		onDeskSelected(deskIdParam);
+	}, [deskIdParam]);
+
+	useEffect(() => {
+		onDeskSelected(deskIdParam);
+	}, [desks]);
+
 	// =============================================================
 	// Functions
 	// =============================================================
+
+	function onDeskSelected(deskId?: string) {
+		let changedDesk = deskId && desks?.find((d) => d.id === deskId);
+		if (changedDesk) {
+			setSelectedDesk(changedDesk);
+			setDeskParam(deskId);
+		} else if (desks.length > 0) {
+			// Only clear out the selected desk if desks have been loaded
+			setSelectedDesk(undefined);
+			setDeskParam(undefined);
+		}
+	}
 
 	// =============================================================
 	// Render
@@ -30,10 +64,10 @@ function Offices() {
 
 	return (
 		<Grid container spacing={2}>
-			<Grid item lg={3}>
+			<Grid item lg={3} xs={12}>
 				<BookingSubmissionForm />
 			</Grid>
-			<Grid item lg={5}>
+			<Grid item lg={5} xs={12}>
 				<div>
 					<Typography variant="h6" component="h2">
 						Location &amp; Desk Selection
@@ -43,35 +77,20 @@ function Offices() {
 						<>
 							<OfficeMap
 								image={selectedOffice.image}
+								desks={desks}
+								selectedDesk={selectedDesk}
+								bookings={bookings}
+								newBookingStart={newBookingStart}
+								onDeskSelected={onDeskSelected}
 							/>
 						</>
 					)}
 				</div>
 			</Grid>
-			<Grid item lg={4}>
+			<Grid item lg={4} xs={12}>
 				<BookingsOverview />
 			</Grid>
 		</Grid>
-		// <>
-		// 	<Unauthenticated>
-		// 		<p>Sign in is required</p>
-		// 	</Unauthenticated>
-		// 	<Authenticated>
-		// 		<div>
-		// 			<OfficeSelector onOfficeSelected={onOfficeSelected} />
-		// 			<BookingSubmissionForm />
-		// 		</div>
-		// 		{selectedOffice && (
-		// 			<>
-		// 				<OfficeMap
-		// 					image={selectedOffice.image}
-		// 					onDeskSelected={onDeskSelected}
-		// 				/>
-		// 			</>
-		// 		)}
-		// 		{selectedDesk && <DeskDetails desk={selectedDesk} />}
-		// 	</Authenticated>
-		// </>
 	);
 }
 

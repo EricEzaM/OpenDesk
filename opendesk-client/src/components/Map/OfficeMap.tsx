@@ -1,52 +1,47 @@
-import React, { useEffect, useRef } from "react";
-import ReactDOMServer from "react-dom/server";
-
-import { MapContainer, Marker, ImageOverlay } from "react-leaflet";
+import { darken, lighten } from "@material-ui/core";
+import { differenceInHours } from "date-fns";
+import isSameDay from "date-fns/esm/fp/isSameDay/index.js";
 import {
 	CRS,
-	point,
+	divIcon,
 	ImageOverlay as LImageOverlay,
 	LatLngBounds,
 	Map,
-	divIcon,
+	point,
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
-
+import { useEffect, useRef } from "react";
+import ReactDOMServer from "react-dom/server";
+import { ImageOverlay, MapContainer, Marker } from "react-leaflet";
 import { ReactComponent as DeskLocationIcon } from "resources/desk-location.svg";
-
+import { Booking, Desk, OfficeImage } from "types";
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
-import { OfficeImage } from "types";
-import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
-import { useOfficeDesks } from "hooks/useOfficeDesks";
-import { useBookings } from "hooks/useBookings";
-import { differenceInHours } from "date-fns";
-import { darken, lighten } from "@material-ui/core";
-import isSameDay from "date-fns/esm/fp/isSameDay/index.js";
 
 const MAP_IMAGE_BORDER = 25;
 
 interface OfficeMapProps {
 	image: OfficeImage;
+	desks?: Desk[];
+	selectedDesk?: Desk;
+	bookings?: Booking[];
+	newBookingStart?: Date;
+	onDeskSelected?: (deskId: string) => void;
 }
 
-function OfficeMap({ image }: OfficeMapProps) {
+function OfficeMap({
+	image,
+	desks,
+	selectedDesk,
+	bookings,
+	newBookingStart,
+	onDeskSelected,
+}: OfficeMapProps) {
 	// =============================================================
 	// Hooks & Variables
 	// =============================================================
 
 	const imageRef = useRef<LImageOverlay>();
 	const mapRef = useRef<Map>();
-
-	const { deskIdParam, setDeskParam } = useOfficeDeskRouteParams();
-	const {
-		desksState: [desks],
-		selectedDeskState: [selectedDesk, setSelectedDesk],
-	} = useOfficeDesks();
-
-	const {
-		bookingsState: [bookings],
-		newBookingStartState: [newBookingStart]
-	} = useBookings();
 
 	// =============================================================
 	// Effects
@@ -59,29 +54,9 @@ function OfficeMap({ image }: OfficeMapProps) {
 		updateMapMaxBounds(image);
 	}, [image]);
 
-	useEffect(() => {
-		handleSelection(deskIdParam);
-	}, [deskIdParam]);
-
-	useEffect(() => {
-		handleSelection(deskIdParam);
-	}, [desks]);
-
 	// =============================================================
 	// Functions
 	// =============================================================
-
-	function handleSelection(deskId?: string) {
-		let changedDesk = deskId && desks?.find((d) => d.id === deskId);
-		if (changedDesk) {
-			setSelectedDesk(changedDesk);
-			setDeskParam(deskId);
-		} else if (desks.length > 0) {
-			// Only clear out the selected desk if desks have been loaded
-			setSelectedDesk(undefined);
-			setDeskParam(undefined);
-		}
-	}
 
 	function updateMapMaxBounds(image: OfficeImage) {
 		let min: [number, number] = [-MAP_IMAGE_BORDER, -MAP_IMAGE_BORDER];
@@ -143,15 +118,27 @@ function OfficeMap({ image }: OfficeMapProps) {
 					/>
 
 					{desks &&
+						newBookingStart &&
+						bookings &&
 						desks.map((desk) => {
-
 							const fillFree = "#49A078";
-							const fillBooked = "#c42525"; 
+							const fillBooked = "#c42525";
 							const fillHalf = "#de9a26";
 
 							const hours = bookings
-								.filter(b => b.deskId === desk.id && isSameDay(b.startDateTime, newBookingStart))
-								.reduce((acc, curr) => acc = differenceInHours(curr.endDateTime, curr.startDateTime), 0)
+								?.filter(
+									(b) =>
+										b.deskId === desk.id &&
+										isSameDay(b.startDateTime, newBookingStart)
+								)
+								.reduce(
+									(acc, curr) =>
+										(acc = differenceInHours(
+											curr.endDateTime,
+											curr.startDateTime
+										)),
+									0
+								);
 
 							let fill = fillFree;
 							if (hours > 7) {
@@ -170,8 +157,13 @@ function OfficeMap({ image }: OfficeMapProps) {
 													width: "100%",
 													height: "100%",
 													fill:
-														desk.id === selectedDesk?.id ? fill : lighten(fill, 0.6),
-													stroke: desk.id === selectedDesk?.id ? darken(fill, 0.6) : fill,
+														desk.id === selectedDesk?.id
+															? fill
+															: lighten(fill, 0.6),
+													stroke:
+														desk.id === selectedDesk?.id
+															? darken(fill, 0.6)
+															: fill,
 													strokeWidth: "2px",
 												}}
 											/>
@@ -181,13 +173,12 @@ function OfficeMap({ image }: OfficeMapProps) {
 									})}
 									eventHandlers={{
 										click: () => {
-											handleSelection(desk.id);
+											onDeskSelected && onDeskSelected(desk.id);
 										},
 									}}
 								/>
-								)
-						})
-					}
+							);
+						})}
 					<MapClickedAtLocationPopup />
 				</MapContainer>
 			</div>
