@@ -40,7 +40,7 @@ function OfficeMap({
 	// Hooks & Variables
 	// =============================================================
 
-	const imageRef = useRef<LImageOverlay>();
+	const imageRef = useRef<LImageOverlay | null>(null);
 	const mapRef = useRef<Map>();
 
 	// =============================================================
@@ -108,7 +108,6 @@ function OfficeMap({
 					maxBoundsViscosity={1}
 				>
 					<ImageOverlay
-						//@ts-ignore
 						ref={imageRef}
 						url={image.url}
 						bounds={[
