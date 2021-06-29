@@ -11,11 +11,13 @@ import apiRequest from "utils/requestUtils";
 interface OfficesContextProps {
 	officesState: [Office[] | undefined, (o: Office[] | undefined) => void];
 	selectedOfficeState: [Office | undefined, (o: Office | undefined) => void];
+	refreshOffices: () => void;
 }
 
 export const OfficesContext = createContext<OfficesContextProps>({
 	officesState: [[], () => {}],
 	selectedOfficeState: [undefined, () => {}],
+	refreshOffices: () => {},
 });
 
 export function OfficesProvider({ children }: { children: ReactNode }) {
@@ -33,16 +35,21 @@ function useOfficesProvider(): OfficesContextProps {
 	const [selectedOffice, setSelectedOffice] = useState<Office>();
 
 	useEffect(() => {
+		refreshOffices();
+	}, []);
+
+	function refreshOffices() {
 		apiRequest<Office[]>("offices").then((res) => {
 			if (res.data) {
 				setOffices(res.data ?? []);
 			}
 		});
-	}, []);
+	}
 
 	return {
 		officesState: [offices, setOffices],
 		selectedOfficeState: [selectedOffice, setSelectedOffice],
+		refreshOffices,
 	};
 }
 

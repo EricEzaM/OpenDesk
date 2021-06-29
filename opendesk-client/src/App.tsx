@@ -11,6 +11,7 @@ import Manage from "pages/Manage";
 import { OfficeDesksProvider } from "hooks/useOfficeDesks";
 import { BookingsProvider } from "hooks/useBookings";
 import { OfficesProvider } from "hooks/useOffices";
+import ManageOffices from "pages/ManageOffices";
 
 function App() {
 	return (
@@ -36,6 +37,9 @@ function App() {
 								</Route>
 								<PrivateRoute exact path="/manage">
 									<Manage />
+								</PrivateRoute>
+								<PrivateRoute exact path="/manage/offices">
+									<ManageOffices />
 								</PrivateRoute>
 							</div>
 						</BookingsProvider>
