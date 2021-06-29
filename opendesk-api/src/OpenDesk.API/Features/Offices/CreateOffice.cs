@@ -14,16 +14,11 @@ using System.Drawing;
 using OpenDesk.Domain.ValueObjects;
 using OpenDesk.API.Models;
 using FluentValidation;
+using OpenDesk.API.Features.Offices.Shared;
 
 namespace OpenDesk.API.Features.Offices
 {
-	public class CreateOfficeCommand : IRequest<OfficeDTO>
-	{
-		public string Location { get; set; }
-		public string SubLocation { get; set; }
-		public string Name { get; set; }
-		public IFormFile Image { get; set; }
-	}
+	public class CreateOfficeCommand : OfficeCommandBase, IRequest<OfficeDTO> { }
 
 	public class CreateOfficeHandler : IRequestHandler<CreateOfficeCommand, OfficeDTO>
 	{
@@ -38,6 +33,7 @@ namespace OpenDesk.API.Features.Offices
 
 		public async Task<OfficeDTO> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
 		{
+			// Unify with UpdateOffice
 			// TODO Re-write this to make it more secure. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
 			// Store in blob storage somewhere and replace ImageUrl with one from a storage provider in the Office database model?
 
@@ -45,7 +41,6 @@ namespace OpenDesk.API.Features.Offices
 			string path = Path.Combine(_env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
 			using var stream = new FileStream(path, FileMode.Create);
 			await request.Image.CopyToAsync(stream, cancellationToken);
-
 			var size = Image.FromStream(stream).Size;
 
 			var office = new Office
@@ -90,21 +85,20 @@ namespace OpenDesk.API.Features.Offices
 				.NotEmpty();
 
 			RuleFor(o => o.Name)
-				.NotEmpty()
-				.Must((c, name) => ValidateNoOfficeWithSameName(c))
-				.WithMessage("A desk with the name '{PropertyValue}' already exists at this office.");
+				.NotEmpty();
 
 			RuleFor(o => o.Image)
 				.NotEmpty();
+
+			RuleFor(o => o)
+				.Must(c => ValidateNoOfficeWithSameDetails(c))
+				.WithMessage(o => $"An Office with the name '{o.Name}' already exists with location '{o.Location}' and sublocation '{o.SubLocation}'.");
 		}
 
-		private bool ValidateNoOfficeWithSameName(CreateOfficeCommand command)
+		private bool ValidateNoOfficeWithSameDetails(OfficeCommandBase command)
 		{
-			var desksWithSameName = _db.Offices
-				.Where(o => o.Name == command.Name)
-				.ToList();
-
-			return desksWithSameName.Any() == false;
+			return _db.Offices
+				.Any(o => o.Name == command.Name && o.Location == command.Location && o.SubLocation == command.SubLocation) == false;
 		}
 	}
 }

@@ -39,5 +39,12 @@ namespace OpenDesk.API.Features.Offices
 			var result = await _mediator.Send(command);
 			return Ok(result);
 		}
+
+		[HttpPatch]
+		public async Task<IActionResult> Update([FromForm]UpdateOfficeCommand command)
+		{
+			var result = await _mediator.Send(command);
+			return Ok(result);
+		}
 	}
 }
