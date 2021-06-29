@@ -98,6 +98,7 @@ export default function ManageOffices() {
 								</Box>
 								{offices?.map((o) => (
 									<ListItem
+										key={o.id}
 										button
 										selected={selectedOffice?.id === o.id}
 										onClick={(e) => onOfficeSelected(o)}
