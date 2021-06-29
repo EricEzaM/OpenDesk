@@ -1,9 +1,7 @@
-import { Desk } from "types";
-
 import OfficeSelector from "components/OfficeSelector";
 import OfficeMap from "components/map/OfficeMap";
 import BookingSubmissionForm from "components/BookingSubmissionForm";
-import { Grid, Typography } from "@material-ui/core";
+import { Box, Grid, Typography } from "@material-ui/core";
 import { useOffices } from "hooks/useOffices";
 import BookingsOverview from "components/BookingsTable";
 import { useEffect } from "react";
@@ -74,7 +72,7 @@ function Offices() {
 					</Typography>
 					<OfficeSelector />
 					{selectedOffice && (
-						<>
+						<Box marginTop={1}>
 							<OfficeMap
 								image={selectedOffice.image}
 								desks={desks}
@@ -83,7 +81,7 @@ function Offices() {
 								newBookingStart={newBookingStart}
 								onDeskSelected={onDeskSelected}
 							/>
-						</>
+						</Box>
 					)}
 				</div>
 			</Grid>
