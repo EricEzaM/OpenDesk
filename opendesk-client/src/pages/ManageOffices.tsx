@@ -36,7 +36,7 @@ export default function ManageOffices() {
 		name: string,
 		location: string,
 		sublocation: string,
-		image?: File
+		image: File | null
 	) {
 		var formData = new FormData();
 
@@ -52,12 +52,12 @@ export default function ManageOffices() {
 			if (!image) {
 				return;
 			}
-			apiRequest("offices", {
+			apiRequest<Office>("offices", {
 				method: "POST",
 				body: formData,
 			}).then((res) => {
 				refreshOffices();
-				setSelectedOffice(undefined);
+				setSelectedOffice(res.data);
 			});
 		} else {
 			formData.append("Id", selectedOffice.id);
@@ -114,11 +114,13 @@ export default function ManageOffices() {
 					</Card>
 				</Grid>
 				{selectedOffice !== undefined && (
-					<OfficeDetailsEditor
-						office={selectedOffice}
-						onSave={onSave}
-						onDelete={onDelete}
-					/>
+					<Grid item md={9} xs={12}>
+						<OfficeDetailsEditor
+							office={selectedOffice}
+							onSave={onSave}
+							onDelete={onDelete}
+						/>
+					</Grid>
 				)}
 			</Grid>
 		</>

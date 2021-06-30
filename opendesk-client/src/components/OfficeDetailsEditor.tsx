@@ -4,6 +4,8 @@ import {
 	Card,
 	CardContent,
 	createStyles,
+	FormControl,
+	FormHelperText,
 	Grid,
 	IconButton,
 	makeStyles,
@@ -14,8 +16,9 @@ import {
 import { Clear } from "@material-ui/icons";
 import { Autocomplete } from "@material-ui/lab";
 import useOfficeLocationFilter from "hooks/useOfficeLocationFilter";
-import { useEffect, useRef, useState } from "react";
-import { Office, OfficeImage } from "types";
+import { useEffect, useState } from "react";
+import { Controller, RegisterOptions, useForm } from "react-hook-form";
+import { Office } from "types";
 import OfficeMap from "./map/OfficeMap";
 
 interface OfficeDetailsPanelProps {
@@ -24,7 +27,7 @@ interface OfficeDetailsPanelProps {
 		name: string,
 		location: string,
 		sublocation: string,
-		image?: File
+		image: File | null
 	) => void;
 	onDelete: () => void;
 }
@@ -48,6 +51,13 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 );
 
+interface FormFields {
+	name: string | null;
+	location: string | null;
+	sublocation: string | null;
+	imageUrl: string | null;
+}
+
 export default function OfficeDetailsEditor({
 	office,
 	onSave,
@@ -56,39 +66,59 @@ export default function OfficeDetailsEditor({
 	const classes = useStyles();
 
 	const {
-		selectedLocationState: [selectedLocation, setSelectedLocation],
-		selectedSublocationState: [selectedSublocation, setSelectedSublocation],
+		selectedLocationState: [, setSelectedLocation],
 		locations,
 		subLocations,
 	} = useOfficeLocationFilter();
 
-	const [name, setName] = useState("");
-	const fileUploadInputElement = useRef<HTMLInputElement | null>(null);
-	const [previewOfficeImage, setPreviewOfficeImage] = useState<OfficeImage>();
+	const { control, handleSubmit, setValue, watch, trigger, reset, formState } =
+		useForm<FormFields>({
+			mode: "onBlur",
+			defaultValues: {
+				name: null,
+				location: null,
+				sublocation: null,
+				imageUrl: null,
+			},
+		});
+	const errors = formState.errors;
+
+	const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+
+	function createRegisterOptions(displayName: string): RegisterOptions {
+		return {
+			required: `${displayName} is required.`,
+			pattern: {
+				value: /[^\s]/,
+				message: `${displayName} cannot be blank.`,
+			},
+		};
+	}
+
+	const location = watch("location");
+	const imageUrl = watch("imageUrl");
 
 	useEffect(() => {
-		setSelectedLocation(office?.location ?? "");
-		setName(office?.name ?? "");
-		setPreviewOfficeImage(office?.image);
+		reset();
+		setValue("name", office?.name ?? null);
+		setValue("location", office?.location ?? null);
+		setValue("sublocation", office?.subLocation ?? null);
+		setValue("imageUrl", office?.imageUrl ?? null);
 	}, [office]);
 
-	function onImageSelected(file?: File | null) {
+	useEffect(() => {
+		setSelectedLocation(location ?? "");
+	}, [location]);
+
+	function processFileIntoImageUrl(file: File | null) {
+		debugger;
+		setSelectedImageFile(file);
 		if (file) {
 			const reader = new FileReader();
 			reader.onload = (e) => {
-				let image = new Image();
-				const imageString = e.target?.result?.toString();
-				if (!imageString) {
-					return;
-				}
-				image.src = imageString;
-				image.onload = (e) => {
-					setPreviewOfficeImage({
-						url: image.src,
-						width: image.width,
-						height: image.height,
-					});
-				};
+				const dataUrl = e.target?.result?.toString();
+				setValue("imageUrl", dataUrl ?? null);
+				trigger("imageUrl");
 			};
 
 			reader.readAsDataURL(file);
@@ -99,49 +129,23 @@ export default function OfficeDetailsEditor({
 		onDelete();
 	}
 
-	function onSaveClicked() {
-		onSave(
-			name,
-			selectedLocation,
-			selectedSublocation,
-			fileUploadInputElement?.current?.files?.[0]
-		);
-	}
-
 	function onImageCleared() {
-		setPreviewOfficeImage(office?.image);
-
-		// Clear the file select input so that it can be cleared and the same image selected again.
-		if (fileUploadInputElement?.current) {
-			fileUploadInputElement.current.value = "";
-		}
+		setValue("imageUrl", null);
 	}
 
-	function isSaveEnabled() {
-		if (!office) {
-			return (
-				name &&
-				name.trim() &&
-				selectedLocation &&
-				selectedLocation.trim() &&
-				selectedSublocation &&
-				selectedSublocation.trim() &&
-				previewOfficeImage != null
-			);
-		} else {
-			return (
-				office.name !== name ||
-				office.location !== selectedLocation ||
-				office.subLocation !== selectedSublocation ||
-				previewOfficeImage?.url !== office.image.url
-			);
+	function onSubmit(fields: FormFields) {
+		// alert(JSON.stringify(fields, null, 2));
+
+		const { name, location, sublocation } = fields;
+		if (name && location && sublocation) {
+			onSave(name, location, sublocation, selectedImageFile);
 		}
 	}
 
 	return (
-		<Grid item md={9} xs={12}>
-			<Card variant="outlined">
-				<CardContent>
+		<Card variant="outlined">
+			<CardContent>
+				<form onSubmit={handleSubmit((data) => onSubmit(data))}>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
 							<Typography variant="h4">Edit Details</Typography>
@@ -155,86 +159,134 @@ export default function OfficeDetailsEditor({
 							</Grid>
 						)}
 						<Grid item xs={12}>
-							<TextField
-								variant="outlined"
-								label="Name"
-								type="text"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								className={classes.formControl}
-							/>
-						</Grid>
-						<Grid item xs={6}>
-							<Autocomplete
-								freeSolo
-								options={locations}
-								value={office?.location ?? ""}
-								onInputChange={(evt, val) => {
-									setSelectedLocation(val ?? "");
-								}}
-								renderInput={(params) => (
-									<TextField {...params} label="Location" variant="outlined" />
+							<Controller
+								control={control}
+								name="name"
+								rules={createRegisterOptions("Name")}
+								render={({ field: { value, ...renderProps } }) => (
+									<TextField
+										{...renderProps}
+										className={classes.formControl}
+										value={value ?? ""}
+										variant="outlined"
+										label="Name"
+										type="text"
+										error={Boolean(errors.name)}
+										helperText={errors.name?.message}
+									/>
 								)}
 							/>
 						</Grid>
 						<Grid item xs={6}>
-							<Autocomplete
-								freeSolo
-								options={subLocations}
-								value={office?.subLocation ?? ""}
-								onInputChange={(evt, val) => {
-									setSelectedSublocation(val ?? "");
-								}}
-								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Sub Location"
-										variant="outlined"
+							<Controller
+								control={control}
+								name="location"
+								rules={createRegisterOptions("Location")}
+								render={({ field: { onChange, ...renderProps } }) => (
+									<Autocomplete
+										{...renderProps}
+										freeSolo
+										options={locations}
+										onInputChange={(e, v) => onChange(v)}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												label="Location"
+												variant="outlined"
+												error={Boolean(errors.location)}
+												helperText={errors.location?.message}
+											/>
+										)}
+									/>
+								)}
+							/>
+						</Grid>
+						<Grid item xs={6}>
+							<Controller
+								control={control}
+								name="sublocation"
+								rules={createRegisterOptions("Sublocation")}
+								render={({ field: { onChange, ...renderProps } }) => (
+									<Autocomplete
+										{...renderProps}
+										freeSolo
+										options={subLocations}
+										onInputChange={(e, v) => onChange(v)}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												label="Sublocation"
+												variant="outlined"
+												error={Boolean(errors.sublocation)}
+												helperText={errors.sublocation?.message}
+											/>
+										)}
 									/>
 								)}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<ButtonGroup>
-								<Button variant="contained" color="primary" component="label">
-									Upload File
-									<input
-										type="file"
-										accept="image/png"
-										hidden
-										ref={fileUploadInputElement}
-										onChange={(e) => onImageSelected(e.target.files?.item(0))}
-									/>
-								</Button>
-								{previewOfficeImage?.url !== office?.image.url && (
-									<IconButton
-										className={classes.clearFileButton}
-										size="small"
-										onClick={() => onImageCleared()}
-										title="Clear selected image"
-									>
-										<Clear />
-									</IconButton>
-								)}
-							</ButtonGroup>
+							<FormControl>
+								<ButtonGroup>
+									<Button variant="contained" color="primary" component="label">
+										Upload Map Image
+										<Controller
+											name="imageUrl"
+											rules={{ required: "An image is required." }}
+											control={control}
+											render={({ field }) => (
+												<input
+													type="file"
+													accept="image/png"
+													hidden
+													onClick={(e) => {
+														e.currentTarget.value = ""; // Clear the value so the same file can be selected again, if desired
+														field.onBlur();
+													}}
+													onChange={(e) =>
+														processFileIntoImageUrl(
+															e.target.files?.item(0) ?? null
+														)
+													}
+												/>
+											)}
+										/>
+									</Button>
+									{imageUrl && imageUrl !== office?.imageUrl && (
+										<IconButton
+											className={classes.clearFileButton}
+											size="small"
+											onClick={() => onImageCleared()}
+											title="Clear selected image"
+										>
+											<Clear />
+										</IconButton>
+									)}
+								</ButtonGroup>
+								<FormHelperText error={Boolean(errors.imageUrl)}>
+									{/* @ts-ignore Have to use ignore here since it thinks message does not exist on DeepMap */}
+									{errors.imageUrl?.message}
+								</FormHelperText>
+							</FormControl>
+
 							<Button
 								variant="contained"
 								color="secondary"
 								className={classes.saveButton}
-								onClick={() => onSaveClicked()}
-								disabled={!isSaveEnabled()}
+								type="submit"
+								disabled={!formState.isValid}
 							>
 								Save
 							</Button>
 						</Grid>
-						{previewOfficeImage && (
+						{imageUrl && (
 							<Grid item xs={12}>
-								<OfficeMap image={previewOfficeImage} />
+								<OfficeMap image={imageUrl} />
 							</Grid>
 						)}
 					</Grid>
-				</CardContent>
-			</Card>
-		</Grid>
+				</form>
+			</CardContent>
+		</Card>
 	);
 }
