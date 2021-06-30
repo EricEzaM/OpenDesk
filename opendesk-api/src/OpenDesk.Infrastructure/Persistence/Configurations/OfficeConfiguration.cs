@@ -16,8 +16,6 @@ namespace OpenDesk.Infrastructure.Persistence.Configurations
 			builder.Property(o => o.Id)
 				.ValueGeneratedOnAdd();
 
-			builder.OwnsOne(o => o.Image);
-
 			builder.HasKey(x => x.Id);
 
 			builder.Property(p => p.Name)

@@ -64,7 +64,7 @@ namespace OpenDesk.API.Features.Bookings
 						{
 							Id = bu.Booking.Desk.Office.Id,
 							Name = bu.Booking.Desk.Office.Name,
-							Image = bu.Booking.Desk.Office.Image
+							ImageUrl = bu.Booking.Desk.Office.ImageUrl
 						},
 						User = bu.User
 					})

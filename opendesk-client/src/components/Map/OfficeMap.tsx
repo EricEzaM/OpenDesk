@@ -14,13 +14,13 @@ import { useEffect, useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { ImageOverlay, MapContainer, Marker } from "react-leaflet";
 import { ReactComponent as DeskLocationIcon } from "resources/desk-location.svg";
-import { Booking, Desk, OfficeImage } from "types";
+import { Booking, Desk } from "types";
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
 
 const MAP_IMAGE_BORDER = 25;
 
 interface OfficeMapProps {
-	image: OfficeImage;
+	image: string;
 	desks?: Desk[];
 	selectedDesk?: Desk;
 	bookings?: Booking[];
@@ -48,17 +48,22 @@ function OfficeMap({
 	// =============================================================
 
 	useEffect(() => {
-		// Update image bounds so image scales properly
-		updateImageBounds(image);
-		// Update maps bounds so that panning works properly for new image
-		updateMapMaxBounds(image);
+		let img = new Image();
+		img.src = image;
+
+		img.onload = () => {
+			// Update image bounds so image scales properly
+			updateImageBounds(img);
+			// Update maps bounds so that panning works properly for new image
+			updateMapMaxBounds(img);
+		};
 	}, [image]);
 
 	// =============================================================
 	// Functions
 	// =============================================================
 
-	function updateMapMaxBounds(image: OfficeImage) {
+	function updateMapMaxBounds(image: HTMLImageElement) {
 		let min: [number, number] = [-MAP_IMAGE_BORDER, -MAP_IMAGE_BORDER];
 		let max: [number, number] = [
 			image.height + MAP_IMAGE_BORDER,
@@ -70,7 +75,7 @@ function OfficeMap({
 		mapRef?.current?.setView([image.height / 2, image.width / 2]);
 	}
 
-	function updateImageBounds(image: OfficeImage) {
+	function updateImageBounds(image: HTMLImageElement) {
 		imageRef?.current?.setBounds(
 			new LatLngBounds([
 				[0, 0],
@@ -81,7 +86,9 @@ function OfficeMap({
 
 	function onMapCreated(map: Map) {
 		mapRef.current = map;
-		updateMapMaxBounds(image);
+		let img = new Image();
+		img.src = image;
+		updateMapMaxBounds(img);
 	}
 
 	// =============================================================
@@ -109,10 +116,10 @@ function OfficeMap({
 				>
 					<ImageOverlay
 						ref={imageRef}
-						url={image.url}
+						url={image}
 						bounds={[
 							[0, 0],
-							[image.height, image.width],
+							[0, 0],
 						]}
 					/>
 

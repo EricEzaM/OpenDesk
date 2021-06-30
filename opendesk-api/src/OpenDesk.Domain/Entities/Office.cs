@@ -11,6 +11,6 @@ namespace OpenDesk.Domain.Entities
 		public string SubLocation { get; set; }
 		public string Name { get; set; }
 		public List<Desk> Desks { get; set; }
-		public OfficeImage Image { get; set; }
+		public string ImageUrl { get; set; }
 	}
 }

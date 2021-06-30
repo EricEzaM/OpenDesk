@@ -32,7 +32,7 @@ namespace OpenDesk.API.Features.Offices
 					Location = o.Location,
 					SubLocation = o.SubLocation,
 					Name = o.Name,
-					Image = o.Image
+					ImageUrl = o.ImageUrl
 				})
 				.AsNoTracking()
 				.ToListAsync();

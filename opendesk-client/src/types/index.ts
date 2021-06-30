@@ -62,13 +62,7 @@ export interface Office {
 	location: string;
 	subLocation: string;
 	name: string;
-	image: OfficeImage;
-}
-
-export interface OfficeImage {
-	url: string;
-	width: number;
-	height: number;
+	imageUrl: string;
 }
 
 // USER

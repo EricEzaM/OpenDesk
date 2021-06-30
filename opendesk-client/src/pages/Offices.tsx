@@ -74,7 +74,7 @@ function Offices() {
 					{selectedOffice && (
 						<Box marginTop={1}>
 							<OfficeMap
-								image={selectedOffice.image}
+								image={selectedOffice.imageUrl}
 								desks={desks}
 								selectedDesk={selectedDesk}
 								bookings={bookings}

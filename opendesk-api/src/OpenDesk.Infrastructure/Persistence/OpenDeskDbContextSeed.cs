@@ -40,12 +40,7 @@ namespace OpenDesk.Infrastructure.Persistence
 				Location = "Brisbane, Australia",
 				SubLocation = "Queen Street",
 				Name = "Office 1",
-				Image = new OfficeImage()
-				{
-					Url = img.Url,
-					Width = img.Width,
-					Height = img.Height
-				},
+				ImageUrl = img,
 				Desks = new List<Desk>()
 				{
 					new Desk()
@@ -84,7 +79,7 @@ namespace OpenDesk.Infrastructure.Persistence
 			await context.SaveChangesAsync();
 		}
 
-		public static async Task<OfficeImage> GetOfficeImage(string existingFile, IHostEnvironment env)
+		public static async Task<string> GetOfficeImage(string existingFile, IHostEnvironment env)
 		{
 			// Get existing
 			using var imageFS = new FileStream(existingFile, FileMode.Open);
@@ -98,13 +93,7 @@ namespace OpenDesk.Infrastructure.Persistence
 			var size = Image.FromStream(stream);
 
 			// TODO: Fix this so that its not hardcoded
-			// return URL
-			return new OfficeImage()
-			{
-				Url = $"https://localhost:5001/office-images/{fName}.png",
-				Width = size.Width,
-				Height = size.Height
-			};
+			return $"https://localhost:5001/office-images/{fName}.png";
 		}
 	}
 }

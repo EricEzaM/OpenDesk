@@ -74,14 +74,8 @@ namespace OpenDesk.API.Features.Offices
 				string path = Path.Combine(_env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
 				using var stream = new FileStream(path, FileMode.Create);
 				await request.Image.CopyToAsync(stream, cancellationToken);
-				var size = Image.FromStream(stream).Size;
 
-				office.Image = new OfficeImage()
-				{
-					Url = $"https://localhost:5001/office-images/{fName}.png", // TODO fix hardcoded png
-					Width = size.Width,
-					Height = size.Height
-				};
+				office.ImageUrl = $"https://localhost:5001/office-images/{fName}.png"; // TODO fix hardcoded png
 			}
 
 			_db.Offices.Update(office);
@@ -93,7 +87,7 @@ namespace OpenDesk.API.Features.Offices
 				Location = office.Location,
 				SubLocation = office.SubLocation,
 				Name = office.Name,
-				Image = office.Image
+				ImageUrl = office.ImageUrl
 			};
 		}
 
