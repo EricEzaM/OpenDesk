@@ -57,7 +57,7 @@ export default function ManageOffices() {
 				body: formData,
 			}).then((res) => {
 				refreshOffices();
-				setSelectedOffice(res.data);
+				setSelectedOffice(undefined);
 			});
 		} else {
 			formData.append("Id", selectedOffice.id);
@@ -67,12 +67,15 @@ export default function ManageOffices() {
 				body: formData,
 			}).then((res) => {
 				refreshOffices();
+				setSelectedOffice(undefined);
 			});
 		}
 	}
 
 	function onDelete() {
 		if (window.confirm("Are you sure?")) {
+			// TODO: Implement
+			alert("Not implemented yet");
 		}
 	}
 

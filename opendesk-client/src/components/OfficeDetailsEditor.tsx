@@ -55,7 +55,7 @@ interface FormFields {
 	name: string | null;
 	location: string | null;
 	sublocation: string | null;
-	imageUrl: string | null;
+	file: File | null;
 }
 
 export default function OfficeDetailsEditor({
@@ -71,19 +71,21 @@ export default function OfficeDetailsEditor({
 		subLocations,
 	} = useOfficeLocationFilter();
 
-	const { control, handleSubmit, setValue, watch, trigger, reset, formState } =
+	const [selectedImageDataUrl, setSelectedImageDataUrl] = useState<
+		string | null
+	>(null);
+
+	const { control, formState, handleSubmit, watch, reset, setValue } =
 		useForm<FormFields>({
 			mode: "onBlur",
 			defaultValues: {
-				name: null,
-				location: null,
-				sublocation: null,
-				imageUrl: null,
+				name: office?.name ?? null,
+				location: office?.location ?? null,
+				sublocation: office?.subLocation ?? null,
+				file: null,
 			},
 		});
-	const errors = formState.errors;
-
-	const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+	const { errors, isDirty, isValid } = formState;
 
 	function createRegisterOptions(displayName: string): RegisterOptions {
 		return {
@@ -96,49 +98,49 @@ export default function OfficeDetailsEditor({
 	}
 
 	const location = watch("location");
-	const imageUrl = watch("imageUrl");
+	const file = watch("file");
 
 	useEffect(() => {
-		reset();
-		setValue("name", office?.name ?? null);
-		setValue("location", office?.location ?? null);
-		setValue("sublocation", office?.subLocation ?? null);
-		setValue("imageUrl", office?.imageUrl ?? null);
+		reset({
+			name: office?.name ?? null,
+			location: office?.location ?? null,
+			sublocation: office?.subLocation ?? null,
+			file: null,
+		});
+
+		if (office) {
+			setSelectedImageDataUrl(office.imageUrl);
+		} else {
+			setSelectedImageDataUrl(null);
+		}
 	}, [office]);
 
 	useEffect(() => {
 		setSelectedLocation(location ?? "");
 	}, [location]);
 
-	function processFileIntoImageUrl(file: File | null) {
-		debugger;
-		setSelectedImageFile(file);
+	useEffect(() => {
 		if (file) {
 			const reader = new FileReader();
 			reader.onload = (e) => {
 				const dataUrl = e.target?.result?.toString();
-				setValue("imageUrl", dataUrl ?? null);
-				trigger("imageUrl");
+				setSelectedImageDataUrl(dataUrl ?? null);
 			};
 
 			reader.readAsDataURL(file);
+		} else {
+			setSelectedImageDataUrl(office?.imageUrl ?? null);
 		}
-	}
+	}, [file]);
 
 	function onDeleteClicked() {
 		onDelete();
 	}
 
-	function onImageCleared() {
-		setValue("imageUrl", null);
-	}
-
 	function onSubmit(fields: FormFields) {
-		// alert(JSON.stringify(fields, null, 2));
-
-		const { name, location, sublocation } = fields;
-		if (name && location && sublocation) {
-			onSave(name, location, sublocation, selectedImageFile);
+		const { name, location, sublocation, file } = fields;
+		if (name && location && sublocation && ((file && !office) || office)) {
+			onSave(name, location, sublocation, file);
 		}
 	}
 
@@ -227,46 +229,64 @@ export default function OfficeDetailsEditor({
 						</Grid>
 						<Grid item xs={12}>
 							<FormControl>
-								<ButtonGroup>
-									<Button variant="contained" color="primary" component="label">
-										Upload Map Image
-										<Controller
-											name="imageUrl"
-											rules={{ required: "An image is required." }}
-											control={control}
-											render={({ field }) => (
+								<Controller
+									name="file"
+									control={control}
+									rules={{
+										validate: (v) => {
+											if (v === null && !Boolean(office)) {
+												return "An image is required for the map.";
+											}
+										},
+									}}
+									render={({
+										field: { value, onChange, onBlur, ...restField },
+									}) => (
+										<ButtonGroup>
+											<Button
+												variant="contained"
+												color="primary"
+												component="label"
+												onBlur={onBlur}
+											>
+												Upload Map Image
 												<input
+													{...restField}
 													type="file"
 													accept="image/png"
 													hidden
 													onClick={(e) => {
 														e.currentTarget.value = ""; // Clear the value so the same file can be selected again, if desired
-														field.onBlur();
 													}}
-													onChange={(e) =>
-														processFileIntoImageUrl(
-															e.target.files?.item(0) ?? null
-														)
-													}
+													onChange={(e) => {
+														e.target.files?.item(0) &&
+															onChange(e.target.files?.item(0));
+														onBlur();
+													}}
 												/>
+											</Button>
+											{file && (
+												<IconButton
+													className={classes.clearFileButton}
+													size="small"
+													onClick={() => {
+														onChange(null);
+														onBlur();
+													}}
+													title="Clear selected image"
+												>
+													<Clear />
+												</IconButton>
 											)}
-										/>
-									</Button>
-									{imageUrl && imageUrl !== office?.imageUrl && (
-										<IconButton
-											className={classes.clearFileButton}
-											size="small"
-											onClick={() => onImageCleared()}
-											title="Clear selected image"
-										>
-											<Clear />
-										</IconButton>
+										</ButtonGroup>
 									)}
-								</ButtonGroup>
-								<FormHelperText error={Boolean(errors.imageUrl)}>
-									{/* @ts-ignore Have to use ignore here since it thinks message does not exist on DeepMap */}
-									{errors.imageUrl?.message}
-								</FormHelperText>
+								/>
+								{Boolean(errors.file) && (
+									<FormHelperText error>
+										{/* @ts-ignore Have to use ignore here since it thinks message does not exist on DeepMap */}
+										{errors.file?.message}
+									</FormHelperText>
+								)}
 							</FormControl>
 
 							<Button
@@ -274,14 +294,14 @@ export default function OfficeDetailsEditor({
 								color="secondary"
 								className={classes.saveButton}
 								type="submit"
-								disabled={!formState.isValid}
+								disabled={(isValid && !isDirty) || !isValid}
 							>
 								Save
 							</Button>
 						</Grid>
-						{imageUrl && (
+						{selectedImageDataUrl && (
 							<Grid item xs={12}>
-								<OfficeMap image={imageUrl} />
+								<OfficeMap image={selectedImageDataUrl} />
 							</Grid>
 						)}
 					</Grid>
