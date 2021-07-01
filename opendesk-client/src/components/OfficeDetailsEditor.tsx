@@ -245,7 +245,7 @@ export default function OfficeDetailsEditor({
 										<ButtonGroup>
 											<Button
 												variant="contained"
-												color="primary"
+												color="secondary"
 												component="label"
 												onBlur={onBlur}
 											>
@@ -291,7 +291,7 @@ export default function OfficeDetailsEditor({
 
 							<Button
 								variant="contained"
-								color="secondary"
+								color="primary"
 								className={classes.saveButton}
 								type="submit"
 								disabled={(isValid && !isDirty) || !isValid}
