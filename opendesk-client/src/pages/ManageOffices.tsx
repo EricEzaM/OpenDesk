@@ -11,9 +11,10 @@ import {
 } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import OfficeDetailsEditor from "components/OfficeDetailsEditor";
+import { StatusData } from "components/StatusAlert";
 import { useOffices } from "hooks/useOffices";
 import { useState } from "react";
-import { Office } from "types";
+import { Office, ValidationError } from "types";
 import apiRequest from "utils/requestUtils";
 
 export default function ManageOffices() {
@@ -23,21 +24,24 @@ export default function ManageOffices() {
 	} = useOffices();
 
 	const [selectedOffice, setSelectedOffice] = useState<Office | null>();
+	const [statusData, setStatusData] = useState<StatusData>({});
 
 	function onOfficeSelected(office: Office) {
 		setSelectedOffice(office);
+		setStatusData({});
 	}
 
 	function onNewOfficeClicked() {
 		setSelectedOffice(null);
+		setStatusData({});
 	}
 
-	function onSave(
+	async function onSave(
 		name: string,
 		location: string,
 		sublocation: string,
 		image: File | null
-	) {
+	): Promise<StatusData> {
 		var formData = new FormData();
 
 		formData.append("Name", name);
@@ -47,28 +51,33 @@ export default function ManageOffices() {
 			formData.append("Image", image);
 		}
 
-		if (!selectedOffice) {
-			// Create new Office
-			if (!image) {
-				return;
-			}
-			apiRequest<Office>("offices", {
-				method: "POST",
-				body: formData,
-			}).then((res) => {
-				refreshOffices();
-				setSelectedOffice(undefined);
-			});
-		} else {
-			formData.append("Id", selectedOffice.id);
+		let method = "POST"; // Create new office
+
+		if (selectedOffice) {
 			// Update existing office
-			apiRequest("offices", {
-				method: "PATCH",
-				body: formData,
-			}).then((res) => {
-				refreshOffices();
-				setSelectedOffice(undefined);
-			});
+			method = "PATCH";
+			formData.append("Id", selectedOffice.id);
+		}
+
+		let res = await apiRequest<Office>("offices", {
+			method: method,
+			body: formData,
+		});
+
+		if (res.data) {
+			refreshOffices();
+			return {
+				severity: "success",
+				message: "Saved Successfully.",
+			};
+		} else {
+			return {
+				severity: "error",
+				message: "Unable to save.",
+				errors: (res.problem?.errors as ValidationError[])?.map(
+					(ve: ValidationError) => ve.message
+				),
+			};
 		}
 	}
 
@@ -122,6 +131,7 @@ export default function ManageOffices() {
 							office={selectedOffice}
 							onSave={onSave}
 							onDelete={onDelete}
+							statusData={statusData}
 						/>
 					</Grid>
 				)}

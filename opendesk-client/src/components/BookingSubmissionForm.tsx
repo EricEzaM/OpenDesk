@@ -1,4 +1,4 @@
-import { Reducer, useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { differenceInHours, format, isSameDay, set, setHours } from "date-fns";
 import {
 	createStyles,
@@ -13,7 +13,7 @@ import {
 	Button,
 	Typography,
 } from "@material-ui/core";
-import { Alert, AlertTitle, Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from "@material-ui/lab";
 
 import apiRequest from "utils/requestUtils";
 import { Booking, ValidationError } from "types";
@@ -22,60 +22,7 @@ import { useOfficeDesks } from "hooks/useOfficeDesks";
 import { useAuth } from "hooks/useAuth";
 import { FORMAT_ISO_WITH_TZ_STRING } from "utils/dateUtils";
 import { useOffices } from "hooks/useOffices";
-
-interface StatusState {
-	severity?: "info" | "error";
-	message: string;
-	errors: string[];
-}
-
-enum ActionType {
-	FAILURE,
-	SUCCESS,
-	CLEAR,
-	INFO,
-}
-
-type Failure = {
-	readonly type: ActionType.FAILURE;
-	readonly message: string;
-	readonly errors: string[];
-};
-
-type Clear = {
-	readonly type: ActionType.CLEAR;
-};
-
-type Info = {
-	readonly type: ActionType.INFO;
-	readonly message: string;
-};
-
-type Action = Failure | Clear | Info;
-
-function bookingSubmissionStatusReducer(
-	state: StatusState,
-	action: Action
-): StatusState {
-	switch (action.type) {
-		case ActionType.FAILURE:
-			return {
-				severity: "error",
-				message: action.message,
-				errors: action.errors,
-			};
-		case ActionType.INFO:
-			return {
-				severity: "info",
-				message: action.message,
-				errors: [],
-			};
-		case ActionType.CLEAR:
-			return { severity: undefined, message: "", errors: [] };
-		default:
-			return state;
-	}
-}
+import StatusAlert, { StatusData } from "components/StatusAlert";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -119,13 +66,7 @@ export default function BookingSubmissionForm() {
 
 	const [allowSubmit, setAllowSubmit] = useState(false);
 
-	const [statusState, statusDispatch] = useReducer<
-		Reducer<StatusState, Action>
-	>(bookingSubmissionStatusReducer, {
-		severity: undefined,
-		message: "",
-		errors: [],
-	});
+	const [statusState, setStatusState] = useState<StatusData>({});
 
 	const deskOptions = useMemo(
 		() =>
@@ -154,16 +95,16 @@ export default function BookingSubmissionForm() {
 		[desks, bookings, bookingStart]
 	);
 
-	const selectedDeskOption = deskOptions.find(d => d.desk.id === selectedDesk?.id) ?? null;
+	const selectedDeskOption =
+		deskOptions.find((d) => d.desk.id === selectedDesk?.id) ?? null;
 
 	// =============================================================
 	// Effects
 	// =============================================================
 
 	useEffect(() => {
-		statusDispatch({
-			type: ActionType.CLEAR,
-		});
+		setStatusState({});
+
 		setAllowSubmit(selectedDesk !== undefined && isNewBookingValid);
 
 		if (clashedBooking) {
@@ -171,13 +112,13 @@ export default function BookingSubmissionForm() {
 			const endTime = format(clashedBooking.endDateTime, "haaa");
 
 			if (clashedBooking.user.id === user?.id) {
-				statusDispatch({
-					type: ActionType.INFO,
+				setStatusState({
+					severity: "info",
 					message: `You already have a booking on this desk from ${startTime} to ${endTime}`,
 				});
 			} else {
-				statusDispatch({
-					type: ActionType.FAILURE,
+				setStatusState({
+					severity: "error",
 					message: "Clash",
 					errors: [
 						`The booking clashes with another booking on this desk by ${clashedBooking.user.displayName} from ${startTime} to ${endTime}`,
@@ -230,9 +171,7 @@ export default function BookingSubmissionForm() {
 		}
 
 		// Clear status when submitting a booking.
-		statusDispatch({
-			type: ActionType.CLEAR,
-		});
+		setStatusState({});
 
 		// Post the booking
 		apiRequest<Booking>(`desks/${selectedDesk.id}/bookings`, {
@@ -248,8 +187,8 @@ export default function BookingSubmissionForm() {
 			if (res.data) {
 				refreshBookings();
 			} else if (res.problem) {
-				statusDispatch({
-					type: ActionType.FAILURE,
+				setStatusState({
+					severity: "error",
 					message: res.problem.title,
 					errors: (res.problem?.errors as ValidationError[])?.map(
 						(ve: ValidationError) => ve.message
@@ -341,7 +280,9 @@ export default function BookingSubmissionForm() {
 						getOptionLabel={(opt) => opt.desk.name}
 						getOptionSelected={(opt, val) => opt.desk.id === val.desk.id}
 						disabled={!Boolean(selectedOffice)}
-						onChange={(evt, val) => { setSelectedDesk(val?.desk) }}
+						onChange={(evt, val) => {
+							setSelectedDesk(val?.desk);
+						}}
 						value={selectedDeskOption}
 						renderInput={(params) => (
 							<TextField
@@ -385,16 +326,7 @@ export default function BookingSubmissionForm() {
 					</Button>
 				</Grid>
 				<Grid item xs={12}>
-					{statusState.severity !== undefined && (
-						<Alert severity={statusState.severity}>
-							<AlertTitle>{statusState.message}</AlertTitle>
-							<ul>
-								{statusState.errors.map((e) => (
-									<li>{e}</li>
-								))}
-							</ul>
-						</Alert>
-					)}
+					<StatusAlert {...statusState} />
 				</Grid>
 			</Grid>
 		</div>

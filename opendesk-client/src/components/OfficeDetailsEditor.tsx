@@ -1,8 +1,10 @@
 import {
+	Box,
 	Button,
 	ButtonGroup,
 	Card,
 	CardContent,
+	CircularProgress,
 	createStyles,
 	FormControl,
 	FormHelperText,
@@ -20,6 +22,7 @@ import { useEffect, useState } from "react";
 import { Controller, RegisterOptions, useForm } from "react-hook-form";
 import { Office } from "types";
 import OfficeMap from "./map/OfficeMap";
+import StatusAlert, { StatusData } from "./StatusAlert";
 
 interface OfficeDetailsPanelProps {
 	office: Office | null;
@@ -28,8 +31,9 @@ interface OfficeDetailsPanelProps {
 		location: string,
 		sublocation: string,
 		image: File | null
-	) => void;
+	) => Promise<StatusData>;
 	onDelete: () => void;
+	statusData: StatusData;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -42,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) =>
 			backgroundColor: "#00000012",
 		},
 		saveButton: {
+			marginLeft: theme.spacing(2),
+		},
+		saveButtonIcon: {
 			marginLeft: theme.spacing(2),
 		},
 		gridItemContentRight: {
@@ -65,6 +72,9 @@ export default function OfficeDetailsEditor({
 }: OfficeDetailsPanelProps) {
 	const classes = useStyles();
 
+	const [statusData, setStatusData] = useState<StatusData>({});
+	const [inProgress, setInProgress] = useState(false);
+
 	const {
 		selectedLocationState: [, setSelectedLocation],
 		locations,
@@ -75,7 +85,7 @@ export default function OfficeDetailsEditor({
 		string | null
 	>(null);
 
-	const { control, formState, handleSubmit, watch, reset, setValue } =
+	const { control, formState, handleSubmit, watch, reset } =
 		useForm<FormFields>({
 			mode: "onBlur",
 			defaultValues: {
@@ -101,6 +111,9 @@ export default function OfficeDetailsEditor({
 	const file = watch("file");
 
 	useEffect(() => {
+		setInProgress(false);
+		setStatusData({});
+
 		reset({
 			name: office?.name ?? null,
 			location: office?.location ?? null,
@@ -140,7 +153,12 @@ export default function OfficeDetailsEditor({
 	function onSubmit(fields: FormFields) {
 		const { name, location, sublocation, file } = fields;
 		if (name && location && sublocation && ((file && !office) || office)) {
-			onSave(name, location, sublocation, file);
+			setInProgress(true);
+			setStatusData({});
+			onSave(name, location, sublocation, file).then((res) => {
+				setStatusData(res);
+				setInProgress(false);
+			});
 		}
 	}
 
@@ -294,10 +312,22 @@ export default function OfficeDetailsEditor({
 								color="primary"
 								className={classes.saveButton}
 								type="submit"
-								disabled={(isValid && !isDirty) || !isValid}
+								disabled={(isValid && !isDirty) || !isValid || inProgress}
 							>
 								Save
+								{inProgress && (
+									<CircularProgress
+										className={classes.saveButtonIcon}
+										size={24}
+									/>
+								)}
 							</Button>
+
+							{statusData.severity && (
+								<Box marginTop={2}>
+									<StatusAlert {...statusData} />
+								</Box>
+							)}
 						</Grid>
 						{selectedImageDataUrl && (
 							<Grid item xs={12}>
