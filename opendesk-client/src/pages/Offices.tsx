@@ -8,11 +8,14 @@ import { useEffect } from "react";
 import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
+import { usePageTitle } from "hooks/usePageTitle";
 
 function Offices() {
 	// =============================================================
 	// Hooks and Variables
 	// =============================================================
+	usePageTitle("Make a Booking");
+
 	const {
 		selectedOfficeState: [selectedOffice],
 	} = useOffices();

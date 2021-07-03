@@ -14,6 +14,7 @@ import {
 import { Delete, Room } from "@material-ui/icons";
 import { format } from "date-fns";
 import { useAuth } from "hooks/useAuth";
+import { usePageTitle } from "hooks/usePageTitle";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FullBooking } from "types";
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Me() {
+	usePageTitle("My Bookings");
 	const classes = useStyles();
 
 	const { user } = useAuth();

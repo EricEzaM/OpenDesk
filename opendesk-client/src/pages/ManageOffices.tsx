@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function ManageOffices() {
 	const classes = useStyles();
-	usePageTitle("Manage offices");
+	usePageTitle("Manage Offices");
 
 	const {
 		officesState: [offices],
