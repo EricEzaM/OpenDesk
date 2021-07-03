@@ -7,17 +7,19 @@ import {
 	List,
 	ListItem,
 	ListItemText,
-	Typography,
 } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import OfficeDetailsEditor from "components/OfficeDetailsEditor";
 import { StatusData } from "components/StatusAlert";
 import { useOffices } from "hooks/useOffices";
+import { usePageTitle } from "hooks/usePageTitle";
 import { useState } from "react";
 import { Office, ValidationError } from "types";
 import apiRequest from "utils/requestUtils";
 
 export default function ManageOffices() {
+	usePageTitle("Manage offices");
+
 	const {
 		officesState: [offices],
 		refreshOffices,
@@ -90,9 +92,6 @@ export default function ManageOffices() {
 
 	return (
 		<>
-			<Typography variant="h2" component="h1">
-				Manage Offices
-			</Typography>
 			<Grid container spacing={2}>
 				<Grid item md={3} xs={12}>
 					<Card variant="outlined">

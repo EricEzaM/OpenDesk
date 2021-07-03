@@ -7,6 +7,7 @@ import {
 	Typography,
 } from "@material-ui/core";
 import { Business, Group, Room } from "@material-ui/icons";
+import { usePageTitle } from "hooks/usePageTitle";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,6 +31,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Manage() {
+	usePageTitle("Management");
+
 	const classes = useStyles();
 
 	const iconStyleDefaults = {

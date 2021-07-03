@@ -20,9 +20,11 @@ import {
 	Settings,
 } from "@material-ui/icons";
 import { ReactNode, useState } from "react";
+import { usePageTitle } from "hooks/usePageTitle";
 
 export default function Nav() {
 	const [drawerOpen, setDrawerOpen] = useState(false);
+	const title = usePageTitle();
 
 	return (
 		<>
@@ -39,7 +41,15 @@ export default function Nav() {
 					<Typography variant="h4" component="h1">
 						OpenDesk
 					</Typography>
-					<Box display="flex" justifyContent="flex-end" width="100%">
+					{title && (
+						<Box marginLeft={1}>
+							<Typography variant="h5" component="h2" noWrap>
+								&#47;&#47; {title}
+							</Typography>
+						</Box>
+					)}
+					<Box flexGrow="1" /> {/* Spacer */}
+					<Box>
 						<SignInOut />
 					</Box>
 				</Toolbar>
