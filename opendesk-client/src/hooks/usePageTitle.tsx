@@ -41,11 +41,11 @@ export function usePageTitle(
 ) {
 	const { title, setTitle } = useContext(PageTitleContext);
 
-	if (newTitle) {
-		setTitle(newTitle);
-	}
-
 	useEffect(() => {
+		if (newTitle) {
+			setTitle(newTitle);
+		}
+
 		return () => {
 			if (!retainOnUnmount) {
 				setTitle("");
