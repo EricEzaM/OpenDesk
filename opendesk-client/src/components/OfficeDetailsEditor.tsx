@@ -21,7 +21,7 @@ import useOfficeLocationFilter from "hooks/useOfficeLocationFilter";
 import { useEffect, useState } from "react";
 import { Controller, RegisterOptions, useForm } from "react-hook-form";
 import { Office } from "types";
-import OfficeMap from "./map/OfficeMap";
+import OfficeMapBase from "./map/OfficeMapBase";
 import StatusAlert, { StatusData } from "./StatusAlert";
 
 interface OfficeDetailsPanelProps {
@@ -331,7 +331,7 @@ export default function OfficeDetailsEditor({
 						</Grid>
 						{selectedImageDataUrl && (
 							<Grid item xs={12}>
-								<OfficeMap image={selectedImageDataUrl} />
+								<OfficeMapBase image={selectedImageDataUrl} />
 							</Grid>
 						)}
 					</Grid>

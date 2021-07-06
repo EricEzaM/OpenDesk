@@ -1,5 +1,4 @@
 import OfficeSelector from "components/OfficeSelector";
-import OfficeMap from "components/map/OfficeMap";
 import BookingSubmissionForm from "components/BookingSubmissionForm";
 import { Box, Grid, Typography } from "@material-ui/core";
 import { useOffices } from "hooks/useOffices";
@@ -9,6 +8,7 @@ import { useBookings } from "hooks/useBookings";
 import { useOfficeDesks } from "hooks/useOfficeDesks";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 import { usePageTitle } from "hooks/usePageTitle";
+import OfficeMapBookingsDisplay from "components/map/OfficeMapBookingsDisplay";
 
 function Offices() {
 	// =============================================================
@@ -76,7 +76,7 @@ function Offices() {
 					<OfficeSelector />
 					{selectedOffice && (
 						<Box marginTop={1}>
-							<OfficeMap
+							<OfficeMapBookingsDisplay
 								image={selectedOffice.imageUrl}
 								desks={desks}
 								selectedDesk={selectedDesk}

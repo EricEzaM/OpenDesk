@@ -1,41 +1,17 @@
-import { darken, lighten } from "@material-ui/core";
-import { differenceInHours } from "date-fns";
-import isSameDay from "date-fns/esm/fp/isSameDay/index.js";
-import {
-	CRS,
-	divIcon,
-	ImageOverlay as LImageOverlay,
-	LatLngBounds,
-	Map,
-	point,
-} from "leaflet";
+import { CRS, ImageOverlay as LImageOverlay, LatLngBounds, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
-import ReactDOMServer from "react-dom/server";
-import { ImageOverlay, MapContainer, Marker } from "react-leaflet";
-import { ReactComponent as DeskLocationIcon } from "resources/desk-location.svg";
-import { Booking, Desk } from "types";
+import { ImageOverlay, MapContainer } from "react-leaflet";
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
 
 const MAP_IMAGE_BORDER = 25;
 
-interface OfficeMapProps {
+interface OfficeMapBaseProps {
 	image: string;
-	desks?: Desk[];
-	selectedDesk?: Desk;
-	bookings?: Booking[];
-	newBookingStart?: Date;
-	onDeskSelected?: (deskId: string) => void;
+	markers?: JSX.Element[];
 }
 
-function OfficeMap({
-	image,
-	desks,
-	selectedDesk,
-	bookings,
-	newBookingStart,
-	onDeskSelected,
-}: OfficeMapProps) {
+export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
 	// =============================================================
 	// Hooks & Variables
 	// =============================================================
@@ -103,7 +79,7 @@ function OfficeMap({
 					center={[0, 0]}
 					crs={CRS.Simple}
 					attributionControl={false}
-					// Disable dragging and zooming
+					// Disable zooming
 					zoom={-5}
 					dragging={true}
 					zoomControl={false}
@@ -123,73 +99,11 @@ function OfficeMap({
 						]}
 					/>
 
-					{desks &&
-						newBookingStart &&
-						bookings &&
-						desks.map((desk) => {
-							const fillFree = "#49A078";
-							const fillBooked = "#c42525";
-							const fillHalf = "#de9a26";
+					{markers && markers.map((m) => m)}
 
-							const hours = bookings
-								?.filter(
-									(b) =>
-										b.deskId === desk.id &&
-										isSameDay(b.startDateTime, newBookingStart)
-								)
-								.reduce(
-									(acc, curr) =>
-										(acc = differenceInHours(
-											curr.endDateTime,
-											curr.startDateTime
-										)),
-									0
-								);
-
-							let fill = fillFree;
-							if (hours > 7) {
-								fill = fillBooked;
-							} else if (hours > 0) {
-								fill = fillHalf;
-							}
-
-							return (
-								<Marker
-									position={[desk.diagramPosition.x, desk.diagramPosition.y]}
-									icon={divIcon({
-										html: ReactDOMServer.renderToString(
-											<DeskLocationIcon
-												style={{
-													width: "100%",
-													height: "100%",
-													fill:
-														desk.id === selectedDesk?.id
-															? fill
-															: lighten(fill, 0.6),
-													stroke:
-														desk.id === selectedDesk?.id
-															? darken(fill, 0.6)
-															: fill,
-													strokeWidth: "2px",
-												}}
-											/>
-										),
-										iconSize: point(30, 30),
-										className: "", // Do not delete: this stops white box from appearing behind marker icons.
-									})}
-									eventHandlers={{
-										click: () => {
-											onDeskSelected && onDeskSelected(desk.id);
-										},
-									}}
-								/>
-							);
-						})}
 					<MapClickedAtLocationPopup />
 				</MapContainer>
 			</div>
 		</div>
 	);
 }
-
-export default OfficeMap;
