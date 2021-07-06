@@ -38,10 +38,6 @@ interface OfficeDetailsPanelProps {
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		formControl: {
-			minWidth: 120,
-			width: "100%",
-		},
 		clearFileButton: {
 			backgroundColor: "#00000012",
 		},
@@ -186,7 +182,7 @@ export default function OfficeDetailsEditor({
 								render={({ field: { value, ...renderProps } }) => (
 									<TextField
 										{...renderProps}
-										className={classes.formControl}
+										fullWidth={true}
 										value={value ?? ""}
 										variant="outlined"
 										label="Name"
