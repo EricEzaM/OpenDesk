@@ -3,20 +3,14 @@ import {
 	Breadcrumbs,
 	Select,
 	MenuItem,
-	List,
-	ListItem,
-	Collapse,
-	ListItemIcon,
-	ListItemText,
 	ListSubheader,
 	FormControl,
 	InputLabel,
-	Box,
 	makeStyles,
 	Theme,
 	createStyles,
 } from "@material-ui/core";
-import { NavigateNext, StarBorder } from "@material-ui/icons";
+import { NavigateNext } from "@material-ui/icons";
 import { useOffices } from "hooks/useOffices";
 import useOfficeDeskRouteParams from "hooks/useOfficeDeskRouteParams";
 import useOfficeLocationFilter from "hooks/useOfficeLocationFilter";
@@ -32,8 +26,9 @@ type OfficeSelectorProps = {
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		comapctFormControl: {
+		fullWidth: {
 			width: "100%",
+			minWidth: 120,
 		},
 	})
 );
@@ -195,9 +190,12 @@ function OfficeSelector({ compact = false }: OfficeSelectorProps) {
 				</Breadcrumbs>
 			)}
 			{compact && (
-				<FormControl className={classes.comapctFormControl}>
+				<FormControl className={classes.fullWidth}>
 					<InputLabel shrink>Select an Office...</InputLabel>
 					<Select
+						classes={{
+							root: classes.fullWidth,
+						}}
 						value={selectedOffice?.id ?? ""}
 						onChange={(e) => handleOfficeChange(e.target.value as string)}
 						displayEmpty
