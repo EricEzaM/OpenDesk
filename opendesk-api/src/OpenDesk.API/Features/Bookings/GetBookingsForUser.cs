@@ -35,6 +35,7 @@ namespace OpenDesk.API.Features.Bookings
 				return await _db.Bookings
 					.Include(b => b.Desk)
 					.ThenInclude(d => d.Office)
+					.ThenInclude(o => o.Image)
 					.Where(b => b.UserId == request.UserId)
 					// TODO: This join is used in many commands/handlers. Make common?
 					.Join(_db.Users, b => b.UserId, u => u.Id, (b, u) => new
@@ -64,7 +65,7 @@ namespace OpenDesk.API.Features.Bookings
 						{
 							Id = bu.Booking.Desk.Office.Id,
 							Name = bu.Booking.Desk.Office.Name,
-							ImageUrl = bu.Booking.Desk.Office.ImageUrl
+							Image = new BlobDTO(bu.Booking.Desk.Office.Image)
 						},
 						User = bu.User
 					})

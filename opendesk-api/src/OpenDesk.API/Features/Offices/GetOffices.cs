@@ -32,7 +32,7 @@ namespace OpenDesk.API.Features.Offices
 					Location = o.Location,
 					SubLocation = o.SubLocation,
 					Name = o.Name,
-					ImageUrl = o.ImageUrl
+					Image = new BlobDTO(o.Image)
 				})
 				.AsNoTracking()
 				.ToListAsync();

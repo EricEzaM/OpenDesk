@@ -11,6 +11,6 @@ namespace OpenDesk.API.Features.Offices.Shared
 		public string Location { get; set; }
 		public string SubLocation { get; set; }
 		public string Name { get; set; }
-		public IFormFile Image { get; set; }
+		public string ImageBlobId { get; set; }
 	}
 }

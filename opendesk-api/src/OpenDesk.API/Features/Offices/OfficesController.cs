@@ -16,12 +16,10 @@ namespace OpenDesk.API.Features.Offices
 	public class OfficesController : ControllerBase
 	{
 		private readonly IMediator _mediator;
-		private readonly IWebHostEnvironment _env;
 
-		public OfficesController(IMediator mediator, IWebHostEnvironment env)
+		public OfficesController(IMediator mediator)
 		{
 			_mediator = mediator;
-			_env = env;
 		}
 
 		[HttpGet]
@@ -34,14 +32,14 @@ namespace OpenDesk.API.Features.Offices
 
 		// TODO: Add permissions / roles authentication.
 		[HttpPost]
-		public async Task<IActionResult> Create([FromForm]CreateOfficeCommand command)
+		public async Task<IActionResult> Create([FromBody]CreateOfficeCommand command)
 		{
 			var result = await _mediator.Send(command);
 			return Ok(result);
 		}
 
-		[HttpPatch]
-		public async Task<IActionResult> Update([FromForm]UpdateOfficeCommand command)
+		[HttpPut]
+		public async Task<IActionResult> Update([FromBody]UpdateOfficeCommand command)
 		{
 			var result = await _mediator.Send(command);
 			return Ok(result);

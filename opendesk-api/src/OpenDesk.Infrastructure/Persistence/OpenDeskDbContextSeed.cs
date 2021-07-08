@@ -40,7 +40,11 @@ namespace OpenDesk.Infrastructure.Persistence
 				Location = "Brisbane, Australia",
 				SubLocation = "Queen Street",
 				Name = "Office 1",
-				ImageUrl = img,
+				Image = new Blob
+				{
+					Uri = img,
+					Expiry = DateTimeOffset.UtcNow.AddDays(1)
+				},
 				Desks = new List<Desk>()
 				{
 					new Desk()
@@ -71,7 +75,7 @@ namespace OpenDesk.Infrastructure.Persistence
 					new Desk()
 					{
 						Name = "Desk 3",
-						DiagramPosition = new DiagramPosition(70, 70)
+						DiagramPosition = new DiagramPosition(70, 180)
 					}
 				}
 			});
@@ -86,14 +90,14 @@ namespace OpenDesk.Infrastructure.Persistence
 
 			// Copy to content path with new filename
 			string fName = Guid.NewGuid().ToString();
-			string path = Path.Combine(env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
+			string path = Path.Combine(env.ContentRootPath, "static", "blobs", fName + ".png"); // TODO fix this! dont hardcode png
 			using var stream = new FileStream(path, FileMode.Create);
 			await imageFS.CopyToAsync(stream);
 
 			var size = Image.FromStream(stream);
 
 			// TODO: Fix this so that its not hardcoded
-			return $"https://localhost:5001/office-images/{fName}.png";
+			return $"https://localhost:5001/static/blobs/{fName}.png";
 		}
 	}
 }

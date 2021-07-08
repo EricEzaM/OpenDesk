@@ -13,6 +13,7 @@ namespace OpenDesk.Application.Common.Interfaces
 		DbSet<Desk> Desks { get; set; }
 		DbSet<Booking> Bookings { get; set; }
 		DbSet<Office> Offices { get; set; }
+		DbSet<Blob> Blobs { get; set; }
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 	}

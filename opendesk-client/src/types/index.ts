@@ -62,7 +62,7 @@ export interface Office {
 	location: string;
 	subLocation: string;
 	name: string;
-	imageUrl: string;
+	image: Blob;
 }
 
 // USER
@@ -71,4 +71,12 @@ export interface User {
 	id: string;
 	username: string;
 	displayName: string;
+}
+
+// BLOB
+
+export interface Blob {
+	id: string;
+	uri: string;
+	expiry: Date;
 }

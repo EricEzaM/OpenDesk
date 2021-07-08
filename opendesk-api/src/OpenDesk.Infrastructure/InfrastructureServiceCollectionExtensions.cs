@@ -26,6 +26,7 @@ namespace OpenDesk.Infrastructure
 			});
 
 			services.AddScoped<IOpenDeskDbContext>(provider => provider.GetService<OpenDeskDbContext>());
+			services.AddScoped<IBlobSaver, LocalFileBlobSaver>();
 
 			// IDENTITY
 

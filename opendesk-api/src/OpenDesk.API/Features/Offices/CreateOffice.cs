@@ -15,6 +15,8 @@ using OpenDesk.Domain.ValueObjects;
 using OpenDesk.API.Models;
 using FluentValidation;
 using OpenDesk.API.Features.Offices.Shared;
+using OpenDesk.Application.Common.Interfaces;
+using OpenDesk.API.Errors;
 
 namespace OpenDesk.API.Features.Offices
 {
@@ -24,30 +26,31 @@ namespace OpenDesk.API.Features.Offices
 	{
 		private readonly OpenDeskDbContext _db;
 		private readonly IWebHostEnvironment _env;
+		private readonly IBlobSaver _blobSaver;
 
-		public CreateOfficeHandler(OpenDeskDbContext db, IWebHostEnvironment env)
+		public CreateOfficeHandler(OpenDeskDbContext db, IWebHostEnvironment env, IBlobSaver blobSaver)
 		{
 			_db = db;
 			_env = env;
+			_blobSaver = blobSaver;
 		}
 
 		public async Task<OfficeDTO> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
 		{
-			// Unify with UpdateOffice
-			// TODO Re-write this to make it more secure. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
-			// Store in blob storage somewhere and replace ImageUrl with one from a storage provider in the Office database model?
+			var blob = _db.Blobs
+				.FirstOrDefault(b => b.Id == request.ImageBlobId);
 
-			string fName = Guid.NewGuid().ToString();
-			string path = Path.Combine(_env.ContentRootPath, "office-images", fName + ".png"); // TODO fix this! dont hardcode png
-			using var stream = new FileStream(path, FileMode.Create);
-			await request.Image.CopyToAsync(stream, cancellationToken);
+			if (blob == null)
+			{
+				throw new EntityNotFoundException("Blob");
+			}
 
 			var office = new Office
 			{
 				Location = request.Location,
 				SubLocation = request.SubLocation,
 				Name = request.Name,
-				ImageUrl = $"https://localhost:5001/office-images/{fName}.png", // TODO fix hardcoded png
+				Image = blob
 			};
 
 			_db.Offices.Add(office);
@@ -59,7 +62,7 @@ namespace OpenDesk.API.Features.Offices
 				Location = office.Location,
 				SubLocation = office.SubLocation,
 				Name = office.Name,
-				ImageUrl = office.ImageUrl
+				Image = new BlobDTO(blob)
 			};
 		}
 	}
@@ -81,7 +84,7 @@ namespace OpenDesk.API.Features.Offices
 			RuleFor(o => o.Name)
 				.NotEmpty();
 
-			RuleFor(o => o.Image)
+			RuleFor(o => o.ImageBlobId)
 				.NotEmpty();
 
 			RuleFor(o => o)

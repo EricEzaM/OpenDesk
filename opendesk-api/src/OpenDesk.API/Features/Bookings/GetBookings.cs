@@ -28,6 +28,7 @@ namespace OpenDesk.API.Features.Bookings
 			return await _db.Bookings
 				.Include(b => b.Desk)
 				.ThenInclude(d => d.Office)
+				.ThenInclude(o => o.Image)
 				.Join(_db.Users, b => b.UserId, u => u.Id, (b, u) => new
 				{
 					Booking = b,
@@ -53,7 +54,7 @@ namespace OpenDesk.API.Features.Bookings
 					{
 						Id = bu.Booking.Desk.Office.Id,
 						Name = bu.Booking.Desk.Office.Name,
-						ImageUrl = bu.Booking.Desk.Office.ImageUrl
+						Image = new BlobDTO(bu.Booking.Desk.Office.Image)
 					},
 					User = bu.User
 				})

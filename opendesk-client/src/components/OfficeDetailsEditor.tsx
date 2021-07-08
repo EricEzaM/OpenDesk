@@ -118,7 +118,7 @@ export default function OfficeDetailsEditor({
 		});
 
 		if (office) {
-			setSelectedImageDataUrl(office.imageUrl);
+			setSelectedImageDataUrl(office.image.uri);
 		} else {
 			setSelectedImageDataUrl(null);
 		}
@@ -138,7 +138,7 @@ export default function OfficeDetailsEditor({
 
 			reader.readAsDataURL(file);
 		} else {
-			setSelectedImageDataUrl(office?.imageUrl ?? null);
+			setSelectedImageDataUrl(office?.image.uri ?? null);
 		}
 	}, [file]);
 

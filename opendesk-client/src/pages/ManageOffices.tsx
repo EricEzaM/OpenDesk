@@ -18,7 +18,7 @@ import { StatusData } from "components/StatusAlert";
 import { useOffices } from "hooks/useOffices";
 import { usePageTitle } from "hooks/usePageTitle";
 import { useEffect, useState } from "react";
-import { Office, ValidationError } from "types";
+import { Office, ValidationError, Blob } from "types";
 import apiRequest from "utils/requestUtils";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -86,26 +86,37 @@ export default function ManageOffices() {
 		sublocation: string,
 		image: File | null
 	): Promise<StatusData> {
-		var formData = new FormData();
+		var imageBlobId = selectedOffice?.image.id;
 
-		formData.append("Name", name);
-		formData.append("Location", location);
-		formData.append("SubLocation", sublocation);
 		if (image) {
-			formData.append("Image", image);
+			var formData = new FormData();
+			formData.append("File", image);
+			let res = await apiRequest<Blob>("blobs", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (res.data) {
+				imageBlobId = res.data.id;
+			}
 		}
 
-		let method = "POST"; // Create new office
+		let method = selectedOffice ? "PUT" : "POST"; // Create new office
 
-		if (selectedOffice) {
-			// Update existing office
-			method = "PATCH";
-			formData.append("Id", selectedOffice.id);
-		}
+		let body = {
+			id: selectedOffice?.id,
+			name: name,
+			location: location,
+			subLocation: sublocation,
+			imageBlobId: imageBlobId,
+		};
 
 		let res = await apiRequest<Office>("offices", {
 			method: method,
-			body: formData,
+			headers: {
+				"content-type": "application/json",
+			},
+			body: JSON.stringify(body),
 		});
 
 		if (res.data) {

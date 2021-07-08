@@ -107,8 +107,8 @@ namespace OpenDesk.API
 
 			app.UseStaticFiles(new StaticFileOptions()
 			{
-				FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "office-images")),
-				RequestPath = "/office-images"
+				FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "static", "blobs")),
+				RequestPath = "/static/blobs"
 			});
 
 			app.UseRouting();
