@@ -38,9 +38,10 @@ namespace OpenDesk.API.Features.Offices
 			return Ok(result);
 		}
 
-		[HttpPut]
-		public async Task<IActionResult> Update([FromBody]UpdateOfficeCommand command)
+		[HttpPut("{officeId}")]
+		public async Task<IActionResult> Update(string officeId, [FromBody]UpdateOfficeCommand command)
 		{
+			command.Id = officeId;
 			var result = await _mediator.Send(command);
 			return Ok(result);
 		}

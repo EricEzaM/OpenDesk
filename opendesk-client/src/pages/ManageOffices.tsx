@@ -102,6 +102,7 @@ export default function ManageOffices() {
 		}
 
 		let method = selectedOffice ? "PUT" : "POST"; // Create new office
+		let endpoint = selectedOffice ? `offices/${selectedOffice.id}` : "offices";
 
 		let body = {
 			id: selectedOffice?.id,
@@ -111,7 +112,7 @@ export default function ManageOffices() {
 			imageBlobId: imageBlobId,
 		};
 
-		let res = await apiRequest<Office>("offices", {
+		let res = await apiRequest<Office>(endpoint, {
 			method: method,
 			headers: {
 				"content-type": "application/json",
