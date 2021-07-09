@@ -241,7 +241,7 @@ export default function OfficeDetailsEditor({
 								)}
 							/>
 						</Grid>
-						<Grid item xs={12}>
+						<Grid item>
 							<FormControl>
 								<Controller
 									name="file"
@@ -318,12 +318,9 @@ export default function OfficeDetailsEditor({
 									/>
 								)}
 							</Button>
-
-							{statusData.severity && (
-								<Box marginTop={2}>
-									<StatusAlert {...statusData} />
-								</Box>
-							)}
+						</Grid>
+						<Grid item>
+							{statusData.severity && <StatusAlert {...statusData} />}
 						</Grid>
 						{selectedImageDataUrl && (
 							<Grid item xs={12}>
