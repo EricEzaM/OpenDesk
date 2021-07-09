@@ -35,7 +35,7 @@ namespace OpenDesk.API.Features.Desks
 
 		public async Task<DeskDTO> Handle(UpdateDeskCommand request, CancellationToken cancellationToken)
 		{
-			var desk = await _db.Desks.FirstOrDefaultAsync(d => d.Id == request.DeskId);
+			var desk = await _db.Desks.FirstOrDefaultAsync(d => d.Id == request.DeskId, cancellationToken);
 
 			if (desk == null)
 			{
@@ -45,7 +45,7 @@ namespace OpenDesk.API.Features.Desks
 			desk.Name = request.Name;
 			desk.DiagramPosition = request.DiagramPosition;
 
-			await _db.SaveChangesAsync();
+			await _db.SaveChangesAsync(cancellationToken);
 
 			return new DeskDTO
 			{
@@ -86,6 +86,7 @@ namespace OpenDesk.API.Features.Desks
 				.Include(d => d.Office)
 				.Where(d => d.Name == command.Name)
 				.Where(d => d.Office.Id == officeId)
+				.Where(d => d.Id != command.DeskId)
 				.ToList();
 
 			return desksWithSameName.Any() == false;
@@ -98,14 +99,15 @@ namespace OpenDesk.API.Features.Desks
 				.First(d => d.Id == command.DeskId)
 				.Office.Id;
 
-			var desksWithSameName = _db.Desks
+			var desksWithSamePosition = _db.Desks
 				.Include(d => d.Office)
 				.Where(d => d.DiagramPosition.X == command.DiagramPosition.X)
 				.Where(d => d.DiagramPosition.Y == command.DiagramPosition.Y)
 				.Where(d => d.Office.Id == officeId)
+				.Where(d => d.Id != command.DeskId)
 				.ToList();
 
-			return desksWithSameName.Any() == false;
+			return desksWithSamePosition.Any() == false;
 		}
 	}
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace OpenDesk.API.Features.Desks
 {
 	[Authorize]
-	[Route("api/offices")]
+	[Route("api")]
 	[ApiController]
 	public class DesksController : ControllerBase
 	{
@@ -20,7 +20,7 @@ namespace OpenDesk.API.Features.Desks
 			_mediator = mediator;
 		}
 
-		[HttpGet("{officeId}/desks")]
+		[HttpGet("offices/{officeId}/desks")]
 		public async Task<IActionResult> Get(string officeId)
 		{
 			var result = await _mediator.Send(new GetDesksCommand(officeId));
@@ -29,13 +29,21 @@ namespace OpenDesk.API.Features.Desks
 		}
 
 		// TODO: Add permissions / roles authentication.
-		[HttpPost("{officeId}/desks")]
+		[HttpPost("offices/{officeId}/desks")]
 		public async Task<IActionResult> Create(string officeId, [FromBody]CreateDeskCommand command)
 		{
 			command.OfficeId = officeId;
 
 			var result = await _mediator.Send(command);
 
+			return Ok(result);
+		}
+
+		[HttpPut("desks/{deskId}")]
+		public async Task<IActionResult> Update(string deskId, [FromBody]UpdateDeskCommand command)
+		{
+			command.DeskId = deskId;
+			var result = await _mediator.Send(command);
 			return Ok(result);
 		}
 
