@@ -4,14 +4,25 @@ import { useEffect, useRef } from "react";
 import { ImageOverlay, MapContainer } from "react-leaflet";
 import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
 
-const MAP_IMAGE_BORDER = 25;
+type MaxBounds = {
+	min: [number, number];
+	max: [number, number];
+};
 
-interface OfficeMapBaseProps {
+type OfficeMapBaseProps = {
 	image: string;
 	markers?: JSX.Element[];
-}
+};
 
-export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
+export type SharedOfficeMapProps = {
+	onMaxBoundsChanged?: (bounds: MaxBounds) => void;
+};
+
+export default function OfficeMapBase({
+	image,
+	markers,
+	onMaxBoundsChanged,
+}: OfficeMapBaseProps & SharedOfficeMapProps) {
 	// =============================================================
 	// Hooks & Variables
 	// =============================================================
@@ -40,15 +51,14 @@ export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
 	// =============================================================
 
 	function updateMapMaxBounds(image: HTMLImageElement) {
-		let min: [number, number] = [-MAP_IMAGE_BORDER, -MAP_IMAGE_BORDER];
-		let max: [number, number] = [
-			image.height + MAP_IMAGE_BORDER,
-			image.width + MAP_IMAGE_BORDER,
-		];
+		let min: [number, number] = [0, 0];
+		let max: [number, number] = [image.height, image.width];
 
 		// Update map bounds & center
 		mapRef?.current?.setMaxBounds([min, max]);
 		mapRef?.current?.setView([image.height / 2, image.width / 2]);
+
+		onMaxBoundsChanged && onMaxBoundsChanged({ min, max });
 	}
 
 	function updateImageBounds(image: HTMLImageElement) {
@@ -60,8 +70,9 @@ export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
 		);
 	}
 
-	function onMapCreated(map: Map) {
+	function onMapCreatedLocal(map: Map) {
 		mapRef.current = map;
+
 		let img = new Image();
 		img.src = image;
 		updateMapMaxBounds(img);
@@ -75,7 +86,7 @@ export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
 		<div className="map-container">
 			<div className="map-container__inner">
 				<MapContainer
-					whenCreated={onMapCreated}
+					whenCreated={onMapCreatedLocal}
 					center={[0, 0]}
 					crs={CRS.Simple}
 					attributionControl={false}
@@ -88,7 +99,7 @@ export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
 					doubleClickZoom={false}
 					keyboard={false}
 					boxZoom={false}
-					maxBoundsViscosity={1}
+					maxBoundsViscosity={0.8}
 				>
 					<ImageOverlay
 						ref={imageRef}
@@ -100,8 +111,6 @@ export default function OfficeMapBase({ image, markers }: OfficeMapBaseProps) {
 					/>
 
 					{markers && markers.map((m) => m)}
-
-					<MapClickedAtLocationPopup />
 				</MapContainer>
 			</div>
 		</div>

@@ -164,7 +164,7 @@ export default function OfficeDetailsEditor({
 				<form onSubmit={handleSubmit((data) => onSubmit(data))}>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
-							<Typography variant="h4">Edit Details</Typography>
+							<Typography variant="h4">Edit Office Details</Typography>
 						</Grid>
 						{/* Only show delete button if office is an existing office */}
 						{office && (
@@ -174,7 +174,7 @@ export default function OfficeDetailsEditor({
 								</Button>
 							</Grid>
 						)}
-						<Grid item xs={12}>
+						<Grid item xs={12} md={4}>
 							<Controller
 								control={control}
 								name="name"
@@ -193,7 +193,7 @@ export default function OfficeDetailsEditor({
 								)}
 							/>
 						</Grid>
-						<Grid item xs={6}>
+						<Grid item xs={12} md={4}>
 							<Controller
 								control={control}
 								name="location"
@@ -217,7 +217,7 @@ export default function OfficeDetailsEditor({
 								)}
 							/>
 						</Grid>
-						<Grid item xs={6}>
+						<Grid item xs={12} md={4}>
 							<Controller
 								control={control}
 								name="sublocation"
@@ -241,6 +241,8 @@ export default function OfficeDetailsEditor({
 								)}
 							/>
 						</Grid>
+					</Grid>
+					<Grid container spacing={2}>
 						<Grid item>
 							<FormControl>
 								<Controller

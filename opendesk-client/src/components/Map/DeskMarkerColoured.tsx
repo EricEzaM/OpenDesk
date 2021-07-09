@@ -1,7 +1,13 @@
-import { divIcon, point } from "leaflet";
-import React from "react";
+import {
+	divIcon,
+	LatLng,
+	LatLngExpression,
+	LeafletMouseEvent,
+	point,
+} from "leaflet";
+import React, { useState } from "react";
 import ReactDOMServer from "react-dom/server";
-import { Marker, MarkerProps } from "react-leaflet";
+import { Marker, MarkerProps, useMap } from "react-leaflet";
 import { ReactComponent as DeskLocationIcon } from "resources/desk-location.svg";
 
 export type DeskMarkerColouredProps = {
@@ -12,10 +18,11 @@ export type DeskMarkerColouredProps = {
 export default function DeskMarkerColoured({
 	fill,
 	stroke,
-	...rest
+	...props
 }: DeskMarkerColouredProps & MarkerProps) {
 	return (
 		<Marker
+			{...props}
 			icon={divIcon({
 				html: ReactDOMServer.renderToString(
 					<DeskLocationIcon
@@ -28,10 +35,10 @@ export default function DeskMarkerColoured({
 						}}
 					/>
 				),
+				iconAnchor: point(0, 30), // Anchor the icon so that the pointy end of the icon is at the location.
 				iconSize: point(30, 30),
 				className: "", // Do not delete: this stops white box from appearing behind marker icons.
 			})}
-			{...rest}
 		/>
 	);
 }
