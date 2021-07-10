@@ -162,7 +162,7 @@ namespace OpenDesk.API.Features.Authentication
 			if (cpResult.Succeeded)
 			{
 				await HttpContext.SignInAsync(cpResult.Value);
-				return Redirect("/");
+				return NoContent();
 			}
 			else
 			{
