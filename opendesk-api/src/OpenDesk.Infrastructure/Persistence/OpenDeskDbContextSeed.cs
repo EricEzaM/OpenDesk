@@ -31,7 +31,7 @@ namespace OpenDesk.Infrastructure.Persistence
 					"Seed",
 					"OfficePlanImage2.png");
 
-			var img = await GetOfficeImage(existingFile, env);
+			var img = await GetOfficeImagePath(existingFile, env);
 
 			var n = DateTimeOffset.Now;
 
@@ -83,7 +83,7 @@ namespace OpenDesk.Infrastructure.Persistence
 			await context.SaveChangesAsync();
 		}
 
-		public static async Task<string> GetOfficeImage(string existingFile, IHostEnvironment env)
+		public static async Task<string> GetOfficeImagePath(string existingFile, IHostEnvironment env)
 		{
 			// Get existing
 			using var imageFS = new FileStream(existingFile, FileMode.Open);

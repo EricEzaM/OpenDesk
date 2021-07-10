@@ -31,6 +31,7 @@ namespace OpenDesk.API
 		{
 			Configuration = configuration;
 			_env = env;
+			CreateBlobsFolder(env);
 		}
 
 		public IConfiguration Configuration { get; }
@@ -126,6 +127,15 @@ namespace OpenDesk.API
 				//endpoints.MapControllers();
 				endpoints.MapControllers();
 			});
+		}
+
+		private void CreateBlobsFolder(IWebHostEnvironment env)
+		{
+			var path = Path.Combine(env.ContentRootPath, "static", "blobs");
+			if (!Directory.Exists(path))
+			{
+				Directory.CreateDirectory(path);
+			}
 		}
 	}
 }
