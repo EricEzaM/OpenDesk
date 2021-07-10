@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenDesk.Domain.Entities;
 using OpenDesk.Domain.ValueObjects;
@@ -16,12 +18,21 @@ namespace OpenDesk.Infrastructure.Persistence
 {
 	public static class OpenDeskDbContextSeed
 	{
-		public static async Task SeedDefaults(OpenDeskDbContext context, IHostEnvironment env)
+		public static async Task SeedDefaults(IServiceProvider serviceProvider)
 		{
-			var userEntity = context.Users.Add(new OpenDeskUser("test.user@testuser.com") 
+			var ctx = serviceProvider.GetRequiredService<OpenDeskDbContext>();
+			var env = serviceProvider.GetRequiredService<IHostEnvironment>();
+			var um = serviceProvider.GetRequiredService<UserManager<OpenDeskUser>>();
+			var rm = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+			var user = new OpenDeskUser("test.user@testuser.com")
 			{
 				DisplayName = "Test User",
-			});
+			};
+
+			await um.CreateAsync(user);
+			await rm.CreateAsync(new IdentityRole("demo"));
+			await um.AddToRoleAsync(user, "demo");
 
 			var existingFile =
 				Path.Combine(
@@ -35,7 +46,7 @@ namespace OpenDesk.Infrastructure.Persistence
 
 			var n = DateTimeOffset.Now;
 
-			context.Offices.Add(new Office
+			ctx.Offices.Add(new Office
 			{
 				Location = "Brisbane, Australia",
 				SubLocation = "Queen Street",
@@ -55,13 +66,13 @@ namespace OpenDesk.Infrastructure.Persistence
 						{
 							new Booking()
 							{
-								UserId = userEntity.Entity.Id,
+								UserId = user.Id,
 								StartDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 8, 0, 0, TimeSpan.FromHours(10)),
 								EndDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 18, 0, 0, TimeSpan.FromHours(10))
 							},
 							new Booking()
 							{
-								UserId = userEntity.Entity.Id,
+								UserId = user.Id,
 								StartDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 8, 0, 0, TimeSpan.FromHours(10)).AddDays(2),
 								EndDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 18, 0, 0, TimeSpan.FromHours(10)).AddDays(3)
 							}
@@ -80,7 +91,7 @@ namespace OpenDesk.Infrastructure.Persistence
 				}
 			});
 
-			await context.SaveChangesAsync();
+			await ctx.SaveChangesAsync();
 		}
 
 		public static async Task<string> GetOfficeImagePath(string existingFile, IHostEnvironment env)

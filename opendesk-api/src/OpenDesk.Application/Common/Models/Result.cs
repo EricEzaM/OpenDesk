@@ -6,6 +6,32 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Common.Models
 {
+	public class Result<T>
+	{
+		internal Result(T value, bool succeeded, IEnumerable<string> errors)
+		{
+			Value = value;
+			Succeeded = succeeded;
+			Errors = errors;
+		}
+
+		public T Value { get; set; }
+		public bool Succeeded { get; set; }
+		public IEnumerable<string> Errors { get; }
+
+		public static Result<T> Success(T value)
+		{
+			return new Result<T>(value, true, Array.Empty<string>());
+		}
+
+		public static Result<T> Failure(params string[] errors) => Failure(errors.ToArray());
+
+		public static Result<T> Failure(IEnumerable<string> errors)
+		{
+			return new Result<T>(default, false, errors);
+		}
+	}
+
 	public class Result
 	{
 		internal Result(bool succeeded, IEnumerable<string> errors)
@@ -19,7 +45,7 @@ namespace OpenDesk.Application.Common.Models
 
 		public static Result Success()
 		{
-			return new Result(true, new string[] { });
+			return new Result(true, Array.Empty<string>());
 		}
 
 		public static Result Failure(IEnumerable<string> errors)

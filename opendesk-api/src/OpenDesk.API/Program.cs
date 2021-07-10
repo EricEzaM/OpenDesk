@@ -23,10 +23,7 @@ namespace OpenDesk.API
 
 				try
 				{
-					var ctx = services.GetRequiredService<OpenDeskDbContext>();
-					var env = services.GetRequiredService<IWebHostEnvironment>();
-
-					await OpenDeskDbContextSeed.SeedDefaults(ctx, env);
+					await OpenDeskDbContextSeed.SeedDefaults(services);
 
 				}
 				catch (Exception ex)

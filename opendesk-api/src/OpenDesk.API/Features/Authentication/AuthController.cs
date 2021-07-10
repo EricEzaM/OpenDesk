@@ -90,26 +90,28 @@ namespace OpenDesk.API.Features.Authentication
 			// Can use custom tenant filtering logic here
 			// << Tenant Filtering Logic here >>
 
-			var (result, userId) = await _identityService.GetUserIdAsync(MicrosoftAuthName, idToken.Subject);
+			var getUserResult = await _identityService.GetUserAsync(MicrosoftAuthName, idToken.Subject);
+			var userId = getUserResult.Value.Id;
 
-			if (result.Succeeded == false)
+			if (getUserResult.Succeeded == false)
 			{
 				// No user yet, so create one
 				var username = idToken.Claims.FirstOrDefault(c => c.Type == "email").Value;
-				(result, userId) = await _identityService.CreateUserAsync(username);
+				var createResult = await _identityService.CreateUserAsync(username);
 
-				if (result.Succeeded)
+				if (createResult.Succeeded)
 				{
 					// Creation Success, add external login info
-					result = await _identityService.AddUserLoginAsync(userId, MicrosoftAuthName, idToken.Subject, MicrosoftAuthName);
+					var addLoginResult = await _identityService.AddUserLoginAsync(createResult.Value, MicrosoftAuthName, idToken.Subject, MicrosoftAuthName);
 
-					if (result.Succeeded == false)
+					if (addLoginResult.Succeeded == false)
 					{
 						return BadRequest("Could not add external login information to user.");
 					}
 
+					userId = createResult.Value;
 					var display = idToken.Claims.FirstOrDefault(c => c.Type == "name").Value;
-					await _identityService.SetDisplayNameAsync(userId, display);
+					await _identityService.SetDisplayNameAsync(createResult.Value, display);
 				}
 				else
 				{
@@ -117,11 +119,11 @@ namespace OpenDesk.API.Features.Authentication
 				}
 			}
 
-			var (cpResult, cp) = await _identityService.GetUserClaimsPrincipal(userId);
+			var cpResult = await _identityService.GetUserClaimsPrincipal(userId);
 
 			if (cpResult.Succeeded)
 			{
-				await HttpContext.SignInAsync(cp);
+				await HttpContext.SignInAsync(cpResult.Value);
 			}
 
 			return Redirect(authModel.State);
@@ -143,6 +145,37 @@ namespace OpenDesk.API.Features.Authentication
 				UserName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
 				DisplayName = User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.DisplayName)?.Value,
 			});
+		}
+
+		[HttpPost("demos/{userId}")]
+		public async Task<IActionResult> LogInDemoUser(string userId)
+		{
+			var demoResult = await _identityService.GetUserIsDemo(userId);
+
+			if (!demoResult.Value)
+			{
+				return BadRequest("Unable to log in given user.");
+			}
+
+			var cpResult = await _identityService.GetUserClaimsPrincipal(userId);
+
+			if (cpResult.Succeeded)
+			{
+				await HttpContext.SignInAsync(cpResult.Value);
+				return Redirect("/");
+			}
+			else
+			{
+				return BadRequest("Unable to log in given user.");
+			}
+		}
+
+		[HttpGet("demos")]
+		public async Task<IActionResult> GetDemoUsers()
+		{
+			var users = await _identityService.GetDemoUsers();
+
+			return Ok(users);
 		}
 	}
 }

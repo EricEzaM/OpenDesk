@@ -31,6 +31,7 @@ namespace OpenDesk.Infrastructure
 			// IDENTITY
 
 			services.AddIdentityCore<OpenDeskUser>() // "Core" version does not set up the cookies. We want to do it ourselves.
+				.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<OpenDeskDbContext>()
 				.AddClaimsPrincipalFactory<OpenDeskUserClaimsPrincipalFactory>(); // Custom factory for adding our own claims.
 

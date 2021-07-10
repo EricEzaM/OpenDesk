@@ -1,4 +1,5 @@
-﻿using OpenDesk.Application.Common.Models;
+﻿using OpenDesk.Application.Common.DataTransferObjects;
+using OpenDesk.Application.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,11 @@ namespace OpenDesk.Application.Common.Interfaces
 	public interface IIdentityService
 	{
 		Task<Result> AddUserLoginAsync(string userId, string loginProvider, string providerKey, string providerDisplayName);
-		Task<(Result Result, string UserId)> CreateUserAsync(string userName);
-		Task<(Result Result, ClaimsPrincipal ClaimsPrincipal)> GetUserClaimsPrincipal(string userId);
-		Task<(Result Result, string UserId)> GetUserIdAsync(string userName);
-		Task<(Result Result, string UserId)> GetUserIdAsync(string loginProvider, string providerKey);
-		Task<string> GetUserNameAsync(string userId);
-		Task<string> GetDisplayNameAsync(string userId);
+		Task<Result<string>> CreateUserAsync(string userName);
+		Task<Result<ClaimsPrincipal>> GetUserClaimsPrincipal(string userId);
+		Task<Result<UserDTO>> GetUserAsync(string loginProvider, string providerKey);
 		Task<Result> SetDisplayNameAsync(string userId, string displayName);
+		Task<Result<bool>> GetUserIsDemo(string userId);
+		Task<IEnumerable<UserDTO>> GetDemoUsers();
 	}
 }
