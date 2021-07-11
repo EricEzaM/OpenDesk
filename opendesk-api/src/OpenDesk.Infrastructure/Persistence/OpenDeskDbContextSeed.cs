@@ -22,7 +22,7 @@ namespace OpenDesk.Infrastructure.Persistence
 {
 	public static class OpenDeskDbContextSeed
 	{
-		public static async Task SeedDefaults(IServiceProvider serviceProvider)
+		public static async Task SeedDemo(IServiceProvider serviceProvider)
 		{
 			var ctx = serviceProvider.GetRequiredService<OpenDeskDbContext>();
 			var um = serviceProvider.GetRequiredService<UserManager<OpenDeskUser>>();

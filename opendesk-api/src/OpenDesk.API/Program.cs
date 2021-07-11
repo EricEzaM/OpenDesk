@@ -23,9 +23,14 @@ namespace OpenDesk.API
 			{
 				var services = scope.ServiceProvider;
 
+				var options = services.GetRequiredService<IOptions<ApplicationOptions>>();
+
 				try
 				{
-					await OpenDeskDbContextSeed.SeedDefaults(services);
+					if (options.Value.IsDemo)
+					{
+						await OpenDeskDbContextSeed.SeedDemo(services);
+					}
 				}
 				catch (Exception ex)
 				{
