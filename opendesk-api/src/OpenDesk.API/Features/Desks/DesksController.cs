@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenDesk.API.Attributes;
+using OpenDesk.Application.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +23,7 @@ namespace OpenDesk.API.Features.Desks
 		}
 
 		[HttpGet("offices/{officeId}/desks")]
+		[HasPermission(Permissions.Desks.Read)]
 		public async Task<IActionResult> Get(string officeId)
 		{
 			var result = await _mediator.Send(new GetDesksCommand(officeId));
@@ -28,8 +31,8 @@ namespace OpenDesk.API.Features.Desks
 			return Ok(result);
 		}
 
-		// TODO: Add permissions / roles authentication.
 		[HttpPost("offices/{officeId}/desks")]
+		[HasPermission(Permissions.Desks.Create)]
 		public async Task<IActionResult> Create(string officeId, [FromBody]CreateDeskCommand command)
 		{
 			command.OfficeId = officeId;
@@ -40,6 +43,7 @@ namespace OpenDesk.API.Features.Desks
 		}
 
 		[HttpPut("desks/{deskId}")]
+		[HasPermission(Permissions.Desks.Edit)]
 		public async Task<IActionResult> Update(string deskId, [FromBody]UpdateDeskCommand command)
 		{
 			command.DeskId = deskId;
@@ -48,6 +52,7 @@ namespace OpenDesk.API.Features.Desks
 		}
 
 		[HttpDelete("{officeId}/desks/{deskId}")]
+		[HasPermission(Permissions.Desks.Delete)]
 		public async Task<IActionResult> Delete(string officeId, string deskId)
 		{
 			throw new NotImplementedException();

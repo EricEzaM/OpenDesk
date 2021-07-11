@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenDesk.Application;
+using OpenDesk.Application.Common;
+using OpenDesk.Application.Common.Interfaces;
 using OpenDesk.Domain.Entities;
 using OpenDesk.Domain.ValueObjects;
 using OpenDesk.Infrastructure.Identity;
@@ -11,6 +14,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,28 +25,25 @@ namespace OpenDesk.Infrastructure.Persistence
 		public static async Task SeedDefaults(IServiceProvider serviceProvider)
 		{
 			var ctx = serviceProvider.GetRequiredService<OpenDeskDbContext>();
-			var env = serviceProvider.GetRequiredService<IHostEnvironment>();
 			var um = serviceProvider.GetRequiredService<UserManager<OpenDeskUser>>();
 			var rm = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-			var user = new OpenDeskUser("test.user@testuser.com")
-			{
-				DisplayName = "Test User",
-			};
+			var bs = serviceProvider.GetRequiredService<IBlobSaver>();
 
-			await um.CreateAsync(user);
-			await rm.CreateAsync(new IdentityRole("demo"));
-			await um.AddToRoleAsync(user, "demo");
+			var demo = new IdentityRole(Roles.Demo);
+			await rm.CreateAsync(demo);
 
-			var existingFile =
+			var superAdmin = await SeedSuperAdminDemoAsync(um, rm);
+			var memberUser = await SeedMemberUserDemoAsync(um, rm);
+
+			var existingOfficeImagePath =
 				Path.Combine(
 					Path.GetDirectoryName(
 						Assembly.GetExecutingAssembly().Location),
 					"Persistence",
 					"Seed",
 					"OfficePlanImage2.png");
-
-			var img = await GetOfficeImagePath(existingFile, env);
+			var dbOfficeImagePath = await GetOfficeImagePathAsync(existingOfficeImagePath, bs);
 
 			var n = DateTimeOffset.Now;
 
@@ -53,7 +54,7 @@ namespace OpenDesk.Infrastructure.Persistence
 				Name = "Office 1",
 				Image = new Blob
 				{
-					Uri = img,
+					Uri = dbOfficeImagePath,
 					Expiry = DateTimeOffset.UtcNow.AddDays(1)
 				},
 				Desks = new List<Desk>()
@@ -66,13 +67,13 @@ namespace OpenDesk.Infrastructure.Persistence
 						{
 							new Booking()
 							{
-								UserId = user.Id,
+								UserId = memberUser.Id,
 								StartDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 8, 0, 0, TimeSpan.FromHours(10)),
 								EndDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 18, 0, 0, TimeSpan.FromHours(10))
 							},
 							new Booking()
 							{
-								UserId = user.Id,
+								UserId = memberUser.Id,
 								StartDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 8, 0, 0, TimeSpan.FromHours(10)).AddDays(2),
 								EndDateTime = new DateTimeOffset(n.Year, n.Month, n.Day, 18, 0, 0, TimeSpan.FromHours(10)).AddDays(3)
 							}
@@ -94,21 +95,52 @@ namespace OpenDesk.Infrastructure.Persistence
 			await ctx.SaveChangesAsync();
 		}
 
-		public static async Task<string> GetOfficeImagePath(string existingFile, IHostEnvironment env)
+		public static async Task<string> GetOfficeImagePathAsync(string existingFile, IBlobSaver env)
 		{
-			// Get existing
-			using var imageFS = new FileStream(existingFile, FileMode.Open);
+			var bytes =File.ReadAllBytes(existingFile);
 
-			// Copy to content path with new filename
-			string fName = Guid.NewGuid().ToString();
-			string path = Path.Combine(env.ContentRootPath, "static", "blobs", fName + ".png"); // TODO fix this! dont hardcode png
-			using var stream = new FileStream(path, FileMode.Create);
-			await imageFS.CopyToAsync(stream);
+			if (bytes.Length == 0)
+			{
+				throw new Exception("Could not load existing file " + existingFile);
+			}
 
-			var size = Image.FromStream(stream);
+			return await env.SaveAsync(bytes, existingFile);
+		}
 
-			// TODO: Fix this so that its not hardcoded
-			return $"https://localhost:5001/static/blobs/{fName}.png";
+		private static async Task<OpenDeskUser> SeedSuperAdminDemoAsync(UserManager<OpenDeskUser> um, RoleManager<IdentityRole> rm)
+		{
+			var superAdmin = new IdentityRole(Roles.SuperAdmin);
+			await rm.CreateAsync(superAdmin);
+
+			foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions)))
+			{
+				await rm.AddClaimAsync(superAdmin, new Claim(CustomClaimTypes.Permission, permissionString));
+			}
+
+			var user = new OpenDeskUser("superadmin@opendeskdemo.com", "SuperAdmin Demo");
+			await um.CreateAsync(user);
+			await um.AddToRoleAsync(user, Roles.SuperAdmin);
+			await um.AddToRoleAsync(user, Roles.Demo);
+
+			return user;
+		}
+
+		private static async Task<OpenDeskUser> SeedMemberUserDemoAsync(UserManager<OpenDeskUser> um, RoleManager<IdentityRole> rm)
+		{
+			var member = new IdentityRole(Roles.Member);
+			await rm.CreateAsync(member);
+
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Desks.Read));
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+
+			var user = new OpenDeskUser("member@opendeskdemo.com", "Member Demo");
+			await um.CreateAsync(user);
+			await um.AddToRoleAsync(user, member.Name);
+			await um.AddToRoleAsync(user, Roles.Demo);
+
+			return user;
 		}
 	}
 }

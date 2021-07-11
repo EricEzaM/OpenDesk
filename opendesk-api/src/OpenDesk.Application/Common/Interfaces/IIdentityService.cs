@@ -18,5 +18,6 @@ namespace OpenDesk.Application.Common.Interfaces
 		Task<Result> SetDisplayNameAsync(string userId, string displayName);
 		Task<Result<bool>> GetUserIsDemo(string userId);
 		Task<IEnumerable<UserDTO>> GetDemoUsers();
+		Task<Result> AddUserToRoleAsync(string userId, string roleName);
 	}
 }

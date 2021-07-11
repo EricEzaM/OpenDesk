@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OpenDesk.Application.Common;
 using OpenDesk.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,6 @@ namespace OpenDesk.API
 				try
 				{
 					await OpenDeskDbContextSeed.SeedDefaults(services);
-
 				}
 				catch (Exception ex)
 				{

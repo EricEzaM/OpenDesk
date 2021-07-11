@@ -8,6 +8,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using OpenDesk.API.Features;
 using OpenDesk.API.Errors;
+using OpenDesk.Application.Common;
+using OpenDesk.API.Attributes;
 
 namespace OpenDesk.API.Features.Bookings
 {
@@ -24,6 +26,7 @@ namespace OpenDesk.API.Features.Bookings
 		}
 
 		[HttpGet("bookings")]
+		[HasPermission(Permissions.Bookings.Read)]
 		public async Task<IActionResult> Get()
 		{
 			var result = await _mediator.Send(new GetBookingsCommand());
@@ -32,6 +35,7 @@ namespace OpenDesk.API.Features.Bookings
 		}
 
 		[HttpGet("desks/{deskId}/bookings")]
+		[HasPermission(Permissions.Bookings.Read)]
 		public async Task<IActionResult> GetForDesk(string deskId)
 		{
 			var result = await _mediator.Send(new GetBookingsForDeskCommand(deskId));
@@ -40,6 +44,7 @@ namespace OpenDesk.API.Features.Bookings
 		}
 
 		[HttpPost("desks/{deskId}/bookings")]
+		[HasPermission(Permissions.Bookings.Create)]
 		public async Task<IActionResult> CreateForDesk(string deskId, [FromBody] CreateBookingCommand command)
 		{
 			command.DeskId = deskId;
@@ -57,6 +62,7 @@ namespace OpenDesk.API.Features.Bookings
 		}
 
 		[HttpGet("/api/users/{userId}/bookings")]
+		[HasPermission(Permissions.Bookings.Read)]
 		public async Task<IActionResult> GetForSignInUser(string userId)
 		{
 			var signedInUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -79,6 +85,7 @@ namespace OpenDesk.API.Features.Bookings
 		}
 
 		[HttpGet("offices/{officeId}/bookings")]
+		[HasPermission(Permissions.Bookings.Read)]
 		public async Task<IActionResult> GetForOffice(string officeId)
 		{
 			var result = await _mediator.Send(new GetBookingsForOfficeCommand(officeId));

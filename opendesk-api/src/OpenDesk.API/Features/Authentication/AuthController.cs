@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using OpenDesk.API.Models;
 using OpenDesk.Application;
+using OpenDesk.Application.Common;
 using OpenDesk.Application.Common.DataTransferObjects;
 using OpenDesk.Application.Common.Interfaces;
 using System;
@@ -18,6 +20,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Authentication
 {
+	[AllowAnonymous]
 	[Route("api/auth")]
 	[ApiController]
 	public class AuthController : ControllerBase
@@ -26,11 +29,13 @@ namespace OpenDesk.API.Features.Authentication
 
 		private readonly HttpClient _httpClient;
 		private readonly IIdentityService _identityService;
+		private readonly IOptions<ApplicationOptions> _options;
 
-		public AuthController(HttpClient httpClient, IIdentityService identityService)
+		public AuthController(HttpClient httpClient, IIdentityService identityService, IOptions<ApplicationOptions> options)
 		{
 			_httpClient = httpClient;
 			_identityService = identityService;
+			_options = options;
 		}
 
 		[HttpGet(MicrosoftAuthName)]
@@ -81,7 +86,7 @@ namespace OpenDesk.API.Features.Authentication
 
 			if (res.IsSuccessStatusCode == false)
 			{
-				return BadRequest("Something went wrong. Please try again.");
+				return BadRequest("Something went wrong. Please try again. (1)");
 			}
 
 			var tokens = await res.Content.ReadFromJsonAsync<TokenReturnModel>();
@@ -96,8 +101,13 @@ namespace OpenDesk.API.Features.Authentication
 			if (getUserResult.Succeeded == false)
 			{
 				// No user yet, so create one
-				var username = idToken.Claims.FirstOrDefault(c => c.Type == "email").Value;
-				var createResult = await _identityService.CreateUserAsync(username);
+				var email = idToken.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
+				if (email == null)
+				{
+					return BadRequest("Something went wrong. Please try again. (2)");
+				}
+
+				var createResult = await _identityService.CreateUserAsync(email);
 
 				if (createResult.Succeeded)
 				{
@@ -106,16 +116,22 @@ namespace OpenDesk.API.Features.Authentication
 
 					if (addLoginResult.Succeeded == false)
 					{
+						// TODO: delete user
 						return BadRequest("Could not add external login information to user.");
 					}
 
 					userId = createResult.Value;
 					var display = idToken.Claims.FirstOrDefault(c => c.Type == "name").Value;
 					await _identityService.SetDisplayNameAsync(createResult.Value, display);
+
+					if (_options.Value.SuperAdminEmail == email)
+					{
+						await _identityService.AddUserToRoleAsync(createResult.Value, Roles.SuperAdmin);
+					}
 				}
 				else
 				{
-					return BadRequest($"Could not create user with username '{username}'");
+					return BadRequest($"Could not create user with username '{email}'");
 				}
 			}
 
@@ -129,14 +145,15 @@ namespace OpenDesk.API.Features.Authentication
 			return Redirect(authModel.State);
 		}
 
+		[Authorize]
 		[HttpPost("signout")]
 		public IActionResult SignOutUser()
 		{
 			return SignOut();
 		}
 
-		[HttpGet("/api/me")] // Don't use the controller prefix for this route.
 		[Authorize]
+		[HttpGet("/api/me")] // Don't use the controller prefix for this route.
 		public IActionResult GetUser()
 		{
 			return Ok(new UserDTO()

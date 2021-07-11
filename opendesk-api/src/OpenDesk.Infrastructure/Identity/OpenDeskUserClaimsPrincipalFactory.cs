@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Infrastructure.Identity
 {
-	public class OpenDeskUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<OpenDeskUser>
+	public class OpenDeskUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<OpenDeskUser, IdentityRole>
 	{
-		public OpenDeskUserClaimsPrincipalFactory(UserManager<OpenDeskUser> userManager, IOptions<IdentityOptions> optionsAccessor) : base(userManager, optionsAccessor)
+		public OpenDeskUserClaimsPrincipalFactory(UserManager<OpenDeskUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor) : base(userManager, roleManager, optionsAccessor)
 		{
 
 		}

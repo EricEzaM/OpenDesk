@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenDesk.API.Attributes;
+using OpenDesk.Application.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Blob
 {
-	[Authorize]
 	[Route("api/blobs")]
 	[ApiController]
 	public class BlobController : ControllerBase
@@ -21,6 +22,7 @@ namespace OpenDesk.API.Features.Blob
 		}
 
 		[HttpGet("{blobId}")]
+		[HasPermission(Permissions.Blobs.Read)]
 		public async Task<IActionResult> Get(string blobId)
 		{
 			var result = await _mediator.Send(new GetBlobCommand(blobId));
@@ -28,6 +30,7 @@ namespace OpenDesk.API.Features.Blob
 		}
 
 		[HttpPost]
+		[HasPermission(Permissions.Blobs.Create)]
 		public async Task<IActionResult> Create([FromForm] CreateBlobCommand command)
 		{
 			var result = await _mediator.Send(command);

@@ -20,6 +20,7 @@ using Hellang.Middleware.ProblemDetails.Mvc;
 using OpenDesk.API.Errors;
 using Microsoft.AspNetCore.Http;
 using System;
+using OpenDesk.Application.Common;
 
 namespace OpenDesk.API
 {
@@ -39,6 +40,10 @@ namespace OpenDesk.API
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			bool isDevelopment = _env.IsDevelopment();
+
+			services.Configure<ApplicationOptions>(Configuration.GetSection(ApplicationOptions.SECTION_NAME));
+
 			services.AddProblemDetails(o =>
 			{
 				o.ExceptionDetailsPropertyName = "internalErrors";
@@ -61,7 +66,7 @@ namespace OpenDesk.API
 				o.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
 			});
 
-			services.AddInfrastructure(Configuration, _env);
+			services.AddInfrastructure(Configuration, isDevelopment);
 
 			services.AddMediatR(typeof(Startup));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

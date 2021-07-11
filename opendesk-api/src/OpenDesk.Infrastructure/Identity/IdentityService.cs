@@ -91,7 +91,7 @@ namespace OpenDesk.Infrastructure.Identity
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
-			bool isDemo = await _userManager.IsInRoleAsync(user, "demo");
+			bool isDemo = await _userManager.IsInRoleAsync(user, "Demo");
 
 			return user == null
 				? Result<bool>.Failure()
@@ -100,7 +100,7 @@ namespace OpenDesk.Infrastructure.Identity
 
 		public async Task<IEnumerable<UserDTO>> GetDemoUsers()
 		{
-			var users = await _userManager.GetUsersInRoleAsync("demo");
+			var users = await _userManager.GetUsersInRoleAsync("Demo");
 
 			return users.Select(u => new UserDTO
 			{
@@ -108,6 +108,18 @@ namespace OpenDesk.Infrastructure.Identity
 				UserName = u.UserName,
 				DisplayName	= u.DisplayName
 			});
+		}
+
+		public async Task<Result> AddUserToRoleAsync(string userId, string roleName)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+
+			if (user == null)
+			{
+				return Result.Failure("Unable to find user");
+			}
+
+			return (await _userManager.AddToRoleAsync(user, roleName)).ToOpenDeskResult();
 		}
 	}
 }
