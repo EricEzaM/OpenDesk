@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -91,7 +91,7 @@ namespace OpenDesk.API.Features.Authentication
 			// << Tenant Filtering Logic here >>
 
 			var getUserResult = await _identityService.GetUserAsync(MicrosoftAuthName, idToken.Subject);
-			var userId = getUserResult.Value.Id;
+			var userId = getUserResult.Value?.Id;
 
 			if (getUserResult.Succeeded == false)
 			{

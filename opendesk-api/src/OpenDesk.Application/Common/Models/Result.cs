@@ -24,12 +24,9 @@ namespace OpenDesk.Application.Common.Models
 			return new Result<T>(value, true, Array.Empty<string>());
 		}
 
-		public static Result<T> Failure(params string[] errors) => Failure(errors.ToArray());
+		public static Result<T> Failure(params string[] errors) => new(default, false, errors);
 
-		public static Result<T> Failure(IEnumerable<string> errors)
-		{
-			return new Result<T>(default, false, errors);
-		}
+		public static Result<T> Failure(IEnumerable<string> errors) => new(default, false, errors);
 	}
 
 	public class Result
