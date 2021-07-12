@@ -22,8 +22,35 @@ namespace OpenDesk.Infrastructure.Persistence
 {
 	public static class OpenDeskDbContextSeed
 	{
-		public static async Task SeedDemo(IServiceProvider serviceProvider)
+		public static async Task SeedDefaultsAsync(IServiceProvider serviceProvider)
 		{
+			var rm = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+			// SuperAdmin
+
+			var superAdminRole = new IdentityRole(Roles.SuperAdmin);
+			await rm.CreateAsync(superAdminRole);
+
+			foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions)))
+			{
+				await rm.AddClaimAsync(superAdminRole, new Claim(CustomClaimTypes.Permission, permissionString));
+			}
+
+			var member = new IdentityRole(Roles.Member);
+			await rm.CreateAsync(member);
+
+			// Member
+
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Desks.Read));
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
+			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+		}
+
+		public static async Task SeedDemoAsync(IServiceProvider serviceProvider)
+		{
+			await SeedDefaultsAsync(serviceProvider);
+
 			var ctx = serviceProvider.GetRequiredService<OpenDeskDbContext>();
 			var um = serviceProvider.GetRequiredService<UserManager<OpenDeskUser>>();
 			var rm = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -109,14 +136,6 @@ namespace OpenDesk.Infrastructure.Persistence
 
 		private static async Task<OpenDeskUser> SeedSuperAdminDemoAsync(UserManager<OpenDeskUser> um, RoleManager<IdentityRole> rm)
 		{
-			var superAdmin = new IdentityRole(Roles.SuperAdmin);
-			await rm.CreateAsync(superAdmin);
-
-			foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions)))
-			{
-				await rm.AddClaimAsync(superAdmin, new Claim(CustomClaimTypes.Permission, permissionString));
-			}
-
 			var user = new OpenDeskUser("superadmin@opendeskdemo.com", "SuperAdmin Demo");
 			await um.CreateAsync(user);
 			await um.AddToRoleAsync(user, Roles.SuperAdmin);
@@ -127,17 +146,9 @@ namespace OpenDesk.Infrastructure.Persistence
 
 		private static async Task<OpenDeskUser> SeedMemberUserDemoAsync(UserManager<OpenDeskUser> um, RoleManager<IdentityRole> rm)
 		{
-			var member = new IdentityRole(Roles.Member);
-			await rm.CreateAsync(member);
-
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Desks.Read));
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
-
 			var user = new OpenDeskUser("member@opendeskdemo.com", "Member Demo");
 			await um.CreateAsync(user);
-			await um.AddToRoleAsync(user, member.Name);
+			await um.AddToRoleAsync(user, Roles.Member);
 			await um.AddToRoleAsync(user, Roles.Demo);
 
 			return user;

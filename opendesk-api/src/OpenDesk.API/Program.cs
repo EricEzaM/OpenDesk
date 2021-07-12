@@ -29,7 +29,11 @@ namespace OpenDesk.API
 				{
 					if (options.Value.IsDemo)
 					{
-						await OpenDeskDbContextSeed.SeedDemo(services);
+						await OpenDeskDbContextSeed.SeedDemoAsync(services);
+					}
+					else
+					{
+						await OpenDeskDbContextSeed.SeedDefaultsAsync(services);
 					}
 				}
 				catch (Exception ex)
