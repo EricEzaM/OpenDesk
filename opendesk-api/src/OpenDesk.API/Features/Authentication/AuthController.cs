@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.API.Features.Authentication
 {
-	[AllowAnonymous]
 	[Route("api/auth")]
 	[ApiController]
 	public class AuthController : ControllerBase
@@ -38,6 +37,7 @@ namespace OpenDesk.API.Features.Authentication
 			_options = options;
 		}
 
+		[AllowAnonymous]
 		[HttpGet(MicrosoftAuthName)]
 		public async Task<IActionResult> Authenticate(string returnUrl)
 		{
@@ -62,6 +62,7 @@ namespace OpenDesk.API.Features.Authentication
 			return Redirect(ub.Uri.AbsoluteUri);
 		}
 
+		[AllowAnonymous]
 		[HttpPost(MicrosoftAuthName + "/callback")]
 		public async Task<IActionResult> Callback([FromForm] MicrosoftAuthRequestModel authModel)
 		{
@@ -145,14 +146,12 @@ namespace OpenDesk.API.Features.Authentication
 			return Redirect(authModel.State);
 		}
 
-		[Authorize]
 		[HttpPost("signout")]
 		public IActionResult SignOutUser()
 		{
 			return SignOut();
 		}
 
-		[Authorize]
 		[HttpGet("/api/me")] // Don't use the controller prefix for this route.
 		public IActionResult GetUser()
 		{
@@ -164,6 +163,7 @@ namespace OpenDesk.API.Features.Authentication
 			});
 		}
 
+		[AllowAnonymous]
 		[HttpPost("demos/{userId}")]
 		public async Task<IActionResult> LogInDemoUser(string userId)
 		{
@@ -187,6 +187,7 @@ namespace OpenDesk.API.Features.Authentication
 			}
 		}
 
+		[AllowAnonymous]
 		[HttpGet("demos")]
 		public async Task<IActionResult> GetDemoUsers()
 		{
