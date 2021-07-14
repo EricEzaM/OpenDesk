@@ -167,6 +167,11 @@ namespace OpenDesk.API.Features.Authentication
 		[HttpPost("demos/{userId}")]
 		public async Task<IActionResult> LogInDemoUser(string userId)
 		{
+			if (!_options.Value.IsDemo)
+			{
+				throw new ApplicationException("Application is not in demo mode.");
+			}
+
 			var demoResult = await _identityService.GetUserIsDemo(userId);
 
 			if (!demoResult.Value)
@@ -191,6 +196,11 @@ namespace OpenDesk.API.Features.Authentication
 		[HttpGet("demos")]
 		public async Task<IActionResult> GetDemoUsers()
 		{
+			if (!_options.Value.IsDemo)
+			{
+				throw new NotSupportedException("Application is not in demo mode.");
+			}
+
 			var users = await _identityService.GetDemoUsers();
 
 			return Ok(users);

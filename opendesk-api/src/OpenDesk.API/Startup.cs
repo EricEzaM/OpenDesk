@@ -63,6 +63,7 @@ namespace OpenDesk.API
 						Status = StatusCodes.Status400BadRequest
 					});
 
+				o.MapToStatusCode<NotSupportedException>(StatusCodes.Status501NotImplemented);
 				o.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
 			});
 
