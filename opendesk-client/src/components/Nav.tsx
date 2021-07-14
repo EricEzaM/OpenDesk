@@ -21,10 +21,21 @@ import {
 } from "@material-ui/icons";
 import { ReactNode, useState } from "react";
 import { usePageTitle } from "hooks/usePageTitle";
+import DemoSignInOut from "./auth/DemoSignInOut";
 
 export default function Nav() {
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const title = usePageTitle();
+
+	const loginElement = process.env.REACT_APP_IS_DEMO ? (
+		<Box>
+			<DemoSignInOut />
+		</Box>
+	) : (
+		<Box>
+			<SignInOut />
+		</Box>
+	);
 
 	return (
 		<>
@@ -49,9 +60,7 @@ export default function Nav() {
 						</Box>
 					)}
 					<Box flexGrow="1" /> {/* Spacer */}
-					<Box>
-						<SignInOut />
-					</Box>
+					{loginElement}
 				</Toolbar>
 			</AppBar>
 

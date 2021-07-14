@@ -10,6 +10,7 @@ interface AuthContextProps {
 	user?: User;
 	signIn: (returnUrl: string) => void;
 	signOut: (returnUrl: string) => void;
+	signInDemo: (userId: string) => void;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -20,6 +21,11 @@ const AuthContext = createContext<AuthContextProps>({
 		);
 	},
 	signOut: () => {
+		console.error(
+			"Not Implemented. Method likely called without context provider."
+		);
+	},
+	signInDemo: () => {
 		console.error(
 			"Not Implemented. Method likely called without context provider."
 		);
@@ -60,6 +66,10 @@ function useAuthProvider(): AuthContextProps {
 	// 3. After MS login success, the API will handle that and will create a user in the database. Then will redirect to the provided redirectUrl.
 	// 4. The redirect url is this application, so the app will reload, trigger this effect, hit the user endpoint successfully and give us the user object!
 	useEffect(() => {
+		refreshUser();
+	}, []);
+
+	function refreshUser() {
 		apiRequest<User>("me").then((res) => {
 			// Set user & update localStorage value.
 			if (res.data) {
@@ -77,6 +87,14 @@ function useAuthProvider(): AuthContextProps {
 		window.location.href = `https://localhost:5001/api/auth/microsoft?returnUrl=${returnUrl}`;
 	}
 
+	function signInDemo(userId: string) {
+		apiRequest<User>(`auth/demos/${userId}`, {
+			method: "POST",
+		}).then((res) => {
+			refreshUser();
+		});
+	}
+
 	function signOut(returnUrl: string) {
 		apiRequest<void>(`auth/signout`, {
 			method: "POST",
@@ -89,5 +107,6 @@ function useAuthProvider(): AuthContextProps {
 		user,
 		signIn,
 		signOut,
+		signInDemo,
 	};
 }
