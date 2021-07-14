@@ -60,7 +60,20 @@ namespace OpenDesk.Infrastructure.Persistence
 			var demo = new IdentityRole(Roles.Demo);
 			await rm.CreateAsync(demo);
 
+			var deskManagerRole = new IdentityRole("DeskManager");
+			await rm.CreateAsync(deskManagerRole);
+
+			foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions.Desks)))
+			{
+				await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, permissionString));
+			}
+
+			await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
+			await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
+			await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+
 			var superAdmin = await SeedSuperAdminDemoAsync(um, rm);
+			var deskManager = await SeedDeskManagerUserDemoAsync(um, rm);
 			var memberUser = await SeedMemberUserDemoAsync(um, rm);
 
 			var existingOfficeImagePath =
@@ -149,6 +162,16 @@ namespace OpenDesk.Infrastructure.Persistence
 			var user = new OpenDeskUser("member@opendeskdemo.com", "Member Demo");
 			await um.CreateAsync(user);
 			await um.AddToRoleAsync(user, Roles.Member);
+			await um.AddToRoleAsync(user, Roles.Demo);
+
+			return user;
+		}
+
+		private static async Task<OpenDeskUser> SeedDeskManagerUserDemoAsync(UserManager<OpenDeskUser> um, RoleManager<IdentityRole> rm)
+		{
+			var user = new OpenDeskUser("deskmanager@opendeskdemo.com", "Desk Manager Demo");
+			await um.CreateAsync(user);
+			await um.AddToRoleAsync(user, "DeskManager");
 			await um.AddToRoleAsync(user, Roles.Demo);
 
 			return user;
