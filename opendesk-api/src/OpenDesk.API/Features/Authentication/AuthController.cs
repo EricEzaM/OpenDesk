@@ -163,6 +163,12 @@ namespace OpenDesk.API.Features.Authentication
 			});
 		}
 
+		[HttpGet("/api/me/permissions")]
+		public IActionResult GetUserPermissions()
+		{
+			return Ok(User.Claims.Where(c => c.Type == CustomClaimTypes.Permission).Select(c => c.Value));
+		}
+
 		[AllowAnonymous]
 		[HttpPost("demos/{userId}")]
 		public async Task<IActionResult> LogInDemoUser(string userId)
