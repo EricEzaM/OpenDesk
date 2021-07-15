@@ -13,8 +13,6 @@ export default function useAuthPermissionsCheck({
 }: PermissionsCheckProps) {
 	const { permissions } = useAuth();
 
-	debugger;
-
 	const reqAllPass =
 		(requiredPermissionsAll &&
 			requiredPermissionsAll.every((rp) => permissions.includes(rp))) ??
