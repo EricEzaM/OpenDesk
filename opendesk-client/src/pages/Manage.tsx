@@ -9,8 +9,15 @@ import {
 import { Business, Group, Room } from "@material-ui/icons";
 import Authenticated from "components/auth/Authenticated";
 import { usePageTitle } from "hooks/usePageTitle";
-import { Link } from "react-router-dom";
-import { permissions } from "utils/permissions";
+import { Link, useRouteMatch } from "react-router-dom";
+import PrivateRoute from "router/PrivateRoute";
+import {
+	deskManagementPermissions,
+	officeManagementPermissions,
+	permissions,
+} from "utils/permissions";
+import ManageDesks from "./ManageDesks";
+import ManageOffices from "./ManageOffices";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -36,6 +43,7 @@ export default function Manage() {
 	usePageTitle("Management");
 
 	const classes = useStyles();
+	const { path, url } = useRouteMatch();
 
 	const iconStyleDefaults = {
 		fontSize: 60,
@@ -44,7 +52,7 @@ export default function Manage() {
 
 	const managementTiles = [
 		{
-			link: "/manage/offices",
+			link: `${url}/offices`,
 			title: "Offices",
 			desc: "Create and edit offices.",
 			icon: <Business color="primary" style={iconStyleDefaults} />,
@@ -55,7 +63,7 @@ export default function Manage() {
 			],
 		},
 		{
-			link: "/manage/desks",
+			link: `${url}/desks`,
 			title: "Desks",
 			desc: "Create and edit desks - including desk location, names and other information.",
 			icon: <Room color="secondary" style={iconStyleDefaults} />,
@@ -66,7 +74,7 @@ export default function Manage() {
 			],
 		},
 		{
-			link: "/manage/users",
+			link: `${url}/users`,
 			title: "Users",
 			desc: "Manage users and their permissions.",
 			icon: <Group style={iconStyleDefaults} />,
@@ -75,25 +83,45 @@ export default function Manage() {
 	];
 
 	return (
-		<Grid container spacing={2} justify="center">
-			{managementTiles.map((tileInfo) => (
-				<Authenticated
-					key={tileInfo.title}
-					requiredPermissionsAny={tileInfo.allowedPermissions}
-				>
-					<Grid item sm={4} xs={12}>
-						<Link className={classes.link} to={tileInfo.link}>
-							<ButtonBase className={classes.button} focusRipple>
-								{tileInfo.icon}
-								<Typography className={classes.buttonTitle}>
-									{tileInfo.title}
-								</Typography>
-								<Typography variant="body1">{tileInfo.desc}</Typography>
-							</ButtonBase>
-						</Link>
-					</Grid>
-				</Authenticated>
-			))}
-		</Grid>
+		<>
+			<PrivateRoute routeProps={{ exact: true, path: `${path}` }}>
+				<Grid container spacing={2} justify="center">
+					{managementTiles.map((tileInfo) => (
+						<Authenticated
+							key={tileInfo.title}
+							requiredPermissionsAny={tileInfo.allowedPermissions}
+						>
+							<Grid item sm={4} xs={12}>
+								<Link className={classes.link} to={tileInfo.link}>
+									<ButtonBase className={classes.button} focusRipple>
+										{tileInfo.icon}
+										<Typography className={classes.buttonTitle}>
+											{tileInfo.title}
+										</Typography>
+										<Typography variant="body1">{tileInfo.desc}</Typography>
+									</ButtonBase>
+								</Link>
+							</Grid>
+						</Authenticated>
+					))}
+				</Grid>
+			</PrivateRoute>
+			<PrivateRoute
+				routeProps={{ exact: true, path: `${path}/offices` }}
+				permissionCheckProps={{
+					requiredPermissionsAny: officeManagementPermissions,
+				}}
+			>
+				<ManageOffices />
+			</PrivateRoute>
+			<PrivateRoute
+				routeProps={{ exact: true, path: `${path}/desks` }}
+				permissionCheckProps={{
+					requiredPermissionsAny: deskManagementPermissions,
+				}}
+			>
+				<ManageDesks />
+			</PrivateRoute>
+		</>
 	);
 }
