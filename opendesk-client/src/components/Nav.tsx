@@ -18,10 +18,12 @@ import {
 	CollectionsBookmark,
 	Person,
 	Settings,
+	Home,
 } from "@material-ui/icons";
 import { ReactNode, useState } from "react";
 import { usePageTitle } from "hooks/usePageTitle";
 import DemoSignInOut from "./auth/DemoSignInOut";
+import { managementPermissions } from "utils/permissions";
 
 export default function Nav() {
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -75,13 +77,18 @@ export default function Nav() {
 					}}
 				>
 					<List>
-						{getMenuListItem(
-							"Book a Desk",
-							"/offices",
-							<CollectionsBookmark />
-						)}
+						{getMenuListItem("Home", "/", <Home />)}
+						<Authenticated>
+							{getMenuListItem(
+								"Book a Desk",
+								"/offices",
+								<CollectionsBookmark />
+							)}
+						</Authenticated>
 						<Authenticated>
 							{getMenuListItem("My Bookings", "/me", <Person />)}
+						</Authenticated>
+						<Authenticated requiredPermissionsAny={managementPermissions}>
 							{getMenuListItem("Management Portal", "/manage", <Settings />)}
 						</Authenticated>
 					</List>

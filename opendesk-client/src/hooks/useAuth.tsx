@@ -5,9 +5,11 @@ import { User } from "types";
 import apiRequest from "utils/requestUtils";
 
 const AUTH_USER_KEY = "auth_user";
+const PERMISSIONS_KEY = "permissions";
 
 interface AuthContextProps {
 	user?: User;
+	permissions: string[];
 	signIn: (returnUrl: string) => void;
 	signOut: (returnUrl: string) => void;
 	signInDemo: (userId: string) => void;
@@ -15,6 +17,7 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps>({
 	user: undefined,
+	permissions: [],
 	signIn: () => {
 		console.error(
 			"Not Implemented. Method likely called without context provider."
@@ -57,7 +60,13 @@ function useAuthProvider(): AuthContextProps {
 	const userJson = localStorage.getItem(AUTH_USER_KEY);
 	const userObj = userJson && JSON.parse(userJson);
 
+	const permissionsJson = localStorage.getItem(PERMISSIONS_KEY);
+	const permissionsObj = permissionsJson && JSON.parse(permissionsJson);
+
 	const [user, setUser] = useState<User | undefined>(userObj ?? undefined);
+	const [permissions, setPermissions] = useState<string[]>(
+		permissionsObj ?? []
+	);
 
 	// On application reload, check the user login status by querying the API (should use the existing cookie)
 	// Since the API redirects us to the application, this will be run after the auth Cookie has been set and will be successful.
@@ -75,12 +84,25 @@ function useAuthProvider(): AuthContextProps {
 			if (res.data) {
 				setUser(res.data);
 				localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
+
+				refreshPermissions();
 			} else if (res.status === 401) {
 				setUser(undefined);
 				localStorage.removeItem(AUTH_USER_KEY);
 			}
 		});
-	}, []);
+	}
+
+	function refreshPermissions() {
+		apiRequest<string[]>("me/permissions").then((res) => {
+			if (res.data) {
+				setPermissions(res.data);
+				localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(res.data));
+			} else {
+				localStorage.setItem(PERMISSIONS_KEY, JSON.stringify([]));
+			}
+		});
+	}
 
 	// Sign in by simply redirecting to the API with the desired auth provider and the return URL.
 	function signIn(returnUrl: string) {
@@ -105,6 +127,7 @@ function useAuthProvider(): AuthContextProps {
 
 	return {
 		user,
+		permissions,
 		signIn,
 		signOut,
 		signInDemo,

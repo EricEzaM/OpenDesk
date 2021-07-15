@@ -14,6 +14,11 @@ import { OfficesProvider } from "hooks/useOffices";
 import ManageOffices from "pages/ManageOffices";
 import { PageTitleProvider } from "hooks/usePageTitle";
 import ManageDesks from "pages/ManageDesks";
+import {
+	deskManagementPermissions,
+	managementPermissions,
+	officeManagementPermissions,
+} from "utils/permissions";
 
 function App() {
 	return (
@@ -32,19 +37,34 @@ function App() {
 									<Route exact path="/offices/:officeId?/:deskId?">
 										<Offices />
 									</Route>
-									<PrivateRoute exact path="/me">
+									<PrivateRoute routeProps={{ exact: true, path: "/me" }}>
 										<Me />
 									</PrivateRoute>
 									<Route exact path="/about">
 										<About />
 									</Route>
-									<PrivateRoute exact path="/manage">
+									<PrivateRoute
+										routeProps={{ exact: true, path: "/manage" }}
+										permissionCheckProps={{
+											requiredPermissionsAny: managementPermissions,
+										}}
+									>
 										<Manage />
 									</PrivateRoute>
-									<PrivateRoute exact path="/manage/offices">
+									<PrivateRoute
+										routeProps={{ exact: true, path: "/manage/offices" }}
+										permissionCheckProps={{
+											requiredPermissionsAny: officeManagementPermissions,
+										}}
+									>
 										<ManageOffices />
 									</PrivateRoute>
-									<PrivateRoute exact path="/manage/desks">
+									<PrivateRoute
+										routeProps={{ exact: true, path: "/manage/desks" }}
+										permissionCheckProps={{
+											requiredPermissionsAny: deskManagementPermissions,
+										}}
+									>
 										<ManageDesks />
 									</PrivateRoute>
 								</div>

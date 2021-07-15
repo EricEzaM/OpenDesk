@@ -1,18 +1,32 @@
 import { ReactNode } from "react";
 import { Redirect, Route, RouteProps } from "react-router";
+import useAuthPermissionsCheck, {
+	PermissionsCheckProps,
+} from "hooks/useAuthPermissionsCheck";
 import { useAuth } from "hooks/useAuth";
 
-interface PrivateRouteProps extends RouteProps {
+interface PrivateRouteProps {
 	children: ReactNode;
+	routeProps: RouteProps;
+	permissionCheckProps?: PermissionsCheckProps;
 }
 
-function PrivateRoute({ children, ...rest }: PrivateRouteProps) {
-	let auth = useAuth();
+function PrivateRoute({
+	children,
+	routeProps,
+	permissionCheckProps,
+}: PrivateRouteProps) {
+	const { user } = useAuth();
+	const passedPermissions = useAuthPermissionsCheck({
+		...permissionCheckProps,
+	});
 
 	return (
 		<Route
-			{...rest}
-			render={(props) => (auth.user ? children : <Redirect to="/" />)}
+			{...routeProps}
+			render={(props) =>
+				user && passedPermissions ? children : <Redirect to="/" />
+			}
 		/>
 	);
 }
