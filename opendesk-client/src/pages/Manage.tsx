@@ -16,8 +16,8 @@ import {
 	officeManagementPermissions,
 	permissions,
 } from "utils/permissions";
-import ManageDesks from "./ManageDesks";
-import ManageOffices from "./ManageOffices";
+import ManageDesks from "components/ManageDesks";
+import ManageOffices from "components/ManageOffices";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
