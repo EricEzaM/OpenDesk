@@ -12,6 +12,9 @@ import {
 	ListItemText,
 	Typography,
 	Box,
+	makeStyles,
+	createStyles,
+	Theme,
 } from "@material-ui/core";
 import {
 	Menu,
@@ -25,7 +28,17 @@ import { usePageTitle } from "hooks/usePageTitle";
 import DemoSignInOut from "./auth/DemoSignInOut";
 import { managementPermissions } from "utils/permissions";
 
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		drawer: {
+			minWidth: 200,
+		},
+	})
+);
+
 export default function Nav() {
+	const classes = useStyles();
+
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const title = usePageTitle();
 
@@ -67,6 +80,9 @@ export default function Nav() {
 			</AppBar>
 
 			<Drawer
+				classes={{
+					paper: classes.drawer,
+				}}
 				anchor="left"
 				open={drawerOpen}
 				onClose={(e) => setDrawerOpen(false)}
