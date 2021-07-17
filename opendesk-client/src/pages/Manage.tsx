@@ -40,10 +40,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Manage() {
-	usePageTitle("Management");
+	const { path, url, isExact } = useRouteMatch();
+	usePageTitle(isExact ? "Manage" : undefined);
 
 	const classes = useStyles();
-	const { path, url } = useRouteMatch();
 
 	const iconStyleDefaults = {
 		fontSize: 60,
