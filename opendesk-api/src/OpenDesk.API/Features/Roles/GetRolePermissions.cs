@@ -30,7 +30,7 @@ namespace OpenDesk.API.Features.Roles
 
 		public async Task<IEnumerable<string>> Handle(GetRolePermissionsCommand request, CancellationToken cancellationToken)
 		{
-			var result = await _identityService.GetRolePermissions(request.RoleId);
+			var result = await _identityService.GetRolePermissionsAsync(request.RoleId);
 
 			if (result.Succeeded)
 			{

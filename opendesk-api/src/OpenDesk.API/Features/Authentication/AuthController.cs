@@ -136,7 +136,7 @@ namespace OpenDesk.API.Features.Authentication
 				}
 			}
 
-			var cpResult = await _identityService.GetUserClaimsPrincipal(userId);
+			var cpResult = await _identityService.GetUserClaimsPrincipalAsync(userId);
 
 			if (cpResult.Succeeded)
 			{
@@ -178,14 +178,14 @@ namespace OpenDesk.API.Features.Authentication
 				throw new ApplicationException("Application is not in demo mode.");
 			}
 
-			var demoResult = await _identityService.GetUserIsDemo(userId);
+			var demoResult = await _identityService.GetUserIsDemoAsync(userId);
 
 			if (!demoResult.Value)
 			{
 				return BadRequest("Unable to log in given user.");
 			}
 
-			var cpResult = await _identityService.GetUserClaimsPrincipal(userId);
+			var cpResult = await _identityService.GetUserClaimsPrincipalAsync(userId);
 
 			if (cpResult.Succeeded)
 			{
@@ -207,7 +207,7 @@ namespace OpenDesk.API.Features.Authentication
 				throw new NotSupportedException("Application is not in demo mode.");
 			}
 
-			var users = await _identityService.GetDemoUsers();
+			var users = await _identityService.GetDemoUsersAsync();
 
 			return Ok(users);
 		}

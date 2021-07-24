@@ -52,7 +52,7 @@ namespace OpenDesk.Infrastructure.Identity
 			return result.ToOpenDeskResult(user.Id);
 		}
 
-		public async Task<Result<ClaimsPrincipal>> GetUserClaimsPrincipal(string userId)
+		public async Task<Result<ClaimsPrincipal>> GetUserClaimsPrincipalAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
@@ -104,7 +104,7 @@ namespace OpenDesk.Infrastructure.Identity
 			return Result.Success();
 		}
 
-		public async Task<Result<bool>> GetUserIsDemo(string userId)
+		public async Task<Result<bool>> GetUserIsDemoAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
@@ -113,7 +113,7 @@ namespace OpenDesk.Infrastructure.Identity
 				: Result<bool>.Success(await _userManager.IsInRoleAsync(user, "Demo"));
 		}
 
-		public async Task<IEnumerable<UserDTO>> GetDemoUsers()
+		public async Task<IEnumerable<UserDTO>> GetDemoUsersAsync()
 		{
 			var users = await _userManager.GetUsersInRoleAsync("Demo");
 
@@ -125,7 +125,7 @@ namespace OpenDesk.Infrastructure.Identity
 			});
 		}
 
-		public async Task<Result<IEnumerable<string>>> GetUserRoles(string userId)
+		public async Task<Result<IEnumerable<string>>> GetUserRolesAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
@@ -205,7 +205,7 @@ namespace OpenDesk.Infrastructure.Identity
 			}).ToListAsync();
 		}
 
-		public async Task<Result<IEnumerable<string>>> GetRolePermissions(string roleId)
+		public async Task<Result<IEnumerable<string>>> GetRolePermissionsAsync(string roleId)
 		{
 			var role = await _roleManager.FindByIdAsync(roleId);
 
