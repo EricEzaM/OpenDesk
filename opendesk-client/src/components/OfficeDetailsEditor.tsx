@@ -163,13 +163,17 @@ export default function OfficeDetailsEditor({
 			<CardContent>
 				<form onSubmit={handleSubmit((data) => onSubmit(data))}>
 					<Grid container spacing={2}>
-						<Grid item xs={6}>
+						<Grid item xs={office ? 6 : 12}>
 							<Typography variant="h4">Edit Office Details</Typography>
 						</Grid>
-						{/* Only show delete button if office is an existing office */}
+						{/* Only enable delete button if office is an existing office */}
 						{office && (
 							<Grid item xs={6} className={classes.gridItemContentRight}>
-								<Button variant="contained" onClick={() => onDeleteClicked()}>
+								<Button
+									variant="contained"
+									disabled={!office}
+									onClick={() => onDeleteClicked()}
+								>
 									Delete Office
 								</Button>
 							</Grid>
