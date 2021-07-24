@@ -52,8 +52,7 @@ export default function ManageDesks() {
 		refreshDesks,
 	} = useOfficeDesks();
 
-	const [newDesk, setNewDesk] = useState<Desk | null>(null);
-	const [selectedDesk, setSelectedDesk] = useState<Desk | null>(null);
+	const [selectedDesk, setSelectedDesk] = useState<Desk | null>();
 	const [statusData, setStatusData] = useState<StatusData>({});
 
 	const [filterValue, setFilterValue] = useState<string>();
@@ -73,19 +72,12 @@ export default function ManageDesks() {
 	}, [filterValue, desks]);
 
 	function onDeskSelected(desk: Desk) {
-		setNewDesk(null);
 		setSelectedDesk(desk);
 		setStatusData({});
 	}
 
 	function onNewDeskClicked() {
-		const newDeskObj: Desk = {
-			id: "new-desk",
-			name: "",
-			diagramPosition: { x: 0, y: 0 },
-		};
-		setNewDesk(newDeskObj);
-		setSelectedDesk(newDeskObj);
+		setSelectedDesk(null);
 		setStatusData({});
 	}
 
@@ -93,10 +85,10 @@ export default function ManageDesks() {
 		name: string,
 		position: DiagramPosition
 	): Promise<StatusData> {
-		let method = newDesk ? "POST" : "PUT";
-		let endpoint = newDesk
-			? `offices/${selectedOffice?.id}/desks` // TODO: Fix undefined possiblity
-			: `desks/${selectedDesk?.id}`;
+		let method = selectedDesk ? "PUT" : "POST";
+		let endpoint = selectedDesk
+			? `desks/${selectedDesk?.id}`
+			: `offices/${selectedOffice?.id}/desks`; // TODO: Fix undefined possiblity
 
 		let body = {
 			id: selectedDesk?.id,
@@ -146,8 +138,6 @@ export default function ManageDesks() {
 		errorContent = <Typography>No desks match the filter.</Typography>;
 	}
 
-	const desksIncludingNew = [...(newDesk ? [newDesk] : []), ...desks];
-
 	return (
 		<>
 			<Grid container spacing={2}>
@@ -190,12 +180,12 @@ export default function ManageDesks() {
 						</List>
 					</Card>
 				</Grid>
-				{selectedDesk !== null && selectedOffice && (
+				{selectedDesk !== undefined && selectedOffice && (
 					<Grid item md={9} xs={12}>
 						<DeskDetailsEditor
 							office={selectedOffice}
 							desk={selectedDesk}
-							desks={desksIncludingNew}
+							desks={desks}
 							onSave={(name: string, position: DiagramPosition) =>
 								onSave(name, position)
 							}

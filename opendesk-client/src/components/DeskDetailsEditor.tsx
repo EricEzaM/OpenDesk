@@ -94,6 +94,7 @@ export default function OfficeDetailsEditor({
 		};
 	}
 
+	const name = watch("name");
 	const dp = watch("diagramPosition");
 
 	useEffect(() => {
@@ -134,7 +135,13 @@ export default function OfficeDetailsEditor({
 		}
 	}
 
-	const desksWithNewPositions = desks.map((d, i) =>
+	const creatingDesk = {
+		id: "new-desk",
+		name: name ?? "",
+		diagramPosition: dp ?? { x: 0, y: 0 },
+	};
+	const desksWithNewDesk: Desk[] = [...(desk ? [] : [creatingDesk]), ...desks];
+	const desksWithNewPositions = desksWithNewDesk.map((d, i) =>
 		d.id === desk?.id
 			? {
 					...desks[i],
@@ -228,7 +235,7 @@ export default function OfficeDetailsEditor({
 							<OfficeMapMovableDesks
 								image={office.image.uri}
 								desks={desksWithNewPositions}
-								selectedDesk={desk ?? undefined}
+								selectedDesk={desk ?? creatingDesk}
 								onDeskSelected={(deskId) => onNewDeskSelected(deskId)}
 								onSelectedDeskMoved={(x, y) => onDeskMoved(x, y)}
 								onMaxBoundsChanged={(bounds) => {
