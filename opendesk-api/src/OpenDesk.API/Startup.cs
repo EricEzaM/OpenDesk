@@ -71,6 +71,7 @@ namespace OpenDesk.API
 
 			services.AddMediatR(typeof(Startup));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(StringTrimmingBehaviour<,>));
 			services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
 
 			services.AddHttpClient();
