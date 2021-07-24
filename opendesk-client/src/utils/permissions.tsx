@@ -36,6 +36,22 @@ export const permissions = {
 	},
 };
 
+export function getAllPermissionsArray() {
+	return flattenObjValues(permissions);
+}
+
+function flattenObjValues(obj: any, result: any[] = []) {
+	for (let key in obj) {
+		if (typeof obj[key] === "object") {
+			flattenObjValues(obj[key], result);
+		} else {
+			result.push(obj[key]);
+		}
+	}
+
+	return result;
+}
+
 export const managementPermissions = [
 	permissions.Users.Edit,
 	permissions.Roles.Create,
@@ -60,4 +76,11 @@ export const deskManagementPermissions = [
 	permissions.Desks.Create,
 	permissions.Desks.Edit,
 	permissions.Desks.Delete,
+];
+
+export const userManagementPermissions = [permissions.Users.Edit];
+
+export const roleManagementPermissions = [
+	permissions.Roles.Edit.Metadata,
+	permissions.Roles.Edit.Permissions,
 ];

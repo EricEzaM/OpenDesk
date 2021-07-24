@@ -15,9 +15,15 @@ namespace OpenDesk.Application.Common.Interfaces
 		Task<Result<string>> CreateUserAsync(string userName);
 		Task<Result<ClaimsPrincipal>> GetUserClaimsPrincipal(string userId);
 		Task<Result<UserDTO>> GetUserAsync(string loginProvider, string providerKey);
+		Task<Result<IEnumerable<UserDTO>>> GetUsersAsync();
 		Task<Result> SetDisplayNameAsync(string userId, string displayName);
 		Task<Result<bool>> GetUserIsDemo(string userId);
 		Task<IEnumerable<UserDTO>> GetDemoUsers();
+		Task<IEnumerable<RoleDTO>> GetRolesAsync();
+		Task<Result<IEnumerable<string>>> GetUserRoles(string userId);
 		Task<Result> AddUserToRoleAsync(string userId, string roleName);
+		Task<Result> SetUserRolesAsync(string userId, IEnumerable<string> roleNames);
+		Task<Result<IEnumerable<string>>> GetRolePermissions(string roleId);
+		Task<Result> SetRolePermissionsAsync(string roleId, IEnumerable<string> permissions);
 	}
 }

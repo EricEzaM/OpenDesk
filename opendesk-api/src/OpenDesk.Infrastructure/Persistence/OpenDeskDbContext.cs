@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Infrastructure.Persistence
 {
-	public class OpenDeskDbContext : IdentityDbContext<OpenDeskUser, IdentityRole, string>, IOpenDeskDbContext
+	public class OpenDeskDbContext : IdentityDbContext<OpenDeskUser, OpenDeskRole, string>, IOpenDeskDbContext
 	{
 		public OpenDeskDbContext(DbContextOptions options) : base(options)
 		{

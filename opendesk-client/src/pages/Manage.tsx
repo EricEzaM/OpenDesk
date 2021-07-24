@@ -6,18 +6,31 @@ import {
 	Theme,
 	Typography,
 } from "@material-ui/core";
-import { Business, Group, Room } from "@material-ui/icons";
+import { Business, Group, Room, Security } from "@material-ui/icons";
 import Authenticated from "components/auth/Authenticated";
 import { usePageTitle } from "hooks/usePageTitle";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, RouteProps, useRouteMatch } from "react-router-dom";
 import PrivateRoute from "router/PrivateRoute";
 import {
 	deskManagementPermissions,
 	officeManagementPermissions,
 	permissions,
+	roleManagementPermissions,
+	userManagementPermissions,
 } from "utils/permissions";
 import ManageDesks from "components/ManageDesks";
 import ManageOffices from "components/ManageOffices";
+import ManageUsers from "components/ManageUsers";
+import ManageRoles from "components/ManageRoles";
+import { PermissionsCheckProps } from "hooks/useAuthPermissionsCheck";
+
+type ManagementTileInfo = {
+	relativePath: string;
+	title: string;
+	description: string;
+	icon: JSX.Element;
+	permissionCheckProps: PermissionsCheckProps;
+};
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -50,55 +63,69 @@ export default function Manage() {
 		marginBottom: 10,
 	};
 
-	const managementTiles = [
+	const managementTiles: ManagementTileInfo[] = [
 		{
-			link: `${url}/offices`,
+			relativePath: `offices`,
 			title: "Offices",
-			desc: "Create and edit offices.",
+			description: "Create and edit offices.",
 			icon: <Business color="primary" style={iconStyleDefaults} />,
-			allowedPermissions: [
-				permissions.Offices.Create,
-				permissions.Offices.Edit,
-				permissions.Offices.Delete,
-			],
+			permissionCheckProps: {
+				requiredPermissionsAny: officeManagementPermissions,
+			},
 		},
 		{
-			link: `${url}/desks`,
+			relativePath: `desks`,
 			title: "Desks",
-			desc: "Create and edit desks - including desk location, names and other information.",
+			description:
+				"Create and edit desks - including desk location, names and other information.",
 			icon: <Room color="secondary" style={iconStyleDefaults} />,
-			allowedPermissions: [
-				permissions.Desks.Create,
-				permissions.Desks.Edit,
-				permissions.Desks.Delete,
-			],
+			permissionCheckProps: {
+				requiredPermissionsAny: deskManagementPermissions,
+			},
 		},
 		{
-			link: `${url}/users`,
+			relativePath: `users`,
 			title: "Users",
-			desc: "Manage users and their permissions.",
+			description: "Manage user roles.",
 			icon: <Group style={iconStyleDefaults} />,
-			allowedPermissions: [permissions.Users.Edit],
+			permissionCheckProps: {
+				requiredPermissionsAny: userManagementPermissions,
+			},
+		},
+		{
+			relativePath: `roles`,
+			title: "Roles",
+			description: "Manage roles and their permissions.",
+			icon: <Security style={iconStyleDefaults} />,
+			permissionCheckProps: {
+				requiredPermissionsAny: roleManagementPermissions,
+			},
 		},
 	];
 
 	return (
 		<>
+			{/* Tiles displaying options */}
 			<PrivateRoute routeProps={{ exact: true, path: `${path}` }}>
 				<Grid container spacing={2} justify="center">
 					{managementTiles.map((tileInfo) => (
 						<Authenticated
 							key={tileInfo.title}
-							requiredPermissionsAny={tileInfo.allowedPermissions}
+							{...tileInfo.permissionCheckProps}
 						>
 							<Grid item sm={4} xs={12}>
-								<Link className={classes.link} to={tileInfo.link}>
+								<Link
+									className={classes.link}
+									to={`${url}/${tileInfo.relativePath}`}
+								>
 									<ButtonBase className={classes.button} focusRipple>
 										{tileInfo.icon}
 										<Typography className={classes.buttonTitle}>
 											{tileInfo.title}
 										</Typography>
-										<Typography variant="body1">{tileInfo.desc}</Typography>
+										<Typography variant="body1">
+											{tileInfo.description}
+										</Typography>
 									</ButtonBase>
 								</Link>
 							</Grid>
@@ -121,6 +148,22 @@ export default function Manage() {
 				}}
 			>
 				<ManageDesks />
+			</PrivateRoute>
+			<PrivateRoute
+				routeProps={{ exact: true, path: `${path}/users` }}
+				permissionCheckProps={{
+					requiredPermissionsAny: userManagementPermissions,
+				}}
+			>
+				<ManageUsers />
+			</PrivateRoute>
+			<PrivateRoute
+				routeProps={{ exact: true, path: `${path}/roles` }}
+				permissionCheckProps={{
+					requiredPermissionsAny: roleManagementPermissions,
+				}}
+			>
+				<ManageRoles />
 			</PrivateRoute>
 		</>
 	);

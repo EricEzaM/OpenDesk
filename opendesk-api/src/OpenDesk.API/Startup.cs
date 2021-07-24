@@ -85,6 +85,7 @@ namespace OpenDesk.API
 						cb.AllowAnyMethod();
 						cb.AllowAnyHeader();
 						cb.AllowCredentials();
+						cb.WithExposedHeaders("Content-Length");
 					});
 				});
 			}

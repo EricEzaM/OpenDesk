@@ -1,7 +1,7 @@
 // API RESPONSES
 
 export interface ApiResponse<T> {
-	status: number;
+	success: boolean;
 	data?: T;
 	problem?: ProblemDetails;
 }
@@ -71,6 +71,12 @@ export interface User {
 	id: string;
 	username: string;
 	displayName: string;
+}
+
+export interface Role {
+	id: string;
+	name: string;
+	description: string;
 }
 
 // BLOB

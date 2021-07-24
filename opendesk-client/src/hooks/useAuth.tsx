@@ -86,7 +86,7 @@ function useAuthProvider(): AuthContextProps {
 				localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
 
 				refreshPermissions();
-			} else if (res.status === 401) {
+			} else if (res.problem?.status === 401) {
 				setUser(undefined);
 				localStorage.removeItem(AUTH_USER_KEY);
 			}

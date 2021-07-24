@@ -127,7 +127,7 @@ namespace OpenDesk.API.Features.Authentication
 
 					if (_options.Value.SuperAdminEmail == email)
 					{
-						await _identityService.AddUserToRoleAsync(createResult.Value, Roles.SuperAdmin);
+						await _identityService.AddUserToRoleAsync(createResult.Value, Application.Common.Roles.SuperAdmin);
 					}
 				}
 				else
