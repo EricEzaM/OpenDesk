@@ -21,6 +21,7 @@ using OpenDesk.API.Errors;
 using Microsoft.AspNetCore.Http;
 using System;
 using OpenDesk.Application.Common;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace OpenDesk.API
 {
@@ -109,6 +110,11 @@ namespace OpenDesk.API
 				app.UseSwagger();
 				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenDesk v1"));
 			}
+
+			app.UseForwardedHeaders(new ForwardedHeadersOptions
+			{
+				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+			});
 
 			app.UseProblemDetails();
 
