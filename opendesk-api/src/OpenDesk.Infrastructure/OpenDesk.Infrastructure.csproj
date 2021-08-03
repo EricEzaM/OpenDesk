@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenDesk.Application\OpenDesk.Application.csproj" />
-    <ProjectReference Include="..\OpenDesk.Domain\OpenDesk.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

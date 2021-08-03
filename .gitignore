@@ -1,4 +1,10 @@
+# Development appsettings
+**/appsettings.development.json
+
+#Blob files (for local testing)
 **/static/blobs/*
+
+###### AUTO GENERATED BELOW ######
 
 # Created by https://www.toptal.com/developers/gitignore/api/csharp,dotnetcore,visualstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=csharp,dotnetcore,visualstudio

@@ -7,11 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDesk.API", "src\OpenDes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{42968406-6E3B-40EE-88E4-8C4DB7F89F26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDesk.Infrastructure", "src\OpenDesk.Infrastructure\OpenDesk.Infrastructure.csproj", "{2BED0275-312B-4FF1-BB12-35CABF7D13AF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDesk.Application", "src\OpenDesk.Application\OpenDesk.Application.csproj", "{56BE67A7-79A5-458B-BBD3-81BAC01938FB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDesk.Domain", "src\OpenDesk.Domain\OpenDesk.Domain.csproj", "{0E8A4CD8-FD6C-482A-9315-23396FB9480F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,27 +19,17 @@ Global
 		{A73C58FA-DFA9-4B98-9529-9E526E304317}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A73C58FA-DFA9-4B98-9529-9E526E304317}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A73C58FA-DFA9-4B98-9529-9E526E304317}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2BED0275-312B-4FF1-BB12-35CABF7D13AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2BED0275-312B-4FF1-BB12-35CABF7D13AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2BED0275-312B-4FF1-BB12-35CABF7D13AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2BED0275-312B-4FF1-BB12-35CABF7D13AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{56BE67A7-79A5-458B-BBD3-81BAC01938FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{56BE67A7-79A5-458B-BBD3-81BAC01938FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56BE67A7-79A5-458B-BBD3-81BAC01938FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56BE67A7-79A5-458B-BBD3-81BAC01938FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E8A4CD8-FD6C-482A-9315-23396FB9480F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E8A4CD8-FD6C-482A-9315-23396FB9480F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E8A4CD8-FD6C-482A-9315-23396FB9480F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E8A4CD8-FD6C-482A-9315-23396FB9480F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A73C58FA-DFA9-4B98-9529-9E526E304317} = {42968406-6E3B-40EE-88E4-8C4DB7F89F26}
-		{2BED0275-312B-4FF1-BB12-35CABF7D13AF} = {42968406-6E3B-40EE-88E4-8C4DB7F89F26}
 		{56BE67A7-79A5-458B-BBD3-81BAC01938FB} = {42968406-6E3B-40EE-88E4-8C4DB7F89F26}
-		{0E8A4CD8-FD6C-482A-9315-23396FB9480F} = {42968406-6E3B-40EE-88E4-8C4DB7F89F26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {904C3624-6231-4CE4-ADEE-48730DDA4F46}

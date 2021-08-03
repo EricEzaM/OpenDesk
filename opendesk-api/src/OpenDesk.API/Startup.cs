@@ -1,27 +1,26 @@
+using FluentValidation;
+using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using OpenDesk.Infrastructure;
-using System.IO;
-using FluentValidation;
-using OpenDesk.API.Behaviours;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using OpenDesk.API.Models;
-using MediatR.Pipeline;
-using Hellang.Middleware.ProblemDetails;
-using Hellang.Middleware.ProblemDetails.Mvc;
 using OpenDesk.API.Errors;
-using Microsoft.AspNetCore.Http;
-using System;
+using OpenDesk.Application;
+using OpenDesk.Application.Authentication;
+using OpenDesk.Application.Behaviours;
 using OpenDesk.Application.Common;
-using Microsoft.AspNetCore.HttpOverrides;
+using OpenDesk.Application.Exceptions;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace OpenDesk.API
 {
@@ -44,6 +43,7 @@ namespace OpenDesk.API
 			bool isDevelopment = _env.IsDevelopment();
 
 			services.Configure<ApplicationOptions>(Configuration.GetSection(ApplicationOptions.SECTION_NAME));
+			services.Configure<AuthenticationOptions>(Configuration.GetSection(AuthenticationOptions.SECTION_NAME));
 
 			services.AddProblemDetails(o =>
 			{
@@ -68,9 +68,9 @@ namespace OpenDesk.API
 				o.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
 			});
 
-			services.AddInfrastructure(Configuration, isDevelopment);
+			services.ConfigureApplicationServices(isDevelopment);
 
-			services.AddMediatR(typeof(Startup));
+			services.AddMediatR(typeof(Startup), typeof(ApplicationStartup));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(StringTrimmingBehaviour<,>));
 			services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
@@ -93,7 +93,9 @@ namespace OpenDesk.API
 			}
 
 			services.AddControllers()
+				.AddApplicationPart(typeof(ApplicationStartup).Assembly)
 				.AddProblemDetailsConventions(); // Adds MVC conventions to work better with the ProblemDetails middleware.
+		
 
 			services.AddSwaggerGen(c =>
 			{
@@ -138,7 +140,6 @@ namespace OpenDesk.API
 
 			app.UseEndpoints(endpoints =>
 			{
-				//endpoints.MapControllers();
 				endpoints.MapControllers();
 			});
 		}
