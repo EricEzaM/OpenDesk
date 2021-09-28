@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using OpenDesk.Application.Common;
 using OpenDesk.Application.Identity;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ namespace OpenDesk.Application.Features.Users
 
 			// TODO do anything with result?
 			var res = await _userManager.CreateAsync(newUser);
+
+			await _userManager.AddToRoleAsync(newUser, RoleStrings.Member);
 
 			return newUser;
 		}

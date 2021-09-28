@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Users
 {
-	class GetUserByExternalLoginQuery : IRequest<OpenDeskUser>
+	public class GetUserByExternalLoginQuery : IRequest<OpenDeskUser>
 	{
 		public GetUserByExternalLoginQuery(string provider, string providerKey)
 		{
@@ -22,7 +22,7 @@ namespace OpenDesk.Application.Features.Users
 		public string ProviderKey { get; set; }
 	}
 
-	class GetUserByExternalLoginQueryHandler : IRequestHandler<GetUserByExternalLoginQuery, OpenDeskUser>
+	public class GetUserByExternalLoginQueryHandler : IRequestHandler<GetUserByExternalLoginQuery, OpenDeskUser>
 	{
 		private readonly UserManager<OpenDeskUser> _userManager;
 

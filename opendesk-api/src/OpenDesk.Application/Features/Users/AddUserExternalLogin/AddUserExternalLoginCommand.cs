@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Users
 {
-	class AddUserExternalLoginCommand : IRequest<Result>
+	public class AddUserExternalLoginCommand : IRequest<Result>
 	{
 		public AddUserExternalLoginCommand(string userId, string provider, string providerKey)
 		{
@@ -25,11 +25,11 @@ namespace OpenDesk.Application.Features.Users
 		public string ProviderKey { get; set; }
 	}
 
-	class AddUserExternalLoginCommandHanlder : IRequestHandler<AddUserExternalLoginCommand, Result>
+	public class AddUserExternalLoginCommandHandler : IRequestHandler<AddUserExternalLoginCommand, Result>
 	{
 		private readonly UserManager<OpenDeskUser> _userManager;
 
-		public AddUserExternalLoginCommandHanlder(UserManager<OpenDeskUser> userManager)
+		public AddUserExternalLoginCommandHandler(UserManager<OpenDeskUser> userManager)
 		{
 			_userManager = userManager;
 		}

@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace OpenDesk.API.Authentication
@@ -57,11 +58,28 @@ namespace OpenDesk.API.Authentication
 			return SignOut();
 		}
 
-		// TODO is this route any good? nothing else uses /me... maybe it should be changed.
+		// TODO should /me routes be kept? Better way of doing it?
 		[HttpGet("/api/me/permissions")]
 		public IActionResult GetUserPermissions()
 		{
 			return Ok(User.Claims.Where(c => c.Type == CustomClaimTypes.Permission).Select(c => c.Value));
+		}
+
+		[HttpGet("/api/me")]
+		public async Task<IActionResult> GetUser()
+		{
+			var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+			if (userIdClaim == null)
+			{
+				return Forbid();
+			}
+			else
+			{
+				var user = await _mediator.Send(new GetUserQuery(userIdClaim.Value));
+				return Ok(user);
+
+			}
 		}
 
 		[AllowAnonymous]
