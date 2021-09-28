@@ -11,8 +11,8 @@ namespace OpenDesk.Application.Features.Bookings
 		public string Id { get; set; }
 		public DateTimeOffset StartDateTime { get; set; }
 		public DateTimeOffset EndDateTime { get; set; }
-		public OfficeDTO Office { get; set; }
-		public DeskDTO Desk { get; set; }
-		public UserDTO User { get; set; }
+		public OfficeDto Office { get; set; }
+		public DeskDto Desk { get; set; }
+		public UserDto User { get; set; }
 	}
 }

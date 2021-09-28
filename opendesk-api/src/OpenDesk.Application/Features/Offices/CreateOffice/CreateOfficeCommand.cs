@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Offices
 {
-	public class CreateOfficeCommand : OfficeCommandBase, IRequest<OfficeDTO> { }
+	public class CreateOfficeCommand : OfficeCommandBase, IRequest<OfficeDto> { }
 
-	public class CreateOfficeHandler : IRequestHandler<CreateOfficeCommand, OfficeDTO>
+	public class CreateOfficeHandler : IRequestHandler<CreateOfficeCommand, OfficeDto>
 	{
 		private readonly OpenDeskDbContext _db;
 		private readonly IBlobSaver _blobSaver;
@@ -24,7 +24,7 @@ namespace OpenDesk.Application.Features.Offices
 			_blobSaver = blobSaver;
 		}
 
-		public async Task<OfficeDTO> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
+		public async Task<OfficeDto> Handle(CreateOfficeCommand request, CancellationToken cancellationToken)
 		{
 			var blob = _db.Blobs
 				.FirstOrDefault(b => b.Id == request.ImageBlobId);
@@ -45,13 +45,13 @@ namespace OpenDesk.Application.Features.Offices
 			_db.Offices.Add(office);
 			await _db.SaveChangesAsync(cancellationToken);
 
-			return new OfficeDTO
+			return new OfficeDto
 			{
 				Id = office.Id,
 				Location = office.Location,
 				SubLocation = office.SubLocation,
 				Name = office.Name,
-				Image = new BlobDTO(blob)
+				Image = new BlobDto(blob)
 			};
 		}
 	}

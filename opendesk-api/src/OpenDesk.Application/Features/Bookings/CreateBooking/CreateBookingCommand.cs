@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Bookings
 {
-	public class CreateBookingCommand : IRequest<BookingDTO>
+	public class CreateBookingCommand : IRequest<BookingDto>
 	{
 		[JsonIgnore]
 		public string UserId { get; set; }
@@ -22,7 +22,7 @@ namespace OpenDesk.Application.Features.Bookings
 		public DateTimeOffset EndDateTime { get; set; }
 	}
 
-	public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, BookingDTO>
+	public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, BookingDto>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -31,7 +31,7 @@ namespace OpenDesk.Application.Features.Bookings
 			_db = db;
 		}
 
-		public async Task<BookingDTO> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
+		public async Task<BookingDto> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
 		{
 			var desk = await _db
 				.Desks
@@ -63,13 +63,13 @@ namespace OpenDesk.Application.Features.Bookings
 
 			await _db.SaveChangesAsync(cancellationToken);
 
-			return new BookingDTO
+			return new BookingDto
 			{
 				Id = booking.Id,
 				DeskId = booking.Desk.Id,
 				StartDateTime = booking.StartDateTime,
 				EndDateTime = booking.EndDateTime,
-				User = new UserDTO
+				User = new UserDto
 				{
 					Id = user.Id,
 					UserName = user.UserName,

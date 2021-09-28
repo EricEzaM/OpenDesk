@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Roles
 {
-	public class GetRolesQuery : IRequest<IEnumerable<RoleDTO>>
+	public class GetRolesQuery : IRequest<IEnumerable<RoleDto>>
 	{
 	}
 
-	public class GetRolesQueryHandler : IRequestHandler<GetRolesQuery, IEnumerable<RoleDTO>>
+	public class GetRolesQueryHandler : IRequestHandler<GetRolesQuery, IEnumerable<RoleDto>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -23,10 +23,10 @@ namespace OpenDesk.Application.Features.Roles
 			_db = db;
 		}
 
-		public async Task<IEnumerable<RoleDTO>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
+		public async Task<IEnumerable<RoleDto>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
 		{
 			return await _db.Roles
-				.Select(r => new RoleDTO
+				.Select(r => new RoleDto
 				{
 					Id = r.Id,
 					Name = r.Name,

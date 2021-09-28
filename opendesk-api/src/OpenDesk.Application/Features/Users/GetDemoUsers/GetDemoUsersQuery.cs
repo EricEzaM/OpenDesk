@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Users
 {
-	public class GetDemoUsersQuery : IRequest<IEnumerable<UserDTO>>
+	public class GetDemoUsersQuery : IRequest<IEnumerable<UserDto>>
 	{
 	}
 
-	public class GetDemoUsersQueryHandler : IRequestHandler<GetDemoUsersQuery, IEnumerable<UserDTO>>
+	public class GetDemoUsersQueryHandler : IRequestHandler<GetDemoUsersQuery, IEnumerable<UserDto>>
 	{
 		private readonly UserManager<OpenDeskUser> _userManager;
 
@@ -27,10 +27,10 @@ namespace OpenDesk.Application.Features.Users
 			_userManager = db;
 		}
 
-		public async Task<IEnumerable<UserDTO>> Handle(GetDemoUsersQuery request, CancellationToken cancellationToken)
+		public async Task<IEnumerable<UserDto>> Handle(GetDemoUsersQuery request, CancellationToken cancellationToken)
 		{
 			var users = await _userManager.GetUsersInRoleAsync(RoleStrings.Demo);
-			return users.Select(u => new UserDTO
+			return users.Select(u => new UserDto
 			{
 				Id = u.Id,
 				UserName = u.UserName,

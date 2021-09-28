@@ -3,17 +3,17 @@ using System;
 
 namespace OpenDesk.Application.Features.Blobs
 {
-	public class BlobDTO
+	public class BlobDto
 	{
 		public string Id { get; set; }
 		public string Uri { get; set; }
 		public DateTimeOffset Expiry { get; set; }
 
-		public BlobDTO()
+		public BlobDto()
 		{
 
 		}
-		public BlobDTO(Blob fromBlob)
+		public BlobDto(Blob fromBlob)
 		{
 			Id = fromBlob.Id;
 			Uri = fromBlob.Uri;

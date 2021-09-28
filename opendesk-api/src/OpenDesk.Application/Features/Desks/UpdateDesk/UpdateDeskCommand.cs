@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Desks
 {
-	public class UpdateDeskCommand : IRequest<DeskDTO>
+	public class UpdateDeskCommand : IRequest<DeskDto>
 	{
 		[JsonIgnore]
 		public string DeskId { get; set; }
@@ -18,7 +18,7 @@ namespace OpenDesk.Application.Features.Desks
 
 	}
 
-	public class UpdateDeskHandler : IRequestHandler<UpdateDeskCommand, DeskDTO>
+	public class UpdateDeskHandler : IRequestHandler<UpdateDeskCommand, DeskDto>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -27,7 +27,7 @@ namespace OpenDesk.Application.Features.Desks
 			_db = db;
 		}
 
-		public async Task<DeskDTO> Handle(UpdateDeskCommand request, CancellationToken cancellationToken)
+		public async Task<DeskDto> Handle(UpdateDeskCommand request, CancellationToken cancellationToken)
 		{
 			var desk = await _db.Desks.FirstOrDefaultAsync(d => d.Id == request.DeskId, cancellationToken);
 
@@ -41,7 +41,7 @@ namespace OpenDesk.Application.Features.Desks
 
 			await _db.SaveChangesAsync(cancellationToken);
 
-			return new DeskDTO
+			return new DeskDto
 			{
 				Id = desk.Id,
 				Name = desk.Name,

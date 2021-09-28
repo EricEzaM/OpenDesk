@@ -33,7 +33,7 @@ namespace OpenDesk.Application.Features.Bookings
 				.Join(_db.Users, b => b.UserId, u => u.Id, (b, u) => new
 				{
 					Booking = b,
-					User = new UserDTO
+					User = new UserDto
 					{
 						Id = u.Id,
 						UserName = u.UserName,
@@ -45,17 +45,17 @@ namespace OpenDesk.Application.Features.Bookings
 					Id = bu.Booking.Id,
 					StartDateTime = bu.Booking.StartDateTime,
 					EndDateTime = bu.Booking.EndDateTime,
-					Desk = new DeskDTO
+					Desk = new DeskDto
 					{
 						Id = bu.Booking.Desk.Id,
 						Name = bu.Booking.Desk.Name,
 						DiagramPosition = new DiagramPosition(bu.Booking.Desk.DiagramPosition)
 					},
-					Office = new OfficeDTO
+					Office = new OfficeDto
 					{
 						Id = bu.Booking.Desk.Office.Id,
 						Name = bu.Booking.Desk.Office.Name,
-						Image = new BlobDTO(bu.Booking.Desk.Office.Image)
+						Image = new BlobDto(bu.Booking.Desk.Office.Image)
 					},
 					User = bu.User
 				})

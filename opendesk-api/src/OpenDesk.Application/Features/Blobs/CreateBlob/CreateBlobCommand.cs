@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Blobs
 {
-	public class CreateBlobCommand : IRequest<BlobDTO>
+	public class CreateBlobCommand : IRequest<BlobDto>
 	{
 		// TODO: is the dependency on Microsoft.AspNetCore.Http acceptable?
 		public IFormFile File { get; set; }
 	}
 
-	public class CreateBlobCommandHandler : IRequestHandler<CreateBlobCommand, BlobDTO>
+	public class CreateBlobCommandHandler : IRequestHandler<CreateBlobCommand, BlobDto>
 	{
 		private readonly OpenDeskDbContext _db;
 		private readonly IBlobSaver _blobSaver;
@@ -27,7 +27,7 @@ namespace OpenDesk.Application.Features.Blobs
 			_blobSaver = blobSaver;
 		}
 
-		public async Task<BlobDTO> Handle(CreateBlobCommand request, CancellationToken cancellationToken)
+		public async Task<BlobDto> Handle(CreateBlobCommand request, CancellationToken cancellationToken)
 		{
 			// TODO Re-write this to make it more secure. https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0
 			using var ms = new MemoryStream();
@@ -44,7 +44,7 @@ namespace OpenDesk.Application.Features.Blobs
 			_db.Blobs.Add(blob);
 			await _db.SaveChangesAsync(cancellationToken);
 
-			return new BlobDTO
+			return new BlobDto
 			{
 				Id = blob.Id,
 				Uri = blob.Uri,

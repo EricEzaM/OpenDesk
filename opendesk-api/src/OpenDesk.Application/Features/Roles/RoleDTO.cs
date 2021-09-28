@@ -1,6 +1,6 @@
 ﻿namespace OpenDesk.Application.Features.Roles
 {
-	public class RoleDTO
+	public class RoleDto
 	{
 		public string Id { get; set; }
 		public string Name { get; set; }

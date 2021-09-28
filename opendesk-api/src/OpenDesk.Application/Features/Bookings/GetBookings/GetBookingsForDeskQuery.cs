@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Bookings
 {
-	public class GetBookingsForDeskQuery : IRequest<IEnumerable<BookingDTO>>
+	public class GetBookingsForDeskQuery : IRequest<IEnumerable<BookingDto>>
 	{
 		public GetBookingsForDeskQuery(string deskId)
 		{
@@ -19,7 +19,7 @@ namespace OpenDesk.Application.Features.Bookings
 		public string DeskId { get; set; }
 	}
 
-	public class GetBookingsForDeskQueryHandler : IRequestHandler<GetBookingsForDeskQuery, IEnumerable<BookingDTO>>
+	public class GetBookingsForDeskQueryHandler : IRequestHandler<GetBookingsForDeskQuery, IEnumerable<BookingDto>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -28,7 +28,7 @@ namespace OpenDesk.Application.Features.Bookings
 			_db = db;
 		}
 
-		public async Task<IEnumerable<BookingDTO>> Handle(GetBookingsForDeskQuery request, CancellationToken cancellationToken)
+		public async Task<IEnumerable<BookingDto>> Handle(GetBookingsForDeskQuery request, CancellationToken cancellationToken)
 		{
 			return await _db.Bookings
 				.Include(b => b.Desk)
@@ -36,14 +36,14 @@ namespace OpenDesk.Application.Features.Bookings
 				.Join(_db.Users, b => b.UserId, u => u.Id, (b, u) => new
 				{
 					Booking = b,
-					User = new UserDTO
+					User = new UserDto
 					{
 						Id = u.Id,
 						UserName = u.UserName,
 						DisplayName = u.DisplayName
 					}
 				})
-				.Select(bu => new BookingDTO
+				.Select(bu => new BookingDto
 				{
 					Id = bu.Booking.Id,
 					DeskId = bu.Booking.Desk.Id,

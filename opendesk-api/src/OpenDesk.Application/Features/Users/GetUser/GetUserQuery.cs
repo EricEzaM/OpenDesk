@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Users
 {
-	public class GetUserQuery : IRequest<UserDTO>
+	public class GetUserQuery : IRequest<UserDto>
 	{
 		public GetUserQuery(string userId)
 		{
@@ -20,7 +20,7 @@ namespace OpenDesk.Application.Features.Users
 	}
 
 	// TODO: set other command/query handler classes to internal
-	internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserDTO>
+	internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserDto>
 	{
 		private readonly UserManager<OpenDeskUser> _userManager;
 
@@ -29,13 +29,13 @@ namespace OpenDesk.Application.Features.Users
 			_userManager = userManager;
 		}
 
-		public async Task<UserDTO> Handle(GetUserQuery request, CancellationToken cancellationToken)
+		public async Task<UserDto> Handle(GetUserQuery request, CancellationToken cancellationToken)
 		{
 			var user = await _userManager.FindByIdAsync(request.UserId);
 
 			return user == null
 				? null
-				: new UserDTO
+				: new UserDto
 				{
 					Id = user.Id,
 					UserName = user.UserName,

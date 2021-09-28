@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Roles
 {
-	public class CreateRoleCommand : IRequest<RoleDTO>
+	public class CreateRoleCommand : IRequest<RoleDto>
 	{
 		public string Name { get; set; }
 		public string Description { get; set; }
 	}
 
-	public class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, RoleDTO>
+	public class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, RoleDto>
 	{
 		private readonly RoleManager<OpenDeskRole> _roleManager;
 
@@ -25,7 +25,7 @@ namespace OpenDesk.Application.Features.Roles
 			_roleManager = roleManager;
 		}
 
-		public async Task<RoleDTO> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
+		public async Task<RoleDto> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
 		{
 			var role = new OpenDeskRole(request.Name)
 			{
@@ -35,7 +35,7 @@ namespace OpenDesk.Application.Features.Roles
 			// TODO: What to do about result?
 			var result = await _roleManager.CreateAsync(role);
 
-			return new RoleDTO
+			return new RoleDto
 			{
 				Id = role.Id,
 				Name = role.Name,

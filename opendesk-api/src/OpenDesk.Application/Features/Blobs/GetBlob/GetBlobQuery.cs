@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Blobs
 {
-	public class GetBlobQuery : IRequest<BlobDTO>
+	public class GetBlobQuery : IRequest<BlobDto>
 	{
 		public GetBlobQuery(string id)
 		{
@@ -17,7 +17,7 @@ namespace OpenDesk.Application.Features.Blobs
 		public string Id { get; set; }
 	}
 
-	public class GetBlobQueryHandler : IRequestHandler<GetBlobQuery, BlobDTO>
+	public class GetBlobQueryHandler : IRequestHandler<GetBlobQuery, BlobDto>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -26,7 +26,7 @@ namespace OpenDesk.Application.Features.Blobs
 			_db = db;
 		}
 
-		public async Task<BlobDTO> Handle(GetBlobQuery request, CancellationToken cancellationToken)
+		public async Task<BlobDto> Handle(GetBlobQuery request, CancellationToken cancellationToken)
 		{
 			var blob = await _db.Blobs.FirstOrDefaultAsync(b => b.Id == request.Id, cancellationToken: cancellationToken);
 
@@ -35,7 +35,7 @@ namespace OpenDesk.Application.Features.Blobs
 				throw new EntityNotFoundException("Blob");
 			}
 
-			return new BlobDTO
+			return new BlobDto
 			{
 				Id = blob.Id,
 				Uri = blob.Uri,

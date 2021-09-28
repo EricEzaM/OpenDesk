@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Desks
 {
-	public class GetDesksQuery : IRequest<IEnumerable<DeskDTO>>
+	public class GetDesksQuery : IRequest<IEnumerable<DeskDto>>
 	{
 		public GetDesksQuery(string officeId)
 		{
@@ -18,7 +18,7 @@ namespace OpenDesk.Application.Features.Desks
 		public string OfficeId { get; set; }
 	}
 
-	public class GetDesksQueryHandler : IRequestHandler<GetDesksQuery, IEnumerable<DeskDTO>>
+	public class GetDesksQueryHandler : IRequestHandler<GetDesksQuery, IEnumerable<DeskDto>>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -27,12 +27,12 @@ namespace OpenDesk.Application.Features.Desks
 			_db = db;
 		}
 
-		public async Task<IEnumerable<DeskDTO>> Handle(GetDesksQuery request, CancellationToken cancellationToken)
+		public async Task<IEnumerable<DeskDto>> Handle(GetDesksQuery request, CancellationToken cancellationToken)
 		{
 			return await _db
 				.Desks
 				.Where(d => d.Office.Id == request.OfficeId)
-				.Select(d => new DeskDTO
+				.Select(d => new DeskDto
 				{
 					Id = d.Id,
 					Name = d.Name,

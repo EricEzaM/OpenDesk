@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace OpenDesk.Application.Features.Offices
 {
-	public class UpdateOfficeCommand : OfficeCommandBase, IRequest<OfficeDTO>
+	public class UpdateOfficeCommand : OfficeCommandBase, IRequest<OfficeDto>
 	{
 		public string Id { get; set; }
 	}
 
-	public class UpdateOfficeHandler : IRequestHandler<UpdateOfficeCommand, OfficeDTO>
+	public class UpdateOfficeHandler : IRequestHandler<UpdateOfficeCommand, OfficeDto>
 	{
 		private readonly OpenDeskDbContext _db;
 
@@ -23,7 +23,7 @@ namespace OpenDesk.Application.Features.Offices
 			_db = db;
 		}
 
-		public async Task<OfficeDTO> Handle(UpdateOfficeCommand request, CancellationToken cancellationToken)
+		public async Task<OfficeDto> Handle(UpdateOfficeCommand request, CancellationToken cancellationToken)
 		{
 			var office = _db.Offices.FirstOrDefault(o => o.Id == request.Id);
 			if (office == null)
@@ -45,13 +45,13 @@ namespace OpenDesk.Application.Features.Offices
 			_db.Offices.Update(office);
 			await _db.SaveChangesAsync(cancellationToken);
 
-			return new OfficeDTO
+			return new OfficeDto
 			{
 				Id = office.Id,
 				Location = office.Location,
 				SubLocation = office.SubLocation,
 				Name = office.Name,
-				Image = new BlobDTO(office.Image)
+				Image = new BlobDto(office.Image)
 			};
 		}
 	}
