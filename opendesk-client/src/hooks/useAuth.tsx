@@ -1,3 +1,5 @@
+import { PublicClientApplication } from "@azure/msal-browser";
+import { loginRequest, msalConfig } from "authConfig";
 import { ReactNode, useContext, useEffect, useState } from "react";
 
 import { createContext } from "react";
@@ -7,7 +9,17 @@ import apiRequest from "utils/requestUtils";
 const AUTH_USER_KEY = "auth_user";
 const PERMISSIONS_KEY = "permissions";
 
+const msalInstance = new PublicClientApplication(msalConfig);
+
+export enum AuthLoadingStatus {
+	Authenticated,
+	NotAuthenticated,
+	Verifying,
+	RetrievingUserData,
+}
+
 interface AuthContextProps {
+	loadingStatus: AuthLoadingStatus;
 	user?: User;
 	permissions: string[];
 	signIn: (returnUrl: string) => void;
@@ -16,6 +28,7 @@ interface AuthContextProps {
 }
 
 const AuthContext = createContext<AuthContextProps>({
+	loadingStatus: AuthLoadingStatus.NotAuthenticated,
 	user: undefined,
 	permissions: [],
 	signIn: () => {
@@ -68,17 +81,42 @@ function useAuthProvider(): AuthContextProps {
 		permissionsObj ?? []
 	);
 
-	// On application reload, check the user login status by querying the API (should use the existing cookie)
-	// Since the API redirects us to the application, this will be run after the auth Cookie has been set and will be successful.
-	// 1. App loads for the first time, calls API, return 401 since cookie is not set.
-	// 2. User clicks login and the API auth endpoint is accessed, which redirects to micrsoft login page.
-	// 3. After MS login success, the API will handle that and will create a user in the database. Then will redirect to the provided redirectUrl.
-	// 4. The redirect url is this application, so the app will reload, trigger this effect, hit the user endpoint successfully and give us the user object!
+	const [loadingStatus, setLoadingStatus] = useState(
+		AuthLoadingStatus.NotAuthenticated
+	);
+
 	useEffect(() => {
-		refreshUser();
+		let current = loadingStatus;
+		setLoadingStatus(AuthLoadingStatus.Verifying);
+		msalInstance.handleRedirectPromise().then((tokenResponse) => {
+			if (tokenResponse !== null) {
+				// Coming back from a valid authentication redirect
+				console.log(tokenResponse);
+				apiRequest("auth/external", {
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+					},
+					body: JSON.stringify({
+						provider: 0, // FIXME: Not hardcode provider 0 (microsoft)
+						idToken: tokenResponse.idToken,
+					}),
+				}).then((res) => {
+					if (res.success) {
+						console.log("Login Success");
+						refreshUser();
+					} else {
+						console.log("Login Failed");
+					}
+				});
+			} else {
+				setLoadingStatus(current);
+			}
+		});
 	}, []);
 
 	function refreshUser() {
+		setLoadingStatus(AuthLoadingStatus.RetrievingUserData);
 		apiRequest<User>("me").then((res) => {
 			// Set user & update localStorage value.
 			if (res.data) {
@@ -86,9 +124,11 @@ function useAuthProvider(): AuthContextProps {
 				localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
 
 				refreshPermissions();
+				setLoadingStatus(AuthLoadingStatus.Authenticated);
 			} else if (res.problem?.status === 401) {
 				setUser(undefined);
 				localStorage.removeItem(AUTH_USER_KEY);
+				setLoadingStatus(AuthLoadingStatus.NotAuthenticated);
 			}
 		});
 	}
@@ -104,9 +144,8 @@ function useAuthProvider(): AuthContextProps {
 		});
 	}
 
-	// Sign in by simply redirecting to the API with the desired auth provider and the return URL.
 	function signIn(returnUrl: string) {
-		window.location.href = `https://localhost:5001/api/auth/microsoft?returnUrl=${returnUrl}`;
+		msalInstance.loginRedirect(loginRequest);
 	}
 
 	function signInDemo(userId: string) {
@@ -122,10 +161,14 @@ function useAuthProvider(): AuthContextProps {
 			method: "POST",
 		}).then(() => {
 			window.location.href = returnUrl;
+			localStorage.removeItem(AUTH_USER_KEY);
+			localStorage.removeItem(PERMISSIONS_KEY);
+			msalInstance.logoutRedirect();
 		});
 	}
 
 	return {
+		loadingStatus,
 		user,
 		permissions,
 		signIn,

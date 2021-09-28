@@ -15,6 +15,7 @@ import {
 	makeStyles,
 	createStyles,
 	Theme,
+	CircularProgress,
 } from "@material-ui/core";
 import {
 	Menu,
@@ -27,11 +28,15 @@ import { ReactNode, useState } from "react";
 import { usePageTitle } from "hooks/usePageTitle";
 import DemoSignInOut from "./auth/DemoSignInOut";
 import { managementPermissions } from "utils/permissions";
+import { AuthLoadingStatus, useAuth } from "hooks/useAuth";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		drawer: {
 			minWidth: 200,
+		},
+		fastProgress: {
+			animationDuration: "0.75s",
 		},
 	})
 );
@@ -42,15 +47,45 @@ export default function Nav() {
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const title = usePageTitle();
 
-	const loginElement = process.env.REACT_APP_IS_DEMO ? (
-		<Box>
-			<DemoSignInOut />
-		</Box>
-	) : (
-		<Box>
-			<SignInOut />
-		</Box>
-	);
+	const { loadingStatus } = useAuth();
+
+	const loginElement =
+		process.env.REACT_APP_IS_DEMO === "true" ? (
+			<Box>
+				<DemoSignInOut />
+			</Box>
+		) : (
+			<Box>
+				<SignInOut />
+			</Box>
+		);
+
+	let loginDisplay = loginElement;
+
+	if (
+		loadingStatus === AuthLoadingStatus.Verifying ||
+		loadingStatus === AuthLoadingStatus.RetrievingUserData
+	) {
+		const text =
+			loadingStatus === AuthLoadingStatus.Verifying
+				? "Verifying..."
+				: "Getting Data...";
+
+		loginDisplay = (
+			<Box display="flex">
+				<CircularProgress
+					className={classes.fastProgress}
+					size={30}
+					thickness={5}
+					color="secondary"
+					disableShrink
+				/>
+				<Typography style={{ alignSelf: "center", marginLeft: "1em" }}>
+					{text}
+				</Typography>
+			</Box>
+		);
+	}
 
 	return (
 		<>
@@ -75,7 +110,7 @@ export default function Nav() {
 						</Box>
 					)}
 					<Box flexGrow="1" /> {/* Spacer */}
-					{loginElement}
+					{loginDisplay}
 				</Toolbar>
 			</AppBar>
 
