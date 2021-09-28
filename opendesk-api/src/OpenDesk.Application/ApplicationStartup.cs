@@ -36,8 +36,8 @@ namespace OpenDesk.Application
 
 			// AUTHENTICATION & AUTHORIZATION
 
-			services.AddSingleton<IExternalAuthenticationVerifier, ExternalAuthenticationVerifier>();
-			services.AddSingleton<IExternalAuthenticationService, ExternalAuthenticationService>();
+			services.AddScoped<IExternalAuthenticationVerifier, ExternalAuthenticationVerifier>();
+			services.AddScoped<IExternalAuthenticationService, ExternalAuthenticationService>();
 
 			services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 			services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
@@ -68,10 +68,6 @@ namespace OpenDesk.Application
 					.RequireAuthenticatedUser()
 					.Build();
 			});
-
-			// APPLICATION SERVICES
-
-			//services.AddTransient<IIdentityService, IdentityService>();
 
 			return services;
 		}
