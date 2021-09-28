@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using OpenDesk.Application.Common;
 using OpenDesk.Application.Identity;
 using System;
@@ -26,20 +27,28 @@ namespace OpenDesk.Application.Features.Users
 	public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OpenDeskUser>
 	{
 		private readonly UserManager<OpenDeskUser> _userManager;
+		private readonly IOptions<ApplicationOptions> _appOptions;
 
-		public CreateUserCommandHandler(UserManager<OpenDeskUser> userManager)
+		public CreateUserCommandHandler(UserManager<OpenDeskUser> userManager, IOptions<ApplicationOptions> appOptions)
 		{
 			_userManager = userManager;
+			_appOptions = appOptions;
 		}
 
 		public async Task<OpenDeskUser> Handle(CreateUserCommand request, CancellationToken cancellationToken)
 		{
 			var newUser = new OpenDeskUser(request.Email, request.DisplayName);
+			newUser.Email = request.Email;
 
 			// TODO do anything with result?
 			var res = await _userManager.CreateAsync(newUser);
 
 			await _userManager.AddToRoleAsync(newUser, RoleStrings.Member);
+
+			if (newUser.Email == _appOptions.Value.SuperAdminEmail)
+			{
+				await _userManager.AddToRoleAsync(newUser, RoleStrings.SuperAdmin);
+			}
 
 			return newUser;
 		}
