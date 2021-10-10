@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Office } from "types";
 import apiRequest from "utils/requestUtils";
+import { useAuth } from "./useAuth";
 
 interface OfficesContextProps {
 	officesState: [Office[] | undefined, (o: Office[] | undefined) => void];
@@ -33,10 +34,11 @@ export function OfficesProvider({ children }: { children: ReactNode }) {
 function useOfficesProvider(): OfficesContextProps {
 	const [offices, setOffices] = useState<Office[]>();
 	const [selectedOffice, setSelectedOffice] = useState<Office>();
+	const { user } = useAuth();
 
 	useEffect(() => {
 		refreshOffices();
-	}, []);
+	}, [user]);
 
 	function refreshOffices() {
 		apiRequest<Office[]>("offices").then((res) => {
