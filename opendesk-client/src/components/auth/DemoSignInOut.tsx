@@ -1,11 +1,4 @@
-import {
-	Button,
-	createStyles,
-	makeStyles,
-	Menu,
-	MenuItem,
-	Theme,
-} from "@material-ui/core";
+import { Button, Menu, MenuItem } from "@material-ui/core";
 import { useAuth } from "hooks/useAuth";
 import { useEffect, useState } from "react";
 import { User } from "types";

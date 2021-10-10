@@ -10,7 +10,6 @@ import {
 import { usePageTitle } from "hooks/usePageTitle";
 import { useEffect, useState } from "react";
 import { Role, User } from "types";
-import { couldStartTrivia } from "typescript";
 import apiRequest from "utils/requestUtils";
 
 export default function ManageUsers() {

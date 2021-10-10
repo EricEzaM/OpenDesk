@@ -9,12 +9,11 @@ import {
 import { Business, Group, Room, Security } from "@material-ui/icons";
 import Authenticated from "components/auth/Authenticated";
 import { usePageTitle } from "hooks/usePageTitle";
-import { Link, RouteProps, useRouteMatch } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 import PrivateRoute from "router/PrivateRoute";
 import {
 	deskManagementPermissions,
 	officeManagementPermissions,
-	permissions,
 	roleManagementPermissions,
 	userManagementPermissions,
 } from "utils/permissions";

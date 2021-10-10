@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { usePageTitle } from "hooks/usePageTitle";
 import { useEffect, useMemo, useState } from "react";
-import { Role, User } from "types";
+import { Role } from "types";
 import { getAllPermissionsArray } from "utils/permissions";
 import apiRequest from "utils/requestUtils";
 

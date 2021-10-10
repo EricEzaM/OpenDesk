@@ -2,7 +2,6 @@ import { CRS, ImageOverlay as LImageOverlay, LatLngBounds, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 import { ImageOverlay, MapContainer } from "react-leaflet";
-import MapClickedAtLocationPopup from "./MapClickedAtLocationPopup";
 
 type MaxBounds = {
 	min: [number, number];

@@ -1,7 +1,4 @@
-import { darken } from "@material-ui/core/styles";
-import { LeafletMouseEvent, map, Marker } from "leaflet";
 import { Desk } from "types";
-import DeskMarkerColoured from "./DeskMarkerColoured";
 import DeskMarkerDraggableWithinBounds from "./DeskMarkerDraggableWithinBounds";
 import OfficeMapBase, { SharedOfficeMapProps } from "./OfficeMapBase";
 

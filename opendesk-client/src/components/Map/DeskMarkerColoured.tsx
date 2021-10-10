@@ -1,13 +1,6 @@
-import {
-	divIcon,
-	LatLng,
-	LatLngExpression,
-	LeafletMouseEvent,
-	point,
-} from "leaflet";
-import React, { useState } from "react";
+import { divIcon, point } from "leaflet";
 import ReactDOMServer from "react-dom/server";
-import { Marker, MarkerProps, useMap } from "react-leaflet";
+import { Marker, MarkerProps } from "react-leaflet";
 import { ReactComponent as DeskLocationIcon } from "resources/desk-location.svg";
 
 export type DeskMarkerColouredProps = {
