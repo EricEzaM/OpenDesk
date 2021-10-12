@@ -11,18 +11,28 @@ using OpenDesk.Application.Persistence;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using OpenDesk.Application.Authentication;
+using System;
 
 namespace OpenDesk.Application
 {
 	public static class ApplicationStartup
 	{
-		public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services, bool isDevelopment)
+		public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
 		{
 			// PERSISTENCE
 
 			services.AddDbContext<OpenDeskDbContext>(o =>
 			{
-				o.UseInMemoryDatabase("OpenDeskDb");
+				var useInMemoryEnvVar = Environment.GetEnvironmentVariable("OPENDESK_USE_INMEMORY_DATABASE");
+				if (useInMemoryEnvVar == "1" || useInMemoryEnvVar == "true")
+				{
+					o.UseInMemoryDatabase("OpenDeskDb");
+				}
+				else
+				{
+					o.UseNpgsql(configuration.GetConnectionString("DB"));
+					o.UseSnakeCaseNamingConvention();
+				}
 			});
 
 			services.AddScoped<IBlobSaver, LocalFileBlobSaver>();

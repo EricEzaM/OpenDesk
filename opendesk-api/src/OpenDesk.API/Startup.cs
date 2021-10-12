@@ -68,7 +68,7 @@ namespace OpenDesk.API
 				o.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
 			});
 
-			services.ConfigureApplicationServices(isDevelopment);
+			services.ConfigureApplicationServices(Configuration, isDevelopment);
 
 			services.AddMediatR(typeof(Startup), typeof(ApplicationStartup));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -83,7 +83,7 @@ namespace OpenDesk.API
 				{
 					o.AddDefaultPolicy(cb =>
 					{
-						cb.WithOrigins("http://localhost:3000");
+						cb.WithOrigins("http://localhost:3000", "http://localhost:3001");
 						cb.AllowAnyMethod();
 						cb.AllowAnyHeader();
 						cb.AllowCredentials();

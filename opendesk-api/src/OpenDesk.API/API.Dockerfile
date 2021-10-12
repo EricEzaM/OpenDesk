@@ -12,10 +12,12 @@ COPY ["src/OpenDesk.Application/OpenDesk.Application.csproj", "src/OpenDesk.Appl
 RUN dotnet restore "src/OpenDesk.API/OpenDesk.API.csproj"
 COPY . .
 WORKDIR "/src/src/OpenDesk.API"
-RUN dotnet build "OpenDesk.API.csproj" -c Release -o /app/build
+ARG CONFIGURATION
+RUN dotnet build "OpenDesk.API.csproj" -c ${CONFIGURATION} -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "OpenDesk.API.csproj" -c Release -o /app/publish
+ARG CONFIGURATION
+RUN dotnet publish "OpenDesk.API.csproj" -c ${CONFIGURATION} -o /app/publish
 
 FROM base AS final
 WORKDIR /app
