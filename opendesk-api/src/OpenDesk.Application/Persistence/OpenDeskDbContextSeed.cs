@@ -16,35 +16,43 @@ namespace OpenDesk.Application.Persistence
 {
 	public static class OpenDeskDbContextSeed
 	{
+		/// <summary>
+		/// Creates SuperAdmin and Member roles and assigns their permissions.
+		/// </summary>
 		public static async Task SeedDefaultsAsync(IServiceProvider serviceProvider)
 		{
 			var rm = serviceProvider.GetRequiredService<RoleManager<OpenDeskRole>>();
 
 			// SuperAdmin
-
 			var superAdminRole = new OpenDeskRole(RoleStrings.SuperAdmin, "Super Admin! Nice.");
-			await rm.CreateAsync(superAdminRole);
+			var result = await rm.CreateAsync(superAdminRole);
 
-			foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions)))
+			if (result.Succeeded)
 			{
-				await rm.AddClaimAsync(superAdminRole, new Claim(CustomClaimTypes.Permission, permissionString));
+				foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions)))
+				{
+					await rm.AddClaimAsync(superAdminRole, new Claim(CustomClaimTypes.Permission, permissionString));
+				}
 			}
 
-			var member = new OpenDeskRole(RoleStrings.Member, "Member role, hehe");
-			await rm.CreateAsync(member);
-
 			// Member
+			var member = new OpenDeskRole(RoleStrings.Member, "Member role, hehe");
+			result = await rm.CreateAsync(member);
 
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Desks.Read));
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
-			await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+			if (result.Succeeded)
+			{
+				await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
+				await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Desks.Read));
+				await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
+				await rm.AddClaimAsync(member, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+			}
 		}
 
 		public static async Task SeedDemoAsync(IServiceProvider serviceProvider)
 		{
 			await SeedDefaultsAsync(serviceProvider);
 
+			// Get Services
 			var ctx = serviceProvider.GetRequiredService<OpenDeskDbContext>();
 			var um = serviceProvider.GetRequiredService<UserManager<OpenDeskUser>>();
 			var rm = serviceProvider.GetRequiredService<RoleManager<OpenDeskRole>>();
@@ -52,19 +60,22 @@ namespace OpenDesk.Application.Persistence
 			var bs = serviceProvider.GetRequiredService<IBlobSaver>();
 
 			var demo = new OpenDeskRole(RoleStrings.Demo, "Demo users.");
-			await rm.CreateAsync(demo);
+			var demoResult = await rm.CreateAsync(demo);
 
 			var deskManagerRole = new OpenDeskRole("DeskManager", "Manager of desks.");
-			await rm.CreateAsync(deskManagerRole);
+			var deskManagerResult = await rm.CreateAsync(deskManagerRole);
 
-			foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions.Desks)))
+			if (deskManagerResult.Succeeded)
 			{
-				await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, permissionString));
-			}
+				foreach (var permissionString in PermissionHelper.GetPermissionsFromClass(typeof(Permissions.Desks)))
+				{
+					await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, permissionString));
+				}
 
-			await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
-			await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
-			await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+				await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Bookings.Read));
+				await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Offices.Read));
+				await rm.AddClaimAsync(deskManagerRole, new Claim(CustomClaimTypes.Permission, Permissions.Blobs.Read));
+			}
 
 			var superAdmin = await SeedSuperAdminDemoAsync(um, rm);
 			var deskManager = await SeedDeskManagerUserDemoAsync(um, rm);
