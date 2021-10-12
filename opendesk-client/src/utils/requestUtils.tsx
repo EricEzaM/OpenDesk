@@ -7,10 +7,8 @@ export default async function apiRequest<T>(
 	return new Promise(async (resolve, reject) => {
 		options = { ...options, credentials: "include" };
 
-		let response = await fetch(
-			process.env.REACT_APP_API_URL + "/api/" + url,
-			options
-		);
+		const fetchUrl = process.env.REACT_APP_API_URL + "/api/" + url;
+		let response = await fetch(fetchUrl, options);
 
 		const type = response.headers.get("content-type");
 
