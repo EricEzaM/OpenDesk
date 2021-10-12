@@ -8,6 +8,24 @@ namespace OpenDesk.Application.Persistence.Configurations
 	{
 		public void Configure(EntityTypeBuilder<OpenDeskUser> builder)
 		{
+			builder.Property(u => u.Id)
+				.HasMaxLength(50)
+				.ValueGeneratedOnAdd();
+
+			builder.Property(u => u.UserName)
+				.HasMaxLength(50)
+				.IsRequired();
+
+			builder.Property(r => r.NormalizedUserName)
+				.HasMaxLength(50)
+				.IsRequired();
+
+			builder.Property(r => r.DisplayName)
+				.HasMaxLength(50)
+				.IsRequired();
+
+			builder.Property(r => r.PhoneNumber)
+				.HasMaxLength(50);
 		}
 	}
 }

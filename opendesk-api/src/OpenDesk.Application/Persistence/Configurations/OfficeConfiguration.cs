@@ -4,16 +4,22 @@ using OpenDesk.Application.Entities;
 
 namespace OpenDesk.Application.Persistence.Configurations
 {
-	public class OfficeConfiguration : IEntityTypeConfiguration<Office>
+	public class OfficeConfiguration : EntityBaseConfiguration<Office>
 	{
-		public void Configure(EntityTypeBuilder<Office> builder)
+		public override void Configure(EntityTypeBuilder<Office> builder)
 		{
-			builder.Property(o => o.Id)
-				.ValueGeneratedOnAdd();
+			base.Configure(builder);
 
-			builder.HasKey(x => x.Id);
+			builder.Property(o => o.Name)
+				.HasMaxLength(100)
+				.IsRequired();
 
-			builder.Property(p => p.Name)
+			builder.Property(o => o.Location)
+				.HasMaxLength(100)
+				.IsRequired();
+
+			builder.Property(o => o.SubLocation)
+				.HasMaxLength(100)
 				.IsRequired();
 		}
 	}

@@ -4,14 +4,11 @@ using OpenDesk.Application.Entities;
 
 namespace OpenDesk.Application.Persistence.Configurations
 {
-	public class DeskConfiguration : IEntityTypeConfiguration<Desk>
+	public class DeskConfiguration : EntityBaseConfiguration<Desk>
 	{
-		public void Configure(EntityTypeBuilder<Desk> builder)
+		public override void Configure(EntityTypeBuilder<Desk> builder)
 		{
-			builder.Property(d => d.Id)
-				.ValueGeneratedOnAdd();
-
-			builder.HasKey(x => x.Id);
+			base.Configure(builder);
 
 			builder.Property(p => p.Name)
 				.HasMaxLength(100)

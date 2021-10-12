@@ -35,6 +35,14 @@ namespace OpenDesk.Application.Persistence
 			builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
 			base.OnModelCreating(builder);
+
+			builder.Entity<OpenDeskUser>().ToTable("users");
+			builder.Entity<OpenDeskRole>().ToTable("roles");
+			builder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
+			builder.Entity<IdentityUserClaim<string>>().ToTable("user_claims");
+			builder.Entity<IdentityUserLogin<string>>().ToTable("user_logins");
+			builder.Entity<IdentityUserToken<string>>().ToTable("user_tokens");
+			builder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
 		}
 	}
 }

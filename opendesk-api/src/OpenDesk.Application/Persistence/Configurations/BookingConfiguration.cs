@@ -4,14 +4,11 @@ using OpenDesk.Application.Entities;
 
 namespace OpenDesk.Application.Persistence.Configurations
 {
-	public class BookingConfiguration : IEntityTypeConfiguration<Booking>
+	public class BookingConfiguration : EntityBaseConfiguration<Booking>
 	{
-		public void Configure(EntityTypeBuilder<Booking> builder)
+		public override void Configure(EntityTypeBuilder<Booking> builder)
 		{
-			builder.Property(p => p.Id)
-				.ValueGeneratedOnAdd();
-
-			builder.HasKey(p => p.Id);
+			base.Configure(builder);
 
 			builder.Property(p => p.StartDateTime)
 				.IsRequired();
@@ -20,6 +17,7 @@ namespace OpenDesk.Application.Persistence.Configurations
 				.IsRequired();
 
 			builder.Property(p => p.UserId)
+				.HasMaxLength(50)
 				.IsRequired();
 		}
 	}

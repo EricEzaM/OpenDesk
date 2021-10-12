@@ -4,14 +4,11 @@ using OpenDesk.Application.Entities;
 
 namespace OpenDesk.Application.Persistence.Configurations
 {
-	class BlobConfiguration : IEntityTypeConfiguration<Blob>
+	class BlobConfiguration : EntityBaseConfiguration<Blob>
 	{
-		public void Configure(EntityTypeBuilder<Blob> builder)
+		public override void Configure(EntityTypeBuilder<Blob> builder)
 		{
-			builder.Property(p => p.Id)
-				.ValueGeneratedOnAdd();
-
-			builder.HasKey(p => p.Id);
+			base.Configure(builder);
 
 			builder.Property(p => p.Uri)
 				.IsRequired();
