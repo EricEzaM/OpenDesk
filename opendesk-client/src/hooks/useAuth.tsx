@@ -107,6 +107,7 @@ function useAuthProvider(): AuthContextProps {
 						refreshUser();
 					} else {
 						console.log("Login Failed");
+						setLoadingStatus(AuthLoadingStatus.NotAuthenticated);
 					}
 				});
 			} else {
