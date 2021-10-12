@@ -14,7 +14,7 @@ export default function DemoSignInOut() {
 
 	useEffect(() => {
 		debugger;
-		apiRequest<User[]>("auth/demos").then((res) => {
+		apiRequest<User[]>("users/demos").then((res) => {
 			if (res.data) {
 				setOptions(res.data);
 			}
