@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Nginx.Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+
+  opendesk-client:
+    build:
+      context: ./opendesk-client
+      dockerfile: Client.Dockerfile
+      args:
+        - API_URL=https://localhost:443
+        - ENABLE_DEMO_MODE=true
+    ports:
+      - 3001:3000
+    command: npm start
+
+  opendesk-api:
+    depends_on: 
+      - nginx
+      - postgres
+    build: 
+      context: ./opendesk-api
+      dockerfile: ./src/OpenDesk.API/API.Dockerfile
+      args:
+        - CONFIGURATION=Debug
+    expose: 
+      - "80"
+    restart: "no"
+    environment:
+      ConnectionStrings__DB: "host=postgres;port=5432;database=opendesk;username=opendesk;password=opendesk"
+      ASPNETCORE_ENVIRONMENT: Development
+
+  postgres:
+    image: postgres:14
+    restart: always
+    volumes:
+    - opendesk_postgres:/var/lib/postgresql/data
+    - ./database:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: "opendesk"
+      POSTGRES_PASSWORD: "opendesk"
+      POSTGRES_DB: "opendesk"
+    # Log all queries
+    # command: ["postgres", "-c", "log_statement=all"]
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  opendesk_postgres:

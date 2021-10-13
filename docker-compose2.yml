@@ -4,23 +4,12 @@ services:
   client:
     container_name: opendesk_client
     image: opendesk-client:demo
-    build:
-      context: ./opendesk-client
-      dockerfile: Client.Dockerfile
-      args:
-        - API_URL=https://opendesk.iameric.net
-        - ENABLE_DEMO_MODE=true
     expose:
       - "80"
 
   api:
     container_name: opendesk_api
     image: opendesk-api
-    build:
-      context: ./opendesk-api
-      dockerfile: ./src/OpenDesk.API/API.Dockerfile
-      args:
-        - CONFIGURATION=Release
     expose:
       - "80"
     restart: always
