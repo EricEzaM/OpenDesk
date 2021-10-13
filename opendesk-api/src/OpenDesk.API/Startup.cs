@@ -125,7 +125,7 @@ namespace OpenDesk.API
 			app.UseStaticFiles(new StaticFileOptions()
 			{
 				FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "static", "blobs")),
-				RequestPath = "/static/blobs"
+				RequestPath = "/api/static/blobs"
 			});
 
 			app.UseRouting();

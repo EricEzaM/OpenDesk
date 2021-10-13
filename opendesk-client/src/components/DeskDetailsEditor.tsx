@@ -232,7 +232,11 @@ export default function OfficeDetailsEditor({
 								switch desk selection.
 							</Typography>
 							<OfficeMapMovableDesks
-								image={office.image.uri}
+								image={
+									office.image.uri.startsWith("/")
+										? process.env.REACT_APP_API_URL + office.image.uri
+										: office.image.uri
+								}
 								desks={desksWithNewPositions}
 								selectedDesk={desk ?? creatingDesk}
 								onDeskSelected={(deskId) => onNewDeskSelected(deskId)}

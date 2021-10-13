@@ -27,7 +27,7 @@ namespace OpenDesk.Application.Persistence
 
 			await stream.WriteAsync(bytes, cancellationToken);
 
-			return $"https://localhost:5001/static/blobs/{file}";
+			return $"/api/static/blobs/{file}";
 		}
 	}
 }
