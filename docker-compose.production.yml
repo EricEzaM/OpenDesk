@@ -4,6 +4,7 @@ services:
   client:
     container_name: opendesk_client
     image: opendesk-client:demo
+    restart: always
     expose:
       - "80"
 
@@ -14,8 +15,12 @@ services:
       - "80"
     restart: always
     environment:
-      ConnectionStrings__DB: "host=postgres;port=5432;database=opendesk;username=opendesk;password=opendesk"
       ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DB: "host=postgres;port=5432;database=opendesk;username=opendesk;password=opendesk"
+      Application__IsDemo: true
+      Application__SuperAdminEmail: ""
+      Authentication__External__Microsoft__ClientId: ""
+      Authentication__External__Microsoft__TenantId: ""
     depends_on:
       - postgres
 
@@ -32,12 +37,6 @@ services:
       POSTGRES_DB: "opendesk"
     # Log all queries
     # command: ["postgres", "-c", "log_statement=all"]
-
-  # adminer:
-  #   image: adminer:latest
-  #   restart: always
-  #   ports:
-  #     - "8080:8080"
 
 volumes:
   opendesk_postgres:
