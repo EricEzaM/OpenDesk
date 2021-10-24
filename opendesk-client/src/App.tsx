@@ -14,6 +14,7 @@ import { OfficesProvider } from "hooks/useOffices";
 import { PageTitleProvider } from "hooks/usePageTitle";
 import { managementPermissions } from "utils/permissions";
 import React, { JSXElementConstructor, ReactNode } from "react";
+import SEO from "components/SEO";
 
 function CombineProviders({
 	providers,
@@ -47,6 +48,7 @@ function App() {
 	return (
 		<Router>
 			<CombineProviders providers={providers}>
+				<SEO />
 				<Nav />
 
 				<div style={{ margin: "20px" }}>
