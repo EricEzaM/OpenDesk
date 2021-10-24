@@ -17,7 +17,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DB: "host=postgres;port=5432;database=opendesk;username=opendesk;password=opendesk"
-      Application__IsDemo: true
+      Application__IsDemo: "true"
       Application__SuperAdminEmail: ""
       Authentication__External__Microsoft__ClientId: ""
       Authentication__External__Microsoft__TenantId: ""
