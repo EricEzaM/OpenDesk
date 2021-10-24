@@ -19,7 +19,6 @@ services:
         - ENABLE_DEMO_MODE=true
     ports:
       - 3000:80
-    command: npm start
 
   opendesk-api:
     depends_on: 
@@ -38,11 +37,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
 
   postgres:
-    image: postgres:14
+    build:
+      context: ./database
+      dockerfile: ./Db.Dockerfile
     restart: always
     volumes:
     - opendesk_postgres:/var/lib/postgresql/data
-    - ./database:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: "opendesk"
       POSTGRES_PASSWORD: "opendesk"
