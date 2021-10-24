@@ -1,0 +1,1 @@
+openssl req -x509 -nodes -days 1024 -newkey rsa:2048 -keyout localhost.key -out localhost.crt -config localhost.conf
